@@ -1,20 +1,20 @@
 {
   "config_hash": "ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35",
-  "world_digest": "c020e2aa2c66731aa8e537bf7a13fc3babe7f1e4b22d32e4fb593af605577ca9",
+  "world_digest": "c25e00a5983d883a3de8a4ec7206b3e27cec1bf65718a637d1441a13cb8ffe1f",
   "total_cases": 182,
   "headline_interaction_only_cases": 0,
-  "f1_alone_cases": 26,
-  "f2_alone_cases": 24,
-  "neither_stressed_cases": 132,
+  "f1_alone_cases": 104,
+  "f2_alone_cases": 48,
+  "neither_stressed_cases": 30,
   "policy_c_vs_a": {
-    "wins": 50,
-    "ties": 132,
+    "wins": 103,
+    "ties": 79,
     "losses": 0
   },
   "policy_c_vs_b": {
-    "wins": 50,
-    "ties": 132,
-    "losses": 0
+    "wins": 43,
+    "ties": 127,
+    "losses": 12
   },
-  "runtime_seconds": 65.69564819335938
+  "runtime_seconds": 253.36976146697998
 }
