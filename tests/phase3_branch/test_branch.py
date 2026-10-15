@@ -79,8 +79,9 @@ def test_br_02_paired_arc_deletion(setup_world):
 
 def test_br_03_cascade_order_and_ledger(setup_world):
     """BR-03: Ledger rows exist for road arcs, carried alert arcs, carried feeders and unpowered towers with reason codes."""
+    import uuid
     client, orchestrator = setup_world
-    run_id = "test_br03"
+    run_id = f"test_br03_{uuid.uuid4().hex[:6]}"
     # Choose a corridor known to carry infrastructure: road_ring_kashmere_monastery carries pf_yamuna_north / tow_kashmere
     corridor = "road_ring_kashmere_monastery"
 
