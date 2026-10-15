@@ -199,8 +199,8 @@ def test_br_08_branch_mode_and_scratch_invariance(setup_world):
 
     # Test clone-modify-destroy cycle produces no residue
     with orchestrator.branch_context("test_br08", "scratch_cycle") as (bname, bgraph):
-        orchestrator.apply_cascade(bname, "road_red_fort_shanti_van", is_f1=True)
-        orchestrator.apply_cascade(bname, "road_delhi_gate_to_rajghat", is_f1=False)
+        orchestrator.apply_cascade(bname, "road_ring_redfort_delhigate", is_f1=True)
+        orchestrator.apply_cascade(bname, "road_delhigate_connector", is_f1=False)
 
     final_digest, _, _ = compute_graph_digest(base_graph)
     assert final_digest == initial_digest
