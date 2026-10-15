@@ -191,13 +191,16 @@ class SharedEvaluator:
         # 3. Fetch critical facilities
         # Section 10.3: wtp_wazirabad excluded from SLA metrics
         fac_res = graph.query(
-            "MATCH (f:Facility {is_critical_endpoint: true})-[a:ACCESS_VIA]->(i:Intersection) "
+            "MATCH (f:Facility {is_critical_endpoint: true}) "
             "WHERE f.id <> 'wtp_wazirabad' "
+            "OPTIONAL MATCH (f)-[a:ACCESS_VIA]->(i:Intersection) "
             "RETURN f.id, f.name, f.access_offset_km, i.id"
         )
         critical_facilities = []
         for row in fac_res.result_set:
-            f_id, f_name, offset_km, f_int = row[0], row[1], float(row[2]), row[3]
+            f_id, f_name = row[0], row[1]
+            offset_km = float(row[2]) if row[2] is not None else 0.0
+            f_int = row[3]
             critical_facilities.append({"id": f_id, "name": f_name, "offset_km": offset_km, "int_id": f_int})
 
         # Evaluate Road Access
@@ -220,33 +223,34 @@ class SharedEvaluator:
             best_route: List[str] = []
             depot_breakdown = {}
 
-            for d in depots:
-                d_id = d["id"]
-                d_int = d["int_id"]
-                d_delay = d["delay_min"]
+            if f_int is not None and depots:
+                for d in depots:
+                    d_id = d["id"]
+                    d_int = d["int_id"]
+                    d_delay = d["delay_min"]
 
-                road_time, road_dist, route = self._dijkstra(road_adj, d_int, f_int)
-                if road_time is not None:
-                    total_time = d_delay + road_time + offset_time_min
-                    depot_breakdown[d_id] = {
-                        "road_time_min": road_time,
-                        "road_dist_km": road_dist,
-                        "dispatch_delay_min": d_delay,
-                        "offset_time_min": offset_time_min,
-                        "total_time_min": total_time,
-                        "route": route
-                    }
-                    if best_total_time is None or total_time < best_total_time:
-                        best_total_time = total_time
-                        best_depot_id = d_id
-                        best_road_time = road_time
-                        best_road_dist = road_dist
-                        best_route = route
-                else:
-                    depot_breakdown[d_id] = {
-                        "unreachable": True,
-                        "dispatch_delay_min": d_delay
-                    }
+                    road_time, road_dist, route = self._dijkstra(road_adj, d_int, f_int)
+                    if road_time is not None:
+                        total_time = d_delay + road_time + offset_time_min
+                        depot_breakdown[d_id] = {
+                            "road_time_min": road_time,
+                            "road_dist_km": road_dist,
+                            "dispatch_delay_min": d_delay,
+                            "offset_time_min": offset_time_min,
+                            "total_time_min": total_time,
+                            "route": route
+                        }
+                        if best_total_time is None or total_time < best_total_time:
+                            best_total_time = total_time
+                            best_depot_id = d_id
+                            best_road_time = road_time
+                            best_road_dist = road_dist
+                            best_route = route
+                    else:
+                        depot_breakdown[d_id] = {
+                            "unreachable": True,
+                            "dispatch_delay_min": d_delay
+                        }
 
             is_unreachable = best_total_time is None
             if is_unreachable:
