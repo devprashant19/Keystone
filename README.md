@@ -95,20 +95,33 @@ Jaal maintains three distinct graph namespaces in FalkorDB:
 
 ## 5. Production Cypher Queries
 
-### Q1 — Shortest Path Access SLA Check
+### Q1 — Road topology fetch, then application-side Dijkstra (what the product actually depends on)
+
+The access metric is computed by Dijkstra **in the service layer, over `ROAD_ARC` rows
+read from the evaluated branch graph**. The query the product depends on is this one:
+
 ```cypher
-CALL algo.SPpaths({
-  sourceNode: $depot_node,
-  targetNode: $facility_intersection,
-  relTypes: ['ROAD_ARC'],
-  weightProp: 'travel_cost_min',
-  maxLen: 13,
-  relDirection: 'outgoing',
-  pathCount: 1
-})
-YIELD path, pathWeight
-RETURN pathWeight AS travel_min, [n IN nodes(path) | n.id] AS route
+MATCH (a:Intersection)-[r:ROAD_ARC]->(b:Intersection)
+RETURN a.id, b.id, r.travel_cost_min, r.length_km
 ```
+
+Per-depot minima are taken in application code, because the documented shortest-path
+procedures accept one source and one target and no multi-source form was found.
+
+`algo.SPpaths` **is** available on the pinned image and returns the same weights — it is
+used as an independent cross-check in `tests/phase4_evaluator/test_graph_queries.py::test_gr_04_dijkstra_agrees_with_native_sppaths`,
+not as the production path:
+
+```cypher
+MATCH (a:Intersection {id: $s}), (b:Intersection {id: $t})
+CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['ROAD_ARC'],
+                   weightProp: 'travel_cost_min', pathCount: 1})
+YIELD pathWeight RETURN pathWeight
+```
+
+`algo.AStar` is **absent** on this image (`Unknown function 'algo.AStar'`) and nothing
+depends on it. `algo.WCC` is available but is deliberately **not** used as a reachability
+proof, because it ignores edge direction.
 
 ### Q2 — Cross-Layer Tower Power Dependency
 ```cypher
@@ -152,6 +165,30 @@ All 182 scenario pairs ($14 \times 13$) are decomposed before policy evaluation:
 
 ## 7. Primary Policy Results
 
+> **Read this before the numbers.** Two findings here are negative and are reported
+> because they are true, not because they help.
+>
+> **1. Zero interaction-only cases at the frozen threshold.** Of 182 ordered `(f1,f2)`
+> cases, 104 are explained by the first failure alone, 48 by the second failure alone,
+> and 30 are unstressed. **None** require both failures together. Since the
+> interaction-only region is the only place where conditioning on a second failure can
+> change the decision, this fixture **does not demonstrate a pre-mortem advantage at the
+> frozen 6.8 km allowance**. The full sweep (section 3) shows interaction cases do exist
+> in this world at looser allowances (12 cases at 8.0 km, 8 at 9-12 km), so the method is
+> demonstrable here — just not at the preregistered threshold. Changing the threshold
+> after seeing that would be tuning, so the frozen value stands and this result is
+> published as-is.
+>
+> **2. Policy C loses to Policy B in aggregate.** C records 12 losses against B and a
+> higher total breach count (487 vs 446). C optimises lexicographically for robustness
+> across *every* evaluated second failure, which can select a conservative action that is
+> worse on average than B's static degree-centrality choice. That is a genuine
+> robust-versus-average trade-off, not a rounding artifact, and it is unresolved.
+>
+> Policy C's 103 wins against the no-action baseline show only that acting beats not
+> acting — they are not evidence that the pre-mortem conditioning helped.
+
+
 All policies are evaluated using **one identical shared evaluator** (`SharedEvaluator`):
 
 | Policy | Description | Wins vs A | Ties vs A | Losses vs A | Wins vs B | Ties vs B | Losses vs B |
@@ -167,7 +204,7 @@ Policy C achieves **zero losses** across all 182 cases.
 ## 8. Ablation Studies (Rule 3 Substantive Evidence)
 
 - **AB-01: Database Unavailable**: Verified that when FalkorDB is stopped, the API returns a structured `503 Service Unavailable` with `{"error": "DATABASE_UNAVAILABLE"}` and **zero numeric metrics** in the response.
-- **AB-02: Relation Context Removed (Graph Necessity)**: Stripping all edge relationships while retaining entity nodes causes the evaluator to cleanly **abstain**, proving graph topology is necessary for decision-making.
+- **AB-02: Relation Context Removed (Graph Necessity)**: with entity nodes retained but all relationships stripped, the evaluator returns `abstained = true`, reason `NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS`, and emits **no** breach verdicts. "Cannot evaluate" and "is breached" are different claims; conflating them would make this ablation worthless as evidence. Verified by `tests/phase8_benchmark/test_benchmark.py::test_ab_02_relation_context_removed`.
 - **AB-03: Independent Recomputation Cross-Check**: A standalone Python Dijkstra implementation reproduces travel times within 0.001 min of FalkorDB query results.
 
 ---

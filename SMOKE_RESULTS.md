@@ -12,7 +12,7 @@
 | Decision Area | Smoke Evidence | Decision Made |
 | :--- | :--- | :--- |
 | **Engine Image Tag & Digest** | Resolved via `docker inspect` | **`falkordb/falkordb:6.0.2`**<br>`sha256:107455e862a824e45e8e9f5a7fbfdf5e00a08b14e13eae2577c72fd9e3f59ba6` |
-| **Route Metric Method (SM-04)** | `CALL algo.SPpaths` procedure inventory | **Application-side Dijkstra over `ROAD_ARC` rows**. (C-procedure returned `Unknown procedure: algo.SPpaths` on this container build; fallback activated cleanly). |
+| **Route Metric Method (SM-04)** | `CALL algo.SPpaths` procedure inventory | **Application-side Dijkstra over `ROAD_ARC` rows read from the branch graph.** NOTE (corrected 2026-10-14): `algo.SPpaths` is in fact AVAILABLE on this image — see the procedure table below and the live re-probe in section 2a. The earlier summary line here claimed it was absent, which contradicted this file's own inventory table. Dijkstra remains the implemented path and is now cross-checked against `algo.SPpaths` by test GR-04. |
 | **Policy B Heuristic (SM-04)** | Betweenness procedure inventory | **Degree Centrality** over `ROAD_ARC` connectivity (betweenness procedures absent; degree centrality confirmed). |
 | **Branch Execution Mode (SM-07)** | 30-cycle latency gate measurement | **`CLONE_PER_CASE`**. P95 latency is **8.83 ms**, projecting **0.03 minutes** for all 182 cases (well under the 20-minute gate threshold). |
 | **World Immutability Guard (SM-08)** | SHA-256 canonical graph digest | **PASS (Digest Unchanged)**: `2c82d34f83551a506fa349e4bbba80e1e86c9844f0831482280490bb16887bd5`. |
@@ -47,10 +47,10 @@ Evaluated on 5-node directed test graph with weighted `ROAD_ARC` relationships:
 
 | Procedure Name | Status in Engine | Sample Output / Error Message | Operational Decision |
 | :--- | :---: | :--- | :--- |
-| `algo.bfs` | **ABSENT** | `Received 1 arguments to procedure 'algo.BFS', expected at least 3` | Use application-side algorithm fallback |
+| `algo.bfs` | **AVAILABLE** (corrected) | first probe used 1 argument and the engine replied `expected at least 3` — that is a WRONG-ARITY error, not absence. Re-probed as `algo.bfs(node, depth, 'ROAD_ARC')` -> returns 9 nodes | Available; not depended on |
 | `algo.SPpaths` | **AVAILABLE** | `[[<falkordb.path.Path object at 0x0000021294E07020>, 8]]` | **AVAILABLE in FalkorDB** (Can be used alongside or verified against application-side Dijkstra) |
-| `algo.SSpaths` | **ABSENT** | `Procedure `algo.SSpaths` does not yield output `node`` | Use application-side algorithm fallback |
-| `algo.WCC` | **ABSENT** | `Procedure `algo.WCC` does not yield output `component`` | Use application-side algorithm fallback |
+| `algo.SSpaths` | **PRESENT, wrong yield in probe** | `does not yield output 'node'` is a wrong-YIELD-NAME error, not absence; its documented yields are `path`/`pathWeight`/`pathCost` | Not depended on |
+| `algo.WCC` | **AVAILABLE** (corrected) | probe yielded `component`; correct yield is `componentId`. Re-probed -> 13 rows | Available, but NOT used as a directed-reachability proof: WCC ignores edge direction |
 | `algo.pageRank` | **AVAILABLE** | `[[<falkordb.node.Node object at 0x0000021294E07230>, 0.0829476937651634], [` | Available for topological ranking |
 | `algo.betweenness` | **AVAILABLE** | `[[<falkordb.node.Node object at 0x0000021294E071D0>, 0.0], [<falkordb.node.` | **Verified AVAILABLE** (Policy B can use native `algo.betweenness` or Degree Centrality) |
 | `algo.betweennessCentrality` | **ABSENT** | `Unknown function 'algo.betweennessCentrality'` | **Verified AVAILABLE** (Policy B can use native `algo.betweenness` or Degree Centrality) |
@@ -124,3 +124,25 @@ Executed 30 consecutive sequential `GRAPH.COPY` and `Graph.delete()` cycles on t
    FastAPI in-process Dijkstra traversing `ROAD_ARC` rows fetched directly from the isolated branch graph in FalkorDB.
 3. **Branch Architecture**:
    `CLONE_PER_CASE` using native `GRAPH.COPY` and `Graph.delete()` on ephemeral names.
+
+
+---
+
+## 2a. Live procedure re-probe (2026-10-14, corrective)
+
+The original SM-04 inventory recorded three procedures as ABSENT on the basis of error
+strings that were actually **wrong call signatures**. Re-probed against the same running
+image (`falkordb/falkordb:6.0.2`, digest `sha256:107455e8…`) with correct signatures:
+
+| Procedure | Result | Evidence |
+|---|---|---|
+| `algo.SPpaths` | **AVAILABLE** | `pathWeight = 14.5` for `int_delhi_gate` → `int_chandgiram`, `weightProp: 'travel_cost_min'` |
+| `algo.betweenness` | **AVAILABLE** | 13 rows for `nodeLabels: ['Intersection']` |
+| `algo.pageRank` | **AVAILABLE** | 13 rows for `algo.pageRank('Intersection','ROAD_ARC')` |
+| `algo.WCC` | **AVAILABLE** | 13 rows yielding `componentId` |
+| `algo.bfs` | **AVAILABLE** | 9 nodes from `algo.bfs(node, 3, 'ROAD_ARC')` |
+| `algo.AStar` | **ABSENT** | `Unknown function 'algo.AStar'` — matches the pre-decision not to depend on A* |
+
+**Lesson recorded:** an error message is not evidence of absence. A procedure-inventory
+probe must distinguish *unknown procedure* from *wrong arity* and *wrong yield name*,
+or it will under-report engine capability.
