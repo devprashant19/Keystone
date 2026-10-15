@@ -1,0 +1,32 @@
+{
+  "depots": [
+    {
+      "id": "depot_north",
+      "name": "North Emergency Depot",
+      "at_intersection": "int_civil_lines",
+      "dispatch_delay_min": 3.0,
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "depot_south",
+      "name": "South Emergency Depot",
+      "at_intersection": "int_delhi_gate",
+      "dispatch_delay_min": 3.0,
+      "data_origin": "synthetic"
+    }
+  ],
+  "responders": [
+    {
+      "id": "resp_north_1",
+      "kind": "ambulance",
+      "home_depot_id": "depot_north",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "resp_south_1",
+      "kind": "ambulance",
+      "home_depot_id": "depot_south",
+      "data_origin": "synthetic"
+    }
+  ]
+}

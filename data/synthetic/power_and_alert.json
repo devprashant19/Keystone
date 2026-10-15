@@ -1,0 +1,76 @@
+{
+  "power_feeders": [
+    {
+      "id": "pf_chandrawal",
+      "name": "Chandrawal Grid Feeder",
+      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "pf_kashmere",
+      "name": "Kashmere Gate Substation Feeder",
+      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "data_origin": "synthetic"
+    }
+  ],
+  "towers": [
+    {
+      "id": "tower_north_ridge",
+      "name": "North Ridge Telecom Tower",
+      "is_command_source": true,
+      "fed_by": ["pf_chandrawal"],
+      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_isbt",
+      "name": "ISBT Relay Tower",
+      "is_command_source": false,
+      "fed_by": ["pf_kashmere"],
+      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "data_origin": "synthetic"
+    }
+  ],
+  "relay_contacts": [
+    {
+      "id": "relay_civil_lines",
+      "name": "Civil Lines Relay Contact",
+      "is_required_target": true,
+      "covers_facility": "hosp_sushruta",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_delhi_gate",
+      "name": "Delhi Gate Relay Contact",
+      "is_required_target": true,
+      "covers_facility": "hosp_lnjp",
+      "data_origin": "synthetic"
+    }
+  ],
+  "alert_arcs": [
+    {
+      "link_id": "link_t1_t2",
+      "source": "tower_north_ridge",
+      "target": "tower_isbt",
+      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "latency_min": 1.2,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "link_t2_rc1",
+      "source": "tower_isbt",
+      "target": "relay_civil_lines",
+      "carrier_corridor_id": null,
+      "latency_min": 0.8,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "link_t2_rc2",
+      "source": "tower_isbt",
+      "target": "relay_delhi_gate",
+      "carrier_corridor_id": null,
+      "latency_min": 1.5,
+      "data_origin": "synthetic"
+    }
+  ]
+}
