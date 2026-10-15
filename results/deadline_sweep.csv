@@ -1,0 +1,10 @@
+allowance_km,access_deadline_min,is_frozen_default,sample_interaction_only,sample_f1_alone,sample_f2_alone
+4.0,13.0,False,0,13,0
+5.0,15.5,False,0,13,0
+6.0,18.0,False,0,13,0
+6.8,20.0,True,0,13,0
+7.0,20.5,False,0,13,0
+8.0,23.0,False,0,13,0
+9.0,25.5,False,0,13,0
+10.0,28.0,False,0,13,0
+12.0,33.0,False,0,13,0
