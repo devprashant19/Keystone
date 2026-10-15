@@ -138,3 +138,23 @@ ELAPSED: 0.69s
 RECOVERY APPLIED: —
 NEXT: PHASE 8
 
+
+## PHASE 8 — Phase 8 - Benchmark Sweep & Ablations
+STATUS: FAILED
+AT: 2026-10-14T01:06 IST
+RAN: pytest tests\phase8_benchmark -q
+OUTPUT: 1 failed, 5 passed, 1 warning in 2.47s
+ELAPSED: 3.21s
+RECOVERY APPLIED: —
+NEXT: RETRY_OR_RECOVERY
+
+
+## PHASE 8 — Phase 8 - Benchmark Sweep & Ablations
+STATUS: PASS
+AT: 2026-10-14T01:07 IST
+RAN: pytest tests\phase8_benchmark -q
+OUTPUT: 6 passed, 1 warning in 0.70s
+ELAPSED: 1.41s
+RECOVERY APPLIED: —
+NEXT: PHASE 9
+
