@@ -8,3 +8,4 @@ results/raw/
 .pytest_cache/
 *.timestamp-*.mjs
 web/dist/
+web/test-results/
