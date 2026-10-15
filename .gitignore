@@ -6,3 +6,5 @@ node_modules/
 dist/
 results/raw/
 .pytest_cache/
+*.timestamp-*.mjs
+web/dist/
