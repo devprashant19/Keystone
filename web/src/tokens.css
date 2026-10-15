@@ -1,0 +1,33 @@
+/* 07_UI_UX_MOTION_SPEC.md Design Tokens */
+:root {
+  --bg: #0A0E14;
+  --panel: #111720;
+  --panel-2: #161E29;
+  --line: #243040;
+  --text: #E8EDF4;
+  --text-2: #9BA9BC;
+  --text-3: #6B7A8F;
+  --accent: #4FB3FF;
+  --branch: #B07CFF;
+  --ok: #3FBF8F;
+  --warn: #E0A33E;
+  --fail: #E5544B;
+  --synthetic: #7C8CA3;
+
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --transition-sever: 240ms cubic-bezier(0, 0, 0.2, 1);
+  --transition-branch: 300ms cubic-bezier(0, 0, 0.2, 1);
+  --transition-route: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root, html[data-reduced-motion="true"] {
+    --transition-sever: 0ms !important;
+    --transition-branch: 0ms !important;
+    --transition-route: 0ms !important;
+  }
+}
