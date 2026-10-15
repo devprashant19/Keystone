@@ -69,6 +69,6 @@ def compute_graph_digest(graph) -> Tuple[str, int, int]:
         dst = row[3]
         edge_data.append(f"EDGE:{rel_type}:{src}->{dst}:{sorted_props}")
 
-    canonical_repr = "\n".join(node_data + edge_data).encode("utf-8")
+    canonical_repr = "\n".join(sorted(node_data) + sorted(edge_data)).encode("utf-8")
     digest = hashlib.sha256(canonical_repr).hexdigest()
     return digest, len(node_data), len(edge_data)
