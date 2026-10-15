@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { StatusBadge } from '../components/primitives';
 
 interface EvidenceViewProps {
   caseId: string;
@@ -32,15 +33,15 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
   return (
     <div
       style={{
-        height: 'calc(100vh - 48px)',
-        backgroundColor: 'var(--bg)',
-        color: 'var(--text)',
-        padding: '24px 32px',
+        height: 'calc(100vh - var(--h-header))',
+        backgroundColor: 'var(--bg-void)',
+        color: 'var(--ink-hi)',
+        padding: 'var(--s5) var(--s6)',
         overflowY: 'auto',
       }}
     >
       {/* Top Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--s4)' }}>
         <div>
           <button
             onClick={onBack}
@@ -49,69 +50,67 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
               border: 'none',
               color: 'var(--accent)',
               cursor: 'pointer',
-              fontSize: '12px',
+              fontSize: 'var(--fs-cap)',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              marginBottom: '6px',
+              gap: 'var(--s1)',
+              marginBottom: 'var(--s2)',
             }}
           >
             ◀ Back to Command Deck
           </button>
-          <h1 style={{ fontSize: '18px', fontWeight: 700 }}>
+          <h1 style={{ fontSize: 'var(--fs-h3)', fontWeight: 700, margin: 0 }}>
             Case Evidence: <span className="mono" style={{ color: 'var(--accent)' }}>{caseId.replace('__', ' ➔ ')}</span>
           </h1>
         </div>
 
         {data && (
-          <div className="mono" style={{ fontSize: '12px', color: 'var(--text-3)' }}>
-            BRANCH GRAPH: <span className="badge badge-branch">{data.branch_name}</span>
+          <div className="mono" style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-lo)' }}>
+            BRANCH GRAPH: <StatusBadge status="BRANCH" label={data.branch_name} />
           </div>
         )}
       </div>
 
-      {loading && <div style={{ color: 'var(--text-3)' }}>Loading evidence from FalkorDB branch…</div>}
-      {error && <div style={{ color: 'var(--fail)' }}>Error: {error}</div>}
+      {loading && <div style={{ color: 'var(--ink-lo)', fontSize: 'var(--fs-cap)' }}>Loading evidence from FalkorDB branch…</div>}
+      {error && <div style={{ color: 'var(--fail)', fontSize: 'var(--fs-cap)' }}>Error: {error}</div>}
 
       {data && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s4)' }}>
           {/* Left Column: Mutation Ledger */}
           <div
             style={{
-              backgroundColor: 'var(--panel)',
-              border: '1px solid var(--line)',
-              borderRadius: '6px',
-              padding: '16px',
+              backgroundColor: 'var(--bg-panel)',
+              border: '1px solid var(--line-hair)',
+              borderRadius: 'var(--r-panel)',
+              padding: 'var(--s4)',
             }}
           >
-            <h2 style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: 'var(--fs-cap)', textTransform: 'uppercase', color: 'var(--ink-lo)', marginBottom: 'var(--s3)', margin: 0 }}>
               Staged Mutation Ledger ({data.mutation_ledger.length} events)
             </h2>
-            <p style={{ fontSize: '11px', color: 'var(--text-2)', marginBottom: '12px' }}>
+            <p style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s3)' }}>
               Written to <code className="mono">jaal_memory</code> before physical deletion to preserve cause attribution.
             </p>
 
-            <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ color: 'var(--text-3)', borderBottom: '1px solid var(--line)', textAlign: 'left' }}>
-                  <th style={{ padding: '6px 4px' }}>Entity</th>
-                  <th style={{ padding: '6px 4px' }}>Reason Code</th>
-                  <th style={{ padding: '6px 4px' }}>Timestamp</th>
+                <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
+                  <th style={{ padding: 'var(--s2) var(--s1)' }}>Entity</th>
+                  <th style={{ padding: 'var(--s2) var(--s1)' }}>Reason Code</th>
+                  <th style={{ padding: 'var(--s2) var(--s1)' }}>Timestamp</th>
                 </tr>
               </thead>
               <tbody>
                 {data.mutation_ledger.map((item: any) => (
-                  <tr key={item.mutation_id} style={{ borderBottom: '1px solid rgba(36,48,64,0.4)' }}>
-                    <td className="mono" style={{ padding: '6px 4px', color: 'var(--text)' }}>
+                  <tr key={item.mutation_id} style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                    <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-hi)' }}>
                       {item.entity_id}
                     </td>
-                    <td style={{ padding: '6px 4px' }}>
-                      <span className="badge badge-fail" style={{ fontSize: '10px' }}>
-                        {item.reason_code}
-                      </span>
+                    <td style={{ padding: 'var(--s2) var(--s1)' }}>
+                      <StatusBadge status="SEVERED" label={item.reason_code} />
                     </td>
-                    <td className="mono" style={{ padding: '6px 4px', color: 'var(--text-3)' }}>
+                    <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-lo)' }}>
                       {item.at.slice(11, 19)}
                     </td>
                   </tr>
@@ -121,20 +120,20 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
           </div>
 
           {/* Right Column: Road Access Arithmetic & Alert Hop Chains */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s4)' }}>
             {/* 1. Road Access Arithmetic */}
             <div
               style={{
-                backgroundColor: 'var(--panel)',
-                border: '1px solid var(--line)',
-                borderRadius: '6px',
-                padding: '16px',
+                backgroundColor: 'var(--bg-panel)',
+                border: '1px solid var(--line-hair)',
+                borderRadius: 'var(--r-panel)',
+                padding: 'var(--s4)',
               }}
             >
-              <h2 style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '12px' }}>
+              <h2 style={{ fontSize: 'var(--fs-cap)', textTransform: 'uppercase', color: 'var(--ink-lo)', marginBottom: 'var(--s3)', margin: 0 }}>
                 Component Travel Arithmetic (UI-09 Check)
               </h2>
-              <div style={{ fontSize: '11px', color: 'var(--text-2)', marginBottom: '10px' }}>
+              <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s3)' }}>
                 Assumed speed: <strong className="mono">24.0 km/h</strong> • Access Deadline: <strong className="mono">20.0 min</strong>
               </div>
 
@@ -142,32 +141,30 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
                 <div
                   key={fid}
                   style={{
-                    backgroundColor: 'var(--panel-2)',
-                    padding: '10px',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    border: '1px solid var(--line)',
+                    backgroundColor: 'var(--bg-raised)',
+                    padding: 'var(--s3)',
+                    borderRadius: 'var(--r-ctl)',
+                    marginBottom: 'var(--s2)',
+                    border: '1px solid var(--line-hair)',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <strong>{metric.name}</strong>
-                    <span className={`badge ${metric.is_breach ? 'badge-fail' : metric.is_degraded ? 'badge-warn' : 'badge-ok'}`}>
-                      {metric.is_breach ? 'BREACH' : metric.is_degraded ? 'DEGRADED' : 'OK'}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s1)' }}>
+                    <strong style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)' }}>{metric.name}</strong>
+                    <StatusBadge status={metric.is_breach ? 'BREACH' : metric.is_degraded ? 'DEGRADED' : 'OK'} />
                   </div>
 
                   {metric.unreachable ? (
-                    <div style={{ color: 'var(--fail)', fontSize: '11px' }}>UNREACHABLE — No surviving road path from any depot</div>
+                    <div style={{ color: 'var(--fail)', fontSize: 'var(--fs-micro)' }}>UNREACHABLE — No surviving road path from any depot</div>
                   ) : (
-                    <div className="mono" style={{ fontSize: '11px', color: 'var(--text-2)' }}>
+                    <div className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
                       <div>Best Depot: <span style={{ color: 'var(--accent)' }}>{metric.best_depot}</span></div>
                       <div>
                         Equation: Dispatch ({metric.depot_breakdown[metric.best_depot]?.dispatch_delay_min.toFixed(1)}m) + Road ({metric.road_time_min?.toFixed(1)}m, {metric.road_dist_km?.toFixed(1)}km) + Offset ({((metric.offset_km / 24.0) * 60).toFixed(1)}m)
                       </div>
-                      <div style={{ color: 'var(--text)', fontWeight: 600, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--ink-hi)', fontWeight: 600, marginTop: '2px' }}>
                         = Total Response Time: {metric.total_time_min?.toFixed(1)} min
                       </div>
-                      <div style={{ marginTop: '4px', color: 'var(--text-3)' }}>
+                      <div style={{ marginTop: 'var(--s1)', color: 'var(--ink-lo)' }}>
                         Route: {metric.route?.join(' ➔ ')}
                       </div>
                     </div>
@@ -179,16 +176,16 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
             {/* 2. Alert Chain Evidence */}
             <div
               style={{
-                backgroundColor: 'var(--panel)',
-                border: '1px solid var(--line)',
-                borderRadius: '6px',
-                padding: '16px',
+                backgroundColor: 'var(--bg-panel)',
+                border: '1px solid var(--line-hair)',
+                borderRadius: 'var(--r-panel)',
+                padding: 'var(--s4)',
               }}
             >
-              <h2 style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '12px' }}>
+              <h2 style={{ fontSize: 'var(--fs-cap)', textTransform: 'uppercase', color: 'var(--ink-lo)', marginBottom: 'var(--s3)', margin: 0 }}>
                 Alert Network Backhaul & Hops (EV-06 Check)
               </h2>
-              <div style={{ fontSize: '11px', color: 'var(--text-2)', marginBottom: '10px' }}>
+              <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s3)' }}>
                 Max Hops Bound: <strong className="mono">12</strong> • Delivery Deadline: <strong className="mono">8.0 min</strong>
               </div>
 
@@ -196,27 +193,25 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
                 <div
                   key={rid}
                   style={{
-                    backgroundColor: 'var(--panel-2)',
-                    padding: '10px',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    border: '1px solid var(--line)',
+                    backgroundColor: 'var(--bg-raised)',
+                    padding: 'var(--s3)',
+                    borderRadius: 'var(--r-ctl)',
+                    marginBottom: 'var(--s2)',
+                    border: '1px solid var(--line-hair)',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <strong>Relay Target: <span className="mono">{rid}</span></strong>
-                    <span className={`badge ${alert.is_breach ? 'badge-fail' : 'badge-ok'}`}>
-                      {alert.is_breach ? 'ALERT BREACH' : 'DELIVERED'}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s1)' }}>
+                    <strong style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)' }}>Relay Target: <span className="mono">{rid}</span></strong>
+                    <StatusBadge status={alert.is_breach ? 'BREACH' : 'OK'} label={alert.is_breach ? 'ALERT BREACH' : 'DELIVERED'} />
                   </div>
 
                   {alert.unreachable ? (
-                    <div style={{ color: 'var(--fail)', fontSize: '11px' }}>ALERT BACKHAUL SEVERED — No surviving alert arc route</div>
+                    <div style={{ color: 'var(--fail)', fontSize: 'var(--fs-micro)' }}>ALERT BACKHAUL SEVERED — No surviving alert arc route</div>
                   ) : (
-                    <div className="mono" style={{ fontSize: '11px', color: 'var(--text-2)' }}>
+                    <div className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
                       <div>Source Tower: {alert.source_tower}</div>
                       <div>Path: {alert.path?.join(' ➔ ')}</div>
-                      <div style={{ color: 'var(--text)', fontWeight: 600, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--ink-hi)', fontWeight: 600, marginTop: '2px' }}>
                         Latency: {alert.latency_min?.toFixed(1)} min ({alert.hops} hops)
                       </div>
                     </div>

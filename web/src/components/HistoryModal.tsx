@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBadge } from './primitives';
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -25,8 +26,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(10, 14, 20, 0.85)',
-        backdropFilter: 'blur(2px)',
+        backgroundColor: 'var(--overlay-bg)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -40,67 +40,67 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
         style={{
           width: '540px',
           maxHeight: '480px',
-          backgroundColor: 'var(--panel)',
-          border: '1px solid var(--line)',
-          borderRadius: '6px',
-          padding: '24px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          backgroundColor: 'var(--bg-panel)',
+          border: '1px solid var(--line-hair)',
+          borderRadius: 'var(--r-panel)',
+          padding: 'var(--s5)',
+          boxShadow: 'var(--elevation-sticky)',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h2 id="history-title" style={{ fontSize: '15px', color: 'var(--text)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)' }}>
+          <h2 id="history-title" style={{ fontSize: 'var(--fs-ui)', color: 'var(--ink-hi)', margin: 0 }}>
             Run History (Auditable Graph Memory)
           </h2>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: '14px' }}
+            style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer', fontSize: 'var(--fs-ui)' }}
+            aria-label="Close history modal"
           >
             ✕
           </button>
         </div>
 
-        <p style={{ fontSize: '12px', color: 'var(--text-2)', marginBottom: '16px', lineHeight: 1.45 }}>
+        <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', marginBottom: 'var(--s4)', lineHeight: 'var(--lh-data)' }}>
           Past evaluation runs loaded from graph memory. Click a run to inspect its counterfactual branches and verdicts in read-only mode.
         </p>
 
-        <div style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--line)', borderRadius: '4px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-ctl)' }}>
           {pastRuns.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-3)', fontSize: '12px' }}>
+            <div style={{ padding: 'var(--s5)', textAlign: 'center', color: 'var(--ink-lo)', fontSize: 'var(--fs-cap)' }}>
               No previous runs recorded in this session.
             </div>
           ) : (
-            <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', fontSize: 'var(--fs-cap)', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ color: 'var(--text-3)', borderBottom: '1px solid var(--line)', textAlign: 'left', backgroundColor: 'var(--panel-2)' }}>
-                  <th style={{ padding: '8px 12px' }}>Run ID</th>
-                  <th style={{ padding: '8px 12px' }}>f1 Failure</th>
-                  <th style={{ padding: '8px 12px' }}>Outcome</th>
-                  <th style={{ padding: '8px 12px', textAlign: 'right' }}>Action</th>
+                <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
+                  <th style={{ padding: 'var(--s2) var(--s3)' }}>Run ID</th>
+                  <th style={{ padding: 'var(--s2) var(--s3)' }}>f1 Failure</th>
+                  <th style={{ padding: 'var(--s2) var(--s3)' }}>Outcome</th>
+                  <th style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {pastRuns.map((r) => (
-                  <tr key={r.run_id} style={{ borderBottom: '1px solid rgba(36,48,64,0.4)' }}>
-                    <td className="mono" style={{ padding: '8px 12px' }}>{r.run_id}</td>
-                    <td style={{ padding: '8px 12px' }}>{r.f1_corridor_id.replace('road_', '')}</td>
-                    <td style={{ padding: '8px 12px' }}>
-                      <span className={`badge ${r.verdict.includes('ABSTAIN') ? 'badge-fail' : 'badge-ok'}`}>
-                        {r.verdict}
-                      </span>
+                  <tr key={r.run_id} style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                    <td className="mono" style={{ padding: 'var(--s2) var(--s3)', color: 'var(--ink-hi)' }}>{r.run_id}</td>
+                    <td style={{ padding: 'var(--s2) var(--s3)', color: 'var(--ink-mid)' }}>{r.f1_corridor_id.replace('road_', '')}</td>
+                    <td style={{ padding: 'var(--s2) var(--s3)' }}>
+                      <StatusBadge status={r.verdict.includes('ABSTAIN') ? 'BREACH' : 'OK'} label={r.verdict} />
                     </td>
-                    <td style={{ padding: '8px 12px', textAlign: 'right' }}>
+                    <td style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right' }}>
                       <button
                         onClick={() => { onSelectRun(r.run_id); onClose(); }}
                         style={{
-                          padding: '3px 8px',
-                          backgroundColor: 'var(--panel-2)',
-                          border: '1px solid var(--accent)',
+                          padding: '2px var(--s2)',
+                          backgroundColor: 'var(--bg-raised)',
+                          border: '1px solid var(--accent-edge)',
                           color: 'var(--accent)',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r-chip)',
                           cursor: 'pointer',
-                          fontSize: '11px',
+                          fontSize: 'var(--fs-micro)',
+                          fontFamily: 'var(--font-mono)'
                         }}
                       >
                         Open

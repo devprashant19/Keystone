@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { StatusBadge, Chip } from './primitives';
 
 export interface Corridor {
   id: string;
@@ -70,27 +71,28 @@ export const LeftRail: React.FC<LeftRailProps> = ({
   return (
     <aside
       style={{
-        width: '320px',
-        backgroundColor: 'var(--panel)',
-        borderRight: '1px solid var(--line)',
+        width: 'var(--w-rail-l)',
+        backgroundColor: 'var(--bg-panel)',
+        borderRight: '1px solid var(--line-hair)',
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 48px - 56px)',
+        height: 'calc(100vh - var(--h-header) - var(--h-framebar))',
         overflow: 'hidden',
       }}
       role="region"
       aria-label="Observed Failure and Scenario Sweep"
     >
       {/* 1. Observed failure selector */}
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--line)' }}>
+      <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
         <label
           style={{
             display: 'block',
-            fontSize: '11px',
+            fontSize: 'var(--fs-micro)',
             textTransform: 'uppercase',
-            color: 'var(--text-3)',
+            color: 'var(--ink-lo)',
             fontWeight: 600,
-            marginBottom: '8px',
+            marginBottom: 'var(--s2)',
+            letterSpacing: '0.04em'
           }}
         >
           Observed Failure (f1)
@@ -101,13 +103,13 @@ export const LeftRail: React.FC<LeftRailProps> = ({
           disabled={isLoading || isDbDown}
           style={{
             width: '100%',
-            backgroundColor: 'var(--panel-2)',
-            border: '1px solid var(--line)',
-            color: 'var(--text)',
-            padding: '8px 10px',
-            borderRadius: '4px',
-            fontSize: '13px',
-            marginBottom: '12px',
+            backgroundColor: 'var(--bg-sunken)',
+            border: '1px solid var(--line-hair)',
+            color: 'var(--ink-hi)',
+            padding: 'var(--s2) var(--s3)',
+            borderRadius: 'var(--r-ctl)',
+            fontSize: 'var(--fs-body)',
+            marginBottom: 'var(--s3)',
           }}
           className="mono"
           id="f1-select"
@@ -125,13 +127,13 @@ export const LeftRail: React.FC<LeftRailProps> = ({
           disabled={!selectedF1 || isLoading || isDbDown}
           style={{
             width: '100%',
-            backgroundColor: isLoading ? 'var(--line)' : 'var(--accent)',
-            color: isLoading ? 'var(--text-3)' : '#000',
+            backgroundColor: isLoading ? 'var(--line-hair)' : 'var(--accent)',
+            color: isLoading ? 'var(--ink-lo)' : 'var(--bg-void)',
             border: 'none',
-            padding: '10px',
-            borderRadius: '4px',
+            padding: 'var(--s2) var(--s3)',
+            borderRadius: 'var(--r-ctl)',
             fontWeight: 700,
-            fontSize: '13px',
+            fontSize: 'var(--fs-body)',
             cursor: !selectedF1 || isLoading || isDbDown ? 'not-allowed' : 'pointer',
             letterSpacing: '0.04em',
           }}
@@ -145,29 +147,23 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       {cases.length > 0 && (
         <div
           style={{
-            padding: '12px 16px',
-            borderBottom: '1px solid var(--line)',
-            backgroundColor: 'var(--panel-2)',
+            padding: 'var(--s3) var(--s4)',
+            borderBottom: '1px solid var(--line-hair)',
+            backgroundColor: 'var(--bg-raised)',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600 }}>CASES: 13 / 13 ✓</span>
-            <span style={{ fontSize: '11px', color: 'var(--text-3)' }}>100% COMPLETE</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s2)' }}>
+            <span style={{ fontSize: 'var(--fs-cap)', fontWeight: 600, color: 'var(--ink-hi)' }}>CASES: 13 / 13 ✓</span>
+            <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>100% COMPLETE</span>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <span className="badge badge-fail">BREACH {breachCount}</span>
-            <span className="badge badge-warn">DEGRADED {degradedCount}</span>
+          <div style={{ display: 'flex', gap: 'var(--s2)', flexWrap: 'wrap' }}>
+            <StatusBadge status="BREACH" label={`BREACH ${breachCount}`} />
+            <StatusBadge status="DEGRADED" label={`DEGRADED ${degradedCount}`} />
             <span
-              className="badge"
-              style={{
-                backgroundColor: 'rgba(79, 179, 255, 0.15)',
-                color: 'var(--accent)',
-                border: '1px solid rgba(79, 179, 255, 0.4)',
-              }}
               title="Headline denominator: cases where neither corridor breaches alone"
             >
-              INTERACTION {interactionCount}
+              <StatusBadge status="SYNTHETIC" label={`INTERACTION ${interactionCount}`} />
             </span>
           </div>
         </div>
@@ -177,36 +173,26 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       {cases.length > 0 && (
         <div
           style={{
-            padding: '8px 16px',
+            padding: 'var(--s2) var(--s4)',
             display: 'flex',
-            gap: '6px',
-            borderBottom: '1px solid var(--line)',
+            gap: 'var(--s1)',
+            borderBottom: '1px solid var(--line-hair)',
             overflowX: 'auto',
           }}
         >
           {[
-            { id: 'all', label: 'All (13)' },
-            { id: 'breach', label: `Breach (${breachCount})` },
-            { id: 'degraded', label: `Degraded (${degradedCount})` },
-            { id: 'interaction', label: `Interaction (${interactionCount})` },
+            { id: 'all', label: 'All', count: 13 },
+            { id: 'breach', label: 'Breach', count: breachCount },
+            { id: 'degraded', label: 'Degraded', count: degradedCount },
+            { id: 'interaction', label: 'Interaction', count: interactionCount },
           ].map((item) => (
-            <button
+            <Chip
               key={item.id}
+              label={item.label}
+              active={filter === item.id}
+              count={item.count}
               onClick={() => setFilter(item.id)}
-              style={{
-                padding: '2px 8px',
-                borderRadius: '12px',
-                border: '1px solid',
-                borderColor: filter === item.id ? 'var(--accent)' : 'var(--line)',
-                backgroundColor: filter === item.id ? 'rgba(79, 179, 255, 0.15)' : 'transparent',
-                color: filter === item.id ? 'var(--accent)' : 'var(--text-3)',
-                fontSize: '11px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {item.label}
-            </button>
+            />
           ))}
         </div>
       )}
@@ -214,29 +200,30 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       {/* 4. Cases list */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {cases.length === 0 ? (
-          <div style={{ padding: '24px 16px', color: 'var(--text-3)', textAlign: 'center' }}>
+          <div style={{ padding: 'var(--s5) var(--s4)', color: 'var(--ink-lo)', textAlign: 'center', fontSize: 'var(--fs-cap)' }}>
             Select an observed failure corridor and click Run Sweep to evaluate all 13 counterfactual second-failures.
           </div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--fs-cap)' }}>
             <thead>
               <tr
                 style={{
-                  borderBottom: '1px solid var(--line)',
-                  color: 'var(--text-3)',
+                  borderBottom: '1px solid var(--line-hair)',
+                  color: 'var(--ink-lo)',
                   textAlign: 'left',
-                  fontSize: '11px',
+                  fontSize: 'var(--fs-micro)',
+                  backgroundColor: 'var(--bg-header)'
                 }}
               >
                 <th
-                  style={{ padding: '6px 12px', cursor: 'pointer' }}
+                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer' }}
                   onClick={() => setSortBy('f2')}
                   title="Sort by secondary corridor ID"
                 >
                   f2 CORRIDOR
                 </th>
                 <th
-                  style={{ padding: '6px 12px', cursor: 'pointer', textAlign: 'right' }}
+                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer', textAlign: 'right' }}
                   onClick={() => setSortBy('verdict')}
                   title="Sort by verdict severity"
                 >
@@ -247,43 +234,36 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             <tbody>
               {sortedCases.map((c) => {
                 const isSelected = c.case_id === selectedCaseId;
-                const badgeClass =
-                  c.verdict === 'BREACH'
-                    ? 'badge-fail'
-                    : c.verdict === 'DEGRADED'
-                    ? 'badge-warn'
-                    : 'badge-ok';
-
                 return (
                   <tr
                     key={c.case_id}
                     onClick={() => onSelectCase(c.case_id)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: isSelected ? 'var(--panel-2)' : 'transparent',
+                      backgroundColor: isSelected ? 'var(--bg-raised)' : 'transparent',
                       borderLeft: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
-                      borderBottom: '1px solid rgba(36, 48, 64, 0.4)',
+                      borderBottom: '1px solid var(--line-hair)',
+                      height: '28px'
                     }}
                   >
-                    <td style={{ padding: '8px 12px' }}>
-                      <div className="mono" style={{ color: 'var(--text)', fontWeight: 500 }}>
+                    <td style={{ padding: 'var(--s2) var(--s3)' }}>
+                      <div className="mono" style={{ color: 'var(--ink-hi)', fontWeight: 500 }}>
                         {c.f2.replace('road_', '')}
                       </div>
                       {c.interaction_only && (
                         <span
                           style={{
-                            fontSize: '10px',
+                            fontSize: 'var(--fs-micro)',
                             color: 'var(--accent)',
                             display: 'inline-block',
-                            marginTop: '2px',
                           }}
                         >
                           ⚡ Interaction Only
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '8px 12px', textAlign: 'right' }}>
-                      <span className={`badge ${badgeClass}`}>{c.verdict}</span>
+                    <td style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right' }}>
+                      <StatusBadge status={c.verdict} />
                     </td>
                   </tr>
                 );

@@ -1,33 +1,87 @@
-/* 07_UI_UX_MOTION_SPEC.md Design Tokens */
 :root {
-  --bg: #0A0E14;
-  --panel: #111720;
-  --panel-2: #161E29;
-  --line: #243040;
-  --text: #E8EDF4;
-  --text-2: #9BA9BC;
-  --text-3: #6B7A8F;
-  --accent: #4FB3FF;
-  --branch: #B07CFF;
-  --ok: #3FBF8F;
-  --warn: #E0A33E;
-  --fail: #E5544B;
-  --synthetic: #7C8CA3;
+  /* Surfaces — depth by value step, never by shadow */
+  --bg-void:    #070B12;   /* page background */
+  --bg-panel:   #0B1119;   /* panel base */
+  --bg-raised:  #111A25;   /* raised rows, cards, table headers */
+  --bg-sunken:  #060A10;   /* input wells, code, map plate */
+  --bg-header:  #17222F;   /* sticky header, tab strip */
 
-  /* Fonts */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Lines — the only separators */
+  --line-hair:  #1E2A38;   /* default hairline */
+  --line-firm:  #2A3A4C;   /* section divider, table rule */
+  --line-focus: #49B4FF;   /* focus ring */
 
-  /* Transitions */
-  --transition-sever: 240ms cubic-bezier(0, 0, 0.2, 1);
-  --transition-branch: 300ms cubic-bezier(0, 0, 0.2, 1);
-  --transition-route: 320ms cubic-bezier(0.4, 0, 0.2, 1);
-}
+  /* Ink */
+  --ink-hi:     #E9EEF6;   /* primary text, numerals */
+  --ink-mid:    #9FB0C4;   /* labels, secondary */
+  --ink-lo:     #6B7F96;   /* units, captions, disabled text */
 
-@media (prefers-reduced-motion: reduce) {
-  :root, html[data-reduced-motion="true"] {
-    --transition-sever: 0ms !important;
-    --transition-branch: 0ms !important;
-    --transition-route: 0ms !important;
-  }
+  /* Interaction */
+  --accent:     #49B4FF;
+  --accent-wash: rgba(73,180,255,0.14);
+  --accent-edge: rgba(73,180,255,0.42);
+
+  /* Overlays & Sanctioned Elevation */
+  --overlay-bg: rgba(7,11,18,0.85);
+  --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+
+  /* Counterfactual — the ONE sanctioned glow */
+  --branch:     #B57CFF;
+  --branch-wash: rgba(181,124,255,0.12);
+  --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
+
+  /* Status — reserved, semantic, never decorative */
+  --ok:         #35C08A;
+  --ok-wash:    rgba(53,192,138,0.13);
+  --warn:       #E0A33E;   /* DEGRADED: cost worse, no deadline missed */
+  --warn-wash:  rgba(224,163,62,0.13);
+  --fail:       #F2564B;   /* BREACH / SEVERED only */
+  --fail-wash:  rgba(242,86,75,0.13);
+  --synthetic:  #7D8EA3;   /* synthetic-provenance stroke */
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --fs-micro:  11px;  /* units, provenance chips — never body */
+  --fs-cap:    12px;  /* captions, table meta */
+  --fs-body:   13px;  /* MINIMUM body size; table rows, labels */
+  --fs-ui:     15px;  /* panel titles, primary controls */
+  --fs-h3:     18px;
+  --fs-h2:     24px;
+  --fs-h1:     32px;
+  --fs-metric: 44px;  /* headline metric only, mono 500 */
+
+  --lh-tight:  1.2;   /* headings, metrics */
+  --lh-data:   1.35;  /* tables, dense lists */
+  --lh-prose:  1.5;   /* explanatory text */
+
+  /* Motion */
+  --dur-feedback: 120ms;
+  --dur-state:    200ms;
+  --dur-reveal:   300ms;
+  --dur-causal:   420ms;
+  --ease-out:     cubic-bezier(.22,1,.36,1);
+  --ease-in-out:  cubic-bezier(.65,0,.35,1);
+  --ease-emph:    cubic-bezier(.16,1,.30,1);
+
+  /* Space — 4px base */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* Radius — small and consistent */
+  --r-chip:  2px;
+  --r-ctl:   4px;
+  --r-panel: 6px;
+
+  /* Layout */
+  --h-header:   52px;
+  --h-framebar: 56px;
+  --w-rail-l:   300px;
+  --w-rail-r:   380px;
 }

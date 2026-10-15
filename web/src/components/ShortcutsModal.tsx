@@ -21,8 +21,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(10, 14, 20, 0.85)',
-        backdropFilter: 'blur(2px)',
+        backgroundColor: 'var(--overlay-bg)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -35,45 +34,46 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
       <div
         style={{
           width: '420px',
-          backgroundColor: 'var(--panel)',
-          border: '1px solid var(--line)',
-          borderRadius: '6px',
-          padding: '24px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          backgroundColor: 'var(--bg-panel)',
+          border: '1px solid var(--line-hair)',
+          borderRadius: 'var(--r-panel)',
+          padding: 'var(--s5)',
+          boxShadow: 'var(--elevation-sticky)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 id="shortcuts-title" style={{ fontSize: '15px', color: 'var(--text)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s4)' }}>
+          <h2 id="shortcuts-title" style={{ fontSize: 'var(--fs-ui)', color: 'var(--ink-hi)', margin: 0 }}>
             Keyboard Shortcuts
           </h2>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: '14px' }}
+            style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer', fontSize: 'var(--fs-ui)' }}
+            aria-label="Close shortcuts sheet"
           >
             ✕
           </button>
         </div>
 
-        <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', fontSize: 'var(--fs-cap)', borderCollapse: 'collapse' }}>
           <tbody>
             {shortcuts.map((s) => (
-              <tr key={s.key} style={{ borderBottom: '1px solid var(--line)' }}>
-                <td style={{ padding: '8px 0', width: '100px' }}>
+              <tr key={s.key} style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td style={{ padding: 'var(--s2) 0', width: '110px' }}>
                   <kbd
                     style={{
-                      padding: '3px 8px',
-                      backgroundColor: 'var(--panel-2)',
-                      border: '1px solid var(--line)',
-                      borderRadius: '4px',
+                      padding: '2px var(--s2)',
+                      backgroundColor: 'var(--bg-raised)',
+                      border: '1px solid var(--line-hair)',
+                      borderRadius: 'var(--r-chip)',
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '11px',
+                      fontSize: 'var(--fs-micro)',
                       color: 'var(--accent)',
                     }}
                   >
                     {s.key}
                   </kbd>
                 </td>
-                <td style={{ padding: '8px 0', color: 'var(--text-2)' }}>{s.action}</td>
+                <td style={{ padding: 'var(--s2) 0', color: 'var(--ink-mid)' }}>{s.action}</td>
               </tr>
             ))}
           </tbody>

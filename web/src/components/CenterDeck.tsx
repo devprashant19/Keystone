@@ -93,11 +93,6 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
   const coords = viewMode === 'map' ? INTERSECTION_POSITIONS : TOPOLOGY_POSITIONS;
 
   // Determine severed corridors based on frame index
-  // Frame 0: None severed (baseline)
-  // Frame 1: f1 severed
-  // Frame 2: f1 severed + preventive action
-  // Frame 3: f1 + f2 severed
-  // Frame 4: outcome
   const isF1Severed = frameIndex >= 1 && Boolean(f1Corridor);
   const isF2Severed = frameIndex >= 3 && Boolean(f2Corridor);
 
@@ -109,39 +104,39 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
     <main
       style={{
         flex: 1,
-        backgroundColor: 'var(--bg)',
+        backgroundColor: 'var(--bg-void)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
       }}
       role="main"
-      aria-label=" Delhi Road Network and Infrastructure Topology"
+      aria-label="Delhi Road Network and Infrastructure Topology"
     >
       {/* Top toolbar */}
       <div
         style={{
           height: '44px',
-          borderBottom: '1px solid var(--line)',
-          backgroundColor: 'var(--panel)',
+          borderBottom: '1px solid var(--line-hair)',
+          backgroundColor: 'var(--bg-panel)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 16px',
+          padding: '0 var(--s4)',
         }}
       >
         {/* View Mode Toggle: Map vs Topology */}
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: 'var(--s1)' }}>
           <button
             onClick={() => onToggleViewMode('map')}
             style={{
-              padding: '4px 12px',
-              borderRadius: '4px',
-              border: '1px solid var(--line)',
-              backgroundColor: viewMode === 'map' ? 'var(--panel-2)' : 'transparent',
-              color: viewMode === 'map' ? 'var(--accent)' : 'var(--text-3)',
+              padding: 'var(--s1) var(--s3)',
+              borderRadius: 'var(--r-ctl)',
+              border: '1px solid var(--line-hair)',
+              backgroundColor: viewMode === 'map' ? 'var(--bg-raised)' : 'transparent',
+              color: viewMode === 'map' ? 'var(--accent)' : 'var(--ink-lo)',
               fontWeight: 600,
-              fontSize: '12px',
+              fontSize: 'var(--fs-cap)',
               cursor: 'pointer',
             }}
           >
@@ -150,13 +145,13 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           <button
             onClick={() => onToggleViewMode('topology')}
             style={{
-              padding: '4px 12px',
-              borderRadius: '4px',
-              border: '1px solid var(--line)',
-              backgroundColor: viewMode === 'topology' ? 'var(--panel-2)' : 'transparent',
-              color: viewMode === 'topology' ? 'var(--accent)' : 'var(--text-3)',
+              padding: 'var(--s1) var(--s3)',
+              borderRadius: 'var(--r-ctl)',
+              border: '1px solid var(--line-hair)',
+              backgroundColor: viewMode === 'topology' ? 'var(--bg-raised)' : 'transparent',
+              color: viewMode === 'topology' ? 'var(--accent)' : 'var(--ink-lo)',
               fontWeight: 600,
-              fontSize: '12px',
+              fontSize: 'var(--fs-cap)',
               cursor: 'pointer',
             }}
           >
@@ -165,16 +160,16 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
         </div>
 
         {/* Legend buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
           <button
             onClick={onToggleSynthetic}
             style={{
-              fontSize: '11px',
-              background: highlightSynthetic ? 'rgba(124, 140, 163, 0.3)' : 'transparent',
+              fontSize: 'var(--fs-micro)',
+              background: highlightSynthetic ? 'var(--bg-sunken)' : 'transparent',
               border: '1px dashed var(--synthetic)',
-              color: 'var(--text-2)',
-              padding: '2px 8px',
-              borderRadius: '2px',
+              color: 'var(--ink-mid)',
+              padding: '2px var(--s2)',
+              borderRadius: 'var(--r-chip)',
               cursor: 'pointer',
             }}
             title="Toggle synthetic telecom/power overlay"
@@ -185,12 +180,12 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           <button
             onClick={onToggleSevered}
             style={{
-              fontSize: '11px',
-              background: highlightSevered ? 'rgba(229, 84, 75, 0.3)' : 'transparent',
+              fontSize: 'var(--fs-micro)',
+              background: highlightSevered ? 'var(--fail-wash)' : 'transparent',
               border: '1px solid var(--fail)',
               color: 'var(--fail)',
-              padding: '2px 8px',
-              borderRadius: '2px',
+              padding: '2px var(--s2)',
+              borderRadius: 'var(--r-chip)',
               cursor: 'pointer',
             }}
             title="Toggle severed corridors highlight"
@@ -201,12 +196,12 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           <button
             onClick={() => setShowEntityList(!showEntityList)}
             style={{
-              fontSize: '11px',
-              background: 'var(--panel-2)',
-              border: '1px solid var(--line)',
-              color: 'var(--text-3)',
-              padding: '2px 8px',
-              borderRadius: '2px',
+              fontSize: 'var(--fs-micro)',
+              background: 'var(--bg-raised)',
+              border: '1px solid var(--line-hair)',
+              color: 'var(--ink-lo)',
+              padding: '2px var(--s2)',
+              borderRadius: 'var(--r-chip)',
               cursor: 'pointer',
             }}
             title="Accessible screen-reader entity table (AX-07)"
@@ -215,22 +210,22 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           </button>
 
           {/* Zoom controls */}
-          <div style={{ display: 'flex', gap: '2px', marginLeft: '8px' }}>
+          <div style={{ display: 'flex', gap: '2px', marginLeft: 'var(--s2)' }}>
             <button
               onClick={() => setZoom((z) => Math.min(z + 0.2, 2.0))}
-              style={{ padding: '2px 8px', background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--text)', cursor: 'pointer', borderRadius: '2px' }}
+              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
             >
               +
             </button>
             <button
               onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-              style={{ padding: '2px 8px', background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--text)', cursor: 'pointer', borderRadius: '2px' }}
+              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
             >
               −
             </button>
             <button
               onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-              style={{ padding: '2px 8px', background: 'var(--panel-2)', border: '1px solid var(--line)', color: 'var(--text)', cursor: 'pointer', borderRadius: '2px' }}
+              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
             >
               0
             </button>
@@ -247,7 +242,7 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
             height: '100%',
             transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
             transformOrigin: 'center center',
-            transition: 'transform 150ms ease-out',
+            transition: 'transform var(--dur-feedback) var(--ease-out)',
           }}
           role="img"
           aria-label="Delhi Arterial Road Network Graph"
@@ -255,7 +250,7 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           {/* Background grid */}
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--line)" strokeWidth="0.5" strokeOpacity="0.4" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--line-hair)" strokeWidth="0.5" strokeOpacity="0.4" />
             </pattern>
           </defs>
           <rect width="700" height="550" fill="url(#grid)" />
@@ -264,12 +259,12 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           <path
             d="M 370 20 Q 420 100 460 200 T 490 400 T 560 540"
             fill="none"
-            stroke="#1B3854"
+            stroke="var(--line-firm)"
             strokeWidth="16"
             strokeLinecap="round"
             opacity="0.5"
           />
-          <text x="500" y="320" fill="#2D5A85" fontSize="10" fontFamily="var(--font-mono)">
+          <text x="500" y="320" fill="var(--ink-lo)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">
             YAMUNA RIVER
           </text>
 
@@ -281,7 +276,7 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
 
             const isSevered = severedCorridors.has(edge.id);
 
-            let strokeColor = 'var(--text-3)';
+            let strokeColor = 'var(--ink-lo)';
             let strokeWidth = 2.5;
             let strokeDasharray = 'none';
 
@@ -290,8 +285,7 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
               strokeWidth = 3;
               strokeDasharray = '4 4';
             } else if (frameIndex >= 2 && !isSevered) {
-              // Counterfactual branch state: purple hint
-              strokeColor = '#5C7494';
+              strokeColor = 'var(--synthetic)';
             }
 
             return (
@@ -319,8 +313,8 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
                     x={(p1.x + p2.x) / 2}
                     y={(p1.y + p2.y) / 2 + 3}
                     textAnchor="middle"
-                    fill="#fff"
-                    fontSize="9"
+                    fill="var(--ink-hi)"
+                    fontSize="var(--fs-micro)"
                     fontWeight="700"
                   >
                     ✕
@@ -337,16 +331,16 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
                 cx={pos.x}
                 cy={pos.y}
                 r="5"
-                fill="var(--panel-2)"
-                stroke="var(--line)"
+                fill="var(--bg-raised)"
+                stroke="var(--line-hair)"
                 strokeWidth="2"
               />
               <text
                 x={pos.x}
                 y={pos.y - 8}
                 textAnchor="middle"
-                fill="var(--text-2)"
-                fontSize="10"
+                fill="var(--ink-mid)"
+                fontSize="var(--fs-micro)"
                 fontFamily="var(--font-sans)"
               >
                 {pos.name}
@@ -357,31 +351,31 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           {/* Facilities: LNJP Hospital & Sushruta Trauma Centre */}
           {/* LNJP attached to Delhi Gate */}
           <g transform={`translate(${coords.int_delhi_gate.x + 25}, ${coords.int_delhi_gate.y + 10})`}>
-            <rect width="14" height="14" rx="2" fill="var(--panel-2)" stroke="var(--ok)" strokeWidth="1.5" />
-            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="10" fontWeight="700">H</text>
-            <text x="20" y="11" fill="var(--text)" fontSize="10" fontWeight="600">LNJP Hospital</text>
-            <line x1="-5" y1="7" x2="-25" y2="-10" stroke="var(--text-3)" strokeDasharray="2 2" />
+            <rect width="14" height="14" rx="2" fill="var(--bg-raised)" stroke="var(--ok)" strokeWidth="1.5" />
+            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="var(--fs-micro)" fontWeight="700">H</text>
+            <text x="20" y="11" fill="var(--ink-hi)" fontSize="var(--fs-micro)" fontWeight="600">LNJP Hospital</text>
+            <line x1="-5" y1="7" x2="-25" y2="-10" stroke="var(--ink-lo)" strokeDasharray="2 2" />
           </g>
 
           {/* Sushruta attached to Civil Lines */}
           <g transform={`translate(${coords.int_civil_lines.x - 90}, ${coords.int_civil_lines.y - 20})`}>
-            <rect width="14" height="14" rx="2" fill="var(--panel-2)" stroke="var(--ok)" strokeWidth="1.5" />
-            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="10" fontWeight="700">H</text>
-            <text x="20" y="11" fill="var(--text)" fontSize="10" fontWeight="600">Sushruta Trauma</text>
-            <line x1="14" y1="7" x2="90" y2="20" stroke="var(--text-3)" strokeDasharray="2 2" />
+            <rect width="14" height="14" rx="2" fill="var(--bg-raised)" stroke="var(--ok)" strokeWidth="1.5" />
+            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="var(--fs-micro)" fontWeight="700">H</text>
+            <text x="20" y="11" fill="var(--ink-hi)" fontSize="var(--fs-micro)" fontWeight="600">Sushruta Trauma</text>
+            <line x1="14" y1="7" x2="90" y2="20" stroke="var(--ink-lo)" strokeDasharray="2 2" />
           </g>
 
           {/* Depots */}
           {/* North Depot at Civil Lines */}
           <g transform={`translate(${coords.int_civil_lines.x - 20}, ${coords.int_civil_lines.y + 15})`}>
             <polygon points="6,0 12,12 0,12" fill="var(--accent)" />
-            <text x="16" y="10" fill="var(--accent)" fontSize="9" fontFamily="var(--font-mono)">Depot North</text>
+            <text x="16" y="10" fill="var(--accent)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">Depot North</text>
           </g>
 
           {/* South Depot at Delhi Gate */}
           <g transform={`translate(${coords.int_delhi_gate.x - 30}, ${coords.int_delhi_gate.y + 20})`}>
             <polygon points="6,0 12,12 0,12" fill="var(--accent)" />
-            <text x="16" y="10" fill="var(--accent)" fontSize="9" fontFamily="var(--font-mono)">Depot South</text>
+            <text x="16" y="10" fill="var(--accent)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">Depot South</text>
           </g>
 
           {/* Synthetic Telecom Towers (shown if highlightSynthetic is true) */}
@@ -389,13 +383,13 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
             <>
               {/* North Ridge Tower */}
               <g transform={`translate(${coords.int_chandgiram.x + 30}, ${coords.int_chandgiram.y - 20})`}>
-                <circle cx="6" cy="6" r="6" fill="var(--panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
-                <text x="16" y="9" fill="var(--synthetic)" fontSize="9">🗼 Tower Ridge (HQ)</text>
+                <circle cx="6" cy="6" r="6" fill="var(--bg-panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
+                <text x="16" y="9" fill="var(--synthetic)" fontSize="var(--fs-micro)">🗼 Tower Ridge (HQ)</text>
               </g>
               {/* ISBT Relay Tower */}
               <g transform={`translate(${coords.int_kashmere_gate.x + 20}, ${coords.int_kashmere_gate.y - 10})`}>
-                <circle cx="6" cy="6" r="6" fill="var(--panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
-                <text x="16" y="9" fill="var(--synthetic)" fontSize="9">🗼 Tower ISBT</text>
+                <circle cx="6" cy="6" r="6" fill="var(--bg-panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
+                <text x="16" y="9" fill="var(--synthetic)" fontSize="var(--fs-micro)">🗼 Tower ISBT</text>
               </g>
             </>
           )}
@@ -406,22 +400,23 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
           <div
             style={{
               position: 'absolute',
-              top: '12px',
-              left: '12px',
-              backgroundColor: 'rgba(176, 124, 255, 0.15)',
+              top: 'var(--s3)',
+              left: 'var(--s3)',
+              backgroundColor: 'var(--branch-wash)',
               border: '1px solid var(--branch)',
               color: 'var(--branch)',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              fontSize: '11px',
+              padding: 'var(--s1) var(--s3)',
+              borderRadius: 'var(--r-ctl)',
+              fontSize: 'var(--fs-micro)',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: 'var(--s2)',
+              boxShadow: 'var(--branch-glow)'
             }}
           >
             <span>COUNTERFACTUAL BRANCH ACTIVE</span>
-            <span style={{ color: 'var(--text-3)' }}>•</span>
+            <span style={{ color: 'var(--ink-lo)' }}>•</span>
             <span className="mono">jaal_branch_{selectedCaseId || 'preview'}</span>
           </div>
         )}
@@ -436,33 +431,33 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
             left: '0',
             right: '0',
             maxHeight: '220px',
-            backgroundColor: 'var(--panel)',
-            borderTop: '1px solid var(--line)',
-            padding: '12px 16px',
+            backgroundColor: 'var(--bg-panel)',
+            borderTop: '1px solid var(--line-hair)',
+            padding: 'var(--s3) var(--s4)',
             overflowY: 'auto',
             zIndex: 10,
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <strong style={{ fontSize: '12px' }}>Network Entity Table (Screen-Reader Equivalent)</strong>
-            <button onClick={() => setShowEntityList(false)} style={{ background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer' }}>Close ✕</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s2)' }}>
+            <strong style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)' }}>Network Entity Table (Screen-Reader Equivalent)</strong>
+            <button onClick={() => setShowEntityList(false)} style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer' }}>Close ✕</button>
           </div>
-          <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ color: 'var(--text-3)', borderBottom: '1px solid var(--line)', textAlign: 'left' }}>
-                <th style={{ padding: '4px' }}>Entity ID</th>
-                <th style={{ padding: '4px' }}>Type</th>
-                <th style={{ padding: '4px' }}>Status</th>
-                <th style={{ padding: '4px' }}>Provenance</th>
+              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left' }}>
+                <th style={{ padding: 'var(--s1)' }}>Entity ID</th>
+                <th style={{ padding: 'var(--s1)' }}>Type</th>
+                <th style={{ padding: 'var(--s1)' }}>Status</th>
+                <th style={{ padding: 'var(--s1)' }}>Provenance</th>
               </tr>
             </thead>
             <tbody>
               {CORRIDOR_EDGES.map((c) => (
-                <tr key={c.id} style={{ borderBottom: '1px solid rgba(36,48,64,0.4)' }}>
-                  <td className="mono" style={{ padding: '4px' }}>{c.id}</td>
-                  <td style={{ padding: '4px' }}>Road Corridor</td>
-                  <td style={{ padding: '4px' }}>{severedCorridors.has(c.id) ? 'SEVERED' : 'OPERATIONAL'}</td>
-                  <td style={{ padding: '4px' }}>reference_derived</td>
+                <tr key={c.id} style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                  <td className="mono" style={{ padding: 'var(--s1)', color: 'var(--ink-hi)' }}>{c.id}</td>
+                  <td style={{ padding: 'var(--s1)', color: 'var(--ink-mid)' }}>Road Corridor</td>
+                  <td style={{ padding: 'var(--s1)' }}>{severedCorridors.has(c.id) ? 'SEVERED' : 'OPERATIONAL'}</td>
+                  <td style={{ padding: 'var(--s1)', color: 'var(--ink-lo)' }}>reference_derived</td>
                 </tr>
               ))}
             </tbody>

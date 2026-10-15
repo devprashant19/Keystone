@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBadge } from './primitives';
 
 interface FrameBarProps {
   currentFrame: number;
@@ -22,23 +23,23 @@ export const FrameBar: React.FC<FrameBarProps> = ({
   return (
     <footer
       style={{
-        height: '56px',
-        backgroundColor: 'var(--panel)',
-        borderTop: '1px solid var(--line)',
+        height: 'var(--h-framebar)',
+        backgroundColor: 'var(--bg-panel)',
+        borderTop: '1px solid var(--line-hair)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 20px',
+        padding: '0 var(--s5)',
         userSelect: 'none',
       }}
       role="region"
       aria-label="Counterfactual Frame Stepper"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-3)', fontWeight: 600 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+        <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 600 }}>
           FRAMES (◀ / ▶):
         </span>
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: 'var(--s1)' }}>
           {FRAMES.map((f) => {
             const isActive = currentFrame === f.index;
             return (
@@ -46,18 +47,18 @@ export const FrameBar: React.FC<FrameBarProps> = ({
                 key={f.index}
                 onClick={() => onSelectFrame(f.index)}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: '4px',
+                  padding: 'var(--s2) var(--s3)',
+                  borderRadius: 'var(--r-ctl)',
                   border: '1px solid',
-                  borderColor: isActive ? 'var(--accent)' : 'var(--line)',
-                  backgroundColor: isActive ? 'var(--panel-2)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : 'var(--text-2)',
+                  borderColor: isActive ? 'var(--accent)' : 'var(--line-hair)',
+                  backgroundColor: isActive ? 'var(--accent-wash)' : 'transparent',
+                  color: isActive ? 'var(--accent)' : 'var(--ink-mid)',
                   fontWeight: isActive ? 700 : 500,
-                  fontSize: '12px',
+                  fontSize: 'var(--fs-cap)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: 'var(--s1)',
                 }}
                 title={f.desc}
                 aria-pressed={isActive}
@@ -70,14 +71,12 @@ export const FrameBar: React.FC<FrameBarProps> = ({
       </div>
 
       {/* Display active branch graph ID */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="mono">
-        <span style={{ fontSize: '11px', color: 'var(--text-3)' }}>GRAPH STATE:</span>
-        <span
-          className={`badge ${currentFrame >= 2 ? 'badge-branch' : 'badge-ok'}`}
-          style={{ fontSize: '11px' }}
-        >
-          {currentFrame >= 2 ? branchName || 'jaal_branch_counterfactual' : 'jaal_world (base)'}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }} className="mono">
+        <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>GRAPH STATE:</span>
+        <StatusBadge
+          status={currentFrame >= 2 ? 'BRANCH' : 'OK'}
+          label={currentFrame >= 2 ? (branchName || 'jaal_branch_counterfactual') : 'jaal_world (base)'}
+        />
       </div>
     </footer>
   );

@@ -12,8 +12,34 @@ import { MethodView } from './routes/MethodView';
 
 export const App: React.FC = () => {
   // Navigation & route state
-  const [currentRoute, setCurrentRoute] = useState<string>('/');
-  const [evidenceCaseId, setEvidenceCaseId] = useState<string>('');
+  const [currentRoute, setCurrentRouteState] = useState<string>(() => {
+    return typeof window !== 'undefined' && window.location.pathname ? window.location.pathname : '/';
+  });
+  const [evidenceCaseId, setEvidenceCaseId] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/evidence/')) {
+      return window.location.pathname.replace('/evidence/', '');
+    }
+    return '';
+  });
+
+  const setCurrentRoute = (route: string) => {
+    setCurrentRouteState(route);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', route);
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname || '/';
+      setCurrentRouteState(path);
+      if (path.startsWith('/evidence/')) {
+        setEvidenceCaseId(path.replace('/evidence/', ''));
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // World & Health state
   const [worldDigest, setWorldDigest] = useState<string>('');

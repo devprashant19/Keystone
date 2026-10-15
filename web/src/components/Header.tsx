@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBadge } from './primitives';
 
 interface HeaderProps {
   worldDigest: string;
@@ -20,42 +21,43 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       style={{
-        height: '48px',
-        backgroundColor: 'var(--panel)',
-        borderBottom: '1px solid var(--line)',
+        height: 'var(--h-header)',
+        backgroundColor: 'var(--bg-header)',
+        borderBottom: '1px solid var(--line-hair)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 16px',
+        padding: '0 var(--s4)',
         userSelect: 'none',
+        boxShadow: 'var(--elevation-sticky)'
       }}
       role="banner"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s4)' }}>
         <button
           onClick={() => onNavigate('/')}
           style={{
             background: 'none',
             border: 'none',
-            color: 'var(--text)',
-            fontSize: '14px',
+            color: 'var(--ink-hi)',
+            fontSize: 'var(--fs-ui)',
             fontWeight: 700,
-            letterSpacing: '0.05em',
+            letterSpacing: '0.04em',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: 'var(--s2)',
           }}
           aria-label="Jaal Pre-Mortem Home"
         >
           <span style={{ color: 'var(--accent)' }}>JAAL</span> PRE-MORTEM
           <span
             style={{
-              fontSize: '11px',
+              fontSize: 'var(--fs-micro)',
               fontWeight: 400,
-              color: 'var(--text-3)',
-              borderLeft: '1px solid var(--line)',
-              paddingLeft: '8px',
+              color: 'var(--ink-lo)',
+              borderLeft: '1px solid var(--line-hair)',
+              paddingLeft: 'var(--s2)',
             }}
           >
             Delhi Arterial · District Scale
@@ -63,12 +65,11 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <span
-          className="badge badge-synthetic"
           title="Contains both real-world OSM Delhi roads and synthetic power/alert layers"
           style={{ cursor: 'pointer' }}
           onClick={() => onNavigate('/method')}
         >
-          REFERENCE + SYNTHETIC ▸
+          <StatusBadge status="SYNTHETIC" label="REFERENCE + SYNTHETIC ▸" />
         </span>
       </div>
 
@@ -77,21 +78,21 @@ export const Header: React.FC<HeaderProps> = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          fontSize: '11px',
-          color: 'var(--text-2)',
+          gap: 'var(--s3)',
+          fontSize: 'var(--fs-micro)',
+          color: 'var(--ink-mid)',
         }}
         className="mono"
       >
         <span>
-          CONFIG: <strong style={{ color: 'var(--text)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong>
+          CONFIG: <strong style={{ color: 'var(--ink-hi)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong>
         </span>
-        <span style={{ color: 'var(--line)' }}>•</span>
+        <span style={{ color: 'var(--line-hair)' }}>•</span>
         <span>
-          DIGEST: <strong style={{ color: 'var(--text)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong>
+          DIGEST: <strong style={{ color: 'var(--ink-hi)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong>
         </span>
-        <span style={{ color: 'var(--line)' }}>•</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span style={{ color: 'var(--line-hair)' }}>•</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
           <span
             style={{
               width: '8px',
@@ -107,17 +108,17 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
         <button
           onClick={onOpenHistory}
           style={{
-            background: 'var(--panel-2)',
-            border: '1px solid var(--line)',
-            color: 'var(--text-2)',
-            padding: '4px 10px',
-            borderRadius: '4px',
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--line-hair)',
+            color: 'var(--ink-mid)',
+            padding: 'var(--s1) var(--s3)',
+            borderRadius: 'var(--r-ctl)',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: 'var(--fs-cap)',
           }}
           title="Past Run History"
         >
@@ -127,13 +128,13 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => onNavigate(currentRoute === '/method' ? '/' : '/method')}
           style={{
-            background: currentRoute === '/method' ? 'var(--accent)' : 'var(--panel-2)',
-            border: '1px solid var(--line)',
-            color: currentRoute === '/method' ? '#000' : 'var(--text)',
-            padding: '4px 10px',
-            borderRadius: '4px',
+            background: currentRoute === '/method' ? 'var(--accent)' : 'var(--bg-raised)',
+            border: '1px solid var(--line-hair)',
+            color: currentRoute === '/method' ? 'var(--bg-void)' : 'var(--ink-hi)',
+            padding: 'var(--s1) var(--s3)',
+            borderRadius: 'var(--r-ctl)',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: 'var(--fs-cap)',
             fontWeight: 600,
           }}
         >
