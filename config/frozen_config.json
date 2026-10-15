@@ -1,0 +1,22 @@
+{
+  "access_deadline_min": 20.0,
+  "dispatch_delay_no_action_min": 3.0,
+  "dispatch_delay_pre_positioned_min": 1.0,
+  "assumed_arterial_speed_kmh": 24.0,
+  "effective_travel_allowance_km": 6.8,
+  "alert_delivery_deadline_min": 8.0,
+  "alert_hop_bound": 12,
+  "road_hop_bound": 13,
+  "pre_position_lead_window_min": 14.0,
+  "pre_alert_lead_window_min": 10.0,
+  "action_budget": 1,
+  "fixture_seed": 42,
+  "sampling_seed": 20261015,
+  "held_out_corridors": [
+    "road_chelmsford_cp_station",
+    "road_jln_marg_delhigate_cp",
+    "road_rani_jhansi_to_station",
+    "road_sham_nath_sushruta_kashmere"
+  ],
+  "config_hash": "ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35"
+}
