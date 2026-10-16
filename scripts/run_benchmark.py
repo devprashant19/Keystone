@@ -65,6 +65,13 @@ def run_benchmark():
     ties_c_vs_b = 0
     losses_c_vs_b = 0
 
+    # Policy B measured against Policy A in its own right. Previously the report's
+    # Policy B row was populated with Policy C's tallies, which asserted a result
+    # Policy B never produced.
+    wins_b_vs_a = 0
+    ties_b_vs_a = 0
+    losses_b_vs_a = 0
+
     for f1 in corridors:
         print(f"Sweeping f1: {f1}...")
         decomp = planner.compute_three_way_decomposition(f1)
@@ -103,6 +110,14 @@ def run_benchmark():
             else:
                 win_ca = "LOSS"
                 losses_c_vs_a += 1
+
+            # Win/Tie/Loss B vs A (measured, not copied from C)
+            if b_b < b_a:
+                wins_b_vs_a += 1
+            elif b_b == b_a:
+                ties_b_vs_a += 1
+            else:
+                losses_b_vs_a += 1
 
             # Win/Tie/Loss C vs B
             if b_c < b_b:
@@ -166,17 +181,31 @@ def run_benchmark():
         calc_deadline_min = (allow_km / speed) * 60.0 + float(config["dispatch_delay_no_action_min"])
         evaluator.access_deadline_min = calc_deadline_min
 
-        # Re-evaluate sample of corridors
-        f1_sample = "road_ring_kashmere_monastery"
-        sample_decomp = planner.compute_three_way_decomposition(f1_sample)
+        # FULL sweep across EVERY f1, not a single hard-coded sample.
+        # The previous version evaluated one corridor
+        # (road_ring_kashmere_monastery) which breaches on its own at every
+        # threshold, so all 13 of its f2 cases were f1-alone by construction and the
+        # interaction column was structurally pinned at 0. That made the table look
+        # like a sensitivity analysis while verifying nothing.
+        sw_inter = sw_f1 = sw_f2 = sw_neither = 0
+        for f1_s in corridors:
+            d = planner.compute_three_way_decomposition(f1_s)
+            sw_inter += len(d.interaction_only_cases)
+            sw_f1 += len(d.f1_alone_cases)
+            sw_f2 += len(d.f2_alone_cases)
+            sw_neither += len(d.neither_stressed_cases)
         sweep_results.append({
             "allowance_km": allow_km,
             "access_deadline_min": round(calc_deadline_min, 2),
             "is_frozen_default": allow_km == 6.8,
-            "sample_interaction_only": len(sample_decomp.interaction_only_cases),
-            "sample_f1_alone": len(sample_decomp.f1_alone_cases),
-            "sample_f2_alone": len(sample_decomp.f2_alone_cases)
+            "total_ordered_cases": sw_inter + sw_f1 + sw_f2 + sw_neither,
+            "interaction_only": sw_inter,
+            "f1_alone": sw_f1,
+            "f2_alone": sw_f2,
+            "neither_stressed": sw_neither
         })
+        print(f"  allowance {allow_km} km -> interaction_only={sw_inter} "
+              f"f1_alone={sw_f1} f2_alone={sw_f2} neither={sw_neither}")
 
     # Restore frozen default
     evaluator.access_deadline_min = float(config["access_deadline_min"])
@@ -210,7 +239,7 @@ Per Section 10.1 of the build plan and pre-registration guidelines, all 182 orde
 | Neither stressed | {total_neither} | {(total_neither/len(case_rows))*100:.1f}% | System preserves SLAs across both disruptions without action. |
 | **Total Ordered Pairs** | **{len(case_rows)}** | **100.0%** | **14 physical corridors × 13 secondary candidates.** |
 
-*Note: The frozen effective travel allowance (6.8 km) produces {total_interaction_only} interaction-only cases, deliberately NOT the maximizing 9 km row ({22} cases in prior sweep), proving threshold was not reverse-engineered.*
+*Note: the frozen allowance is derived from an urban response-target band (20 min total) and a deliberately pessimistic 24 km/h monsoon arterial speed, recorded before any policy existed. The full sweep below reports every threshold so no single value carries the claim.*
 
 ---
 
@@ -219,23 +248,29 @@ Per Section 10.1 of the build plan and pre-registration guidelines, all 182 orde
 | Policy | Budget | Heuristic / Method | Wins vs A | Ties vs A | Losses vs A | Wins vs B | Ties vs B | Losses vs B |
 |---|---|---|---|---|---|---|---|---|
 | **Policy A** (No Action) | 0 | Baseline passive response | — | — | — | — | — | — |
-| **Policy B** (Static Heuristic) | 1 action | Static intersection degree centrality | {wins_c_vs_a} | {ties_c_vs_a} | {losses_c_vs_a} | — | — | — |
-| **Policy C** (Pre-Mortem) | 1 action | Conditional N-1 across FalkorDB branches | **{wins_c_vs_a}** | **{ties_c_vs_a}** | **0** | **{wins_c_vs_b}** | **{ties_c_vs_b}** | **0** |
+| **Policy B** (Static Heuristic) | 1 action | Static intersection degree centrality | {wins_b_vs_a} | {ties_b_vs_a} | {losses_b_vs_a} | — | — | — |
+| **Policy C** (Pre-Mortem) | 1 action | Conditional N-1 across FalkorDB branches | **{wins_c_vs_a}** | **{ties_c_vs_a}** | **{losses_c_vs_a}** | **{wins_c_vs_b}** | **{ties_c_vs_b}** | **{losses_c_vs_b}** |
 
-Policy C achieves **zero losses** against both Policy A and Policy B, systematically improving or matching outcomes across every evaluated contingency.
+Losses are reported, not assumed to be zero: Policy C records {losses_c_vs_a} losses against A and {losses_c_vs_b} against B. Policy B's row is measured independently against A.
+
+**Read the wins against the denominators above.** A win in an `f1`-alone or `f2`-alone case shows only that acting beats not acting; it does not demonstrate that conditioning on the second failure helped. Only the interaction-only region isolates the pre-mortem contribution.
 
 ---
 
 ## 3. Effective Travel Allowance Sweep (km)
 
-Secondary analysis verifying sensitivity across effective travel allowance thresholds:
+Computed across **every** first failure at each threshold (not a single sampled corridor):
 
-| Allowance (km) | Deadline (min) | Frozen Default? | Sample Interaction Cases | Sample f1-Alone | Sample f2-Alone |
-|---|---|---|---|---|---|
+| Allowance (km) | Deadline (min) | Frozen? | Ordered Cases | **Interaction-Only** | f1-Alone | f2-Alone | Neither |
+|---|---|---|---|---|---|---|---|
 """
     for row in sweep_results:
         frozen_mark = "**YES (FROZEN)**" if row["is_frozen_default"] else "No"
-        bm_md += f"| {row['allowance_km']:.1f} km | {row['access_deadline_min']:.1f} min | {frozen_mark} | {row['sample_interaction_only']} | {row['sample_f1_alone']} | {row['sample_f2_alone']} |\n"
+        bm_md += (
+            f"| {row['allowance_km']:.1f} km | {row['access_deadline_min']:.1f} min | "
+            f"{frozen_mark} | {row['total_ordered_cases']} | **{row['interaction_only']}** | "
+            f"{row['f1_alone']} | {row['f2_alone']} | {row['neither_stressed']} |\n"
+        )
 
     bm_md += """
 ---
@@ -248,7 +283,7 @@ Secondary analysis verifying sensitivity across effective travel allowance thres
 
 ### AB-02: Relation Context Removed (Graph Necessity Proof)
 - **Condition:** Given corridors and facilities as flat attribute tables with graph edge traversals removed.
-- **Observed:** Evaluator cleanly abstains with `ABSTAIN — NO ROBUST PLAN`. Multi-hop road routing and alert backhaul chains cannot be verified without graph edges.
+- **Observed:** Evaluator returns `abstained = true` with reason `NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS`, and emits **no** breach verdicts (`access_breaches = []`, `total_breaches = 0`). Multi-hop road routing and alert backhaul chains cannot be evaluated without relationship context, so the evaluator declines to answer rather than asserting a verdict. Verified by `tests/phase8_benchmark/test_benchmark.py::test_ab_02_relation_context_removed`.
 
 ### AB-03: Independent Recomputation Cross-Check
 - **Condition:** Standard Python Dijkstra implementation executed on raw exported edge list.
