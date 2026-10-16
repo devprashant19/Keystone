@@ -46,6 +46,11 @@ class EvaluationResult:
     total_breaches: int
     unreachable_facilities: List[str]
     config_hash: str
+    # AB-02: when the evaluated graph carries no relationship context, the honest
+    # answer is "cannot evaluate", NOT "everything is breached". An evaluator that
+    # reports breaches here would be asserting a verdict it has no evidence for.
+    abstained: bool = False
+    abstain_reason: Optional[str] = None
 
 class SharedEvaluator:
     """
@@ -177,6 +182,29 @@ class SharedEvaluator:
         for row in road_res.result_set:
             u, v, cost, dist = row[0], row[1], float(row[2]), float(row[3])
             road_adj.setdefault(u, []).append((v, cost, dist))
+
+        # AB-02 ABSTENTION GATE.
+        # If the graph has no ROAD_ARC relationships at all, there is no topology to
+        # reason over. Access time is undefined, not infinite. Return an explicit
+        # abstention with empty verdict lists rather than labelling every facility a
+        # breach -- "we cannot answer" and "the answer is bad" are different claims,
+        # and conflating them would turn the relation-context ablation into a
+        # fabricated result.
+        if not road_adj:
+            return EvaluationResult(
+                case_id=case_id,
+                access_breaches=[],
+                access_degraded=[],
+                facility_metrics={},
+                alert_breaches=[],
+                alert_metrics={},
+                is_breached=False,
+                total_breaches=0,
+                unreachable_facilities=[],
+                config_hash=self.config_hash,
+                abstained=True,
+                abstain_reason="NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS"
+            )
 
         # 2. Fetch depots
         depot_res = graph.query("MATCH (d:Depot)-[:DEPOT_AT]->(i:Intersection) RETURN d.id, d.name, i.id, d.dispatch_delay_min")

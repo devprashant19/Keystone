@@ -77,37 +77,49 @@ class PreMortemPlanner:
         return [row[0] for row in res.result_set]
 
     def get_default_action_catalog(self) -> List[Action]:
-        """Returns the pre-defined catalog of allowed actions."""
-        return [
-            Action(
-                action_id="act_prep_north",
+        """
+        Builds the allowed-action catalog FROM THE GRAPH, not from hard-coded ids.
+
+        One PREPOSITION_DEPOT action per :Depot and one DEPLOY_MOBILE_RELAY action per
+        required-target :RelayContact. Deriving the catalog means a fixture change
+        (adding a depot, renaming a relay) cannot leave a stale action pointing at a
+        node that no longer exists, which would silently make a policy a no-op.
+        Ordering is deterministic (by id) so action selection and tie-breaking are
+        reproducible.
+        """
+        world = self.client.select_graph(self.base_graph_name)
+
+        depot_res = world.query(
+            "MATCH (d:Depot) RETURN d.id, d.name ORDER BY d.id ASC"
+        )
+        relay_res = world.query(
+            "MATCH (r:RelayContact {is_required_target: true}) "
+            "RETURN r.id, r.name ORDER BY r.id ASC"
+        )
+
+        catalog: List[Action] = []
+        for row in depot_res.result_set:
+            did, dname = row[0], row[1]
+            catalog.append(Action(
+                action_id=f"act_prep_{did}",
                 action_kind="PREPOSITION_DEPOT",
-                target_id="depot_north",
+                target_id=did,
                 cost=1.0,
-                description="Pre-position ambulance crew at North Emergency Depot (dispatch delay: 1 min)"
-            ),
-            Action(
-                action_id="act_prep_south",
-                action_kind="PREPOSITION_DEPOT",
-                target_id="depot_south",
-                cost=1.0,
-                description="Pre-position ambulance crew at South Emergency Depot (dispatch delay: 1 min)"
-            ),
-            Action(
-                action_id="act_relay_civil_lines",
+                description=(
+                    f"Pre-position responder at {dname} "
+                    f"(dispatch delay {self.evaluator.dispatch_delay_pre_positioned_min} min)"
+                )
+            ))
+        for row in relay_res.result_set:
+            rid, rname = row[0], row[1]
+            catalog.append(Action(
+                action_id=f"act_relay_{rid}",
                 action_kind="DEPLOY_MOBILE_RELAY",
-                target_id="relay_civil_lines",
+                target_id=rid,
                 cost=1.5,
-                description="Deploy mobile mesh relay to Civil Lines Relay Contact"
-            ),
-            Action(
-                action_id="act_relay_delhi_gate",
-                action_kind="DEPLOY_MOBILE_RELAY",
-                target_id="relay_delhi_gate",
-                cost=1.5,
-                description="Deploy mobile mesh relay to Delhi Gate Relay Contact"
-            ),
-        ]
+                description=f"Deploy mobile mesh relay to {rname}"
+            ))
+        return catalog
 
     def _apply_action_to_branch(self, branch_graph, action: Optional[Action]) -> Optional[Dict[str, float]]:
         """Applies action modifications to branch graph. Returns depot delay overrides if applicable."""

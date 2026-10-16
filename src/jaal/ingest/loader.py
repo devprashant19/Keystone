@@ -195,6 +195,14 @@ def load_world_graph(graph, data_root: Path = None) -> Tuple[str, int, int]:
              "fixture_id": FIXTURE_ID, "ts": now_ts}
         )
 
+    # A power feeder runs ALONG a corridor, so the carrier belongs to the feeder.
+    # FEEDS_TOWER links inherit their feeder's carrier so the branch cascade severs
+    # them when that corridor fails. Towers themselves carry no corridor.
+    feeder_carrier = {
+        pf["id"]: pf.get("carrier_corridor_id")
+        for pf in pa_data["power_feeders"]
+    }
+
     for tow in pa_data["towers"]:
         graph.query(
             "MERGE (t:Tower {id: $id}) "
@@ -203,7 +211,7 @@ def load_world_graph(graph, data_root: Path = None) -> Tuple[str, int, int]:
             "t.source_ref = 'power_and_alert.json', t.is_real_world_observation = false, "
             "t.fixture_id = $fixture_id, t.ingested_at = $ts",
             {"id": tow["id"], "name": tow["name"], "cmd": tow["is_command_source"],
-             "cid": tow["carrier_corridor_id"], "fixture_id": FIXTURE_ID, "ts": now_ts}
+             "cid": tow.get("carrier_corridor_id"), "fixture_id": FIXTURE_ID, "ts": now_ts}
         )
         for pf_id in tow.get("fed_by", []):
             graph.query(
@@ -211,7 +219,7 @@ def load_world_graph(graph, data_root: Path = None) -> Tuple[str, int, int]:
                 "MERGE (p)-[r:FEEDS_TOWER]->(t) "
                 "ON CREATE SET r.carrier_corridor_id = $cid, r.data_origin = 'synthetic', "
                 "r.source_ref = 'power_and_alert.json'",
-                {"pid": pf_id, "tid": tow["id"], "cid": tow["carrier_corridor_id"]}
+                {"pid": pf_id, "tid": tow["id"], "cid": feeder_carrier.get(pf_id)}
             )
 
     for rc in pa_data["relay_contacts"]:

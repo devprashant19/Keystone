@@ -473,7 +473,7 @@ def get_method():
     return {
         "title": "Jaal Pre-Mortem Methodology & Transparency",
         "provenance": {
-            "road_corridors": "Delhi OpenStreetMap / CityGraph (MIT Licensed)",
+            "road_corridors": "CityGraph project (MIT) — author-digitised arterial corridors; no upstream source cited by that project, so treated as unofficial historical reference geometry, not an authoritative dataset",
             "flood_hazard": "Delhi July 2023 Historic Flood Record (CityGraph)",
             "power_and_alert": "Synthetic layered spec (power_and_alert.json)",
             "depots_and_responders": "Synthetic layered spec (depots_and_responders.json)"
