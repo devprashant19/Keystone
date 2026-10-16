@@ -2,7 +2,7 @@
   "run_id": "run_abstain_demo",
   "f1_corridor_id": "road_ring_kashmere_monastery",
   "created_at": "2026-10-15T00:00:00.000000+00:00",
-  "world_digest": "1043c792e07c0974fa9e829b9c59bb7f7492070cfe117e0f5b9336f06a821d3b",
+  "world_digest": "b7ea9b128fa056d5823ab2c5d18f3a84fb50351b43fcd3f234f4c0365a3a68da",
   "config_hash": "ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35",
   "decomposition": {
     "f1_alone_breach": false,
