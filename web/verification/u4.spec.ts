@@ -253,6 +253,31 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     const toggledText = await motionToggle.textContent();
     expect(toggledText).not.toBe(initialText);
     await motionToggle.click();
+
+    // 27. Clear selection button (#clear-btn)
+    const clearBtn = page.locator('#clear-btn');
+    if (await clearBtn.isVisible()) {
+      await clearBtn.click();
+      await expect(page.locator('.case-row')).toHaveCount(0);
+    }
+
+    // 28. Map corridor click (.corridor-group) loads scenario
+    const firstCorridor = page.locator('.corridor-group').first();
+    await firstCorridor.dispatchEvent('click');
+    await page.waitForSelector('.case-row', { timeout: 15000 });
+
+    // 29. Recompute Live button (#recompute-live-btn)
+    const recomputeBtn = page.locator('#recompute-live-btn');
+    await expect(recomputeBtn).toBeVisible();
+
+    // 30. Scenario Provenance chip (#scenario-provenance-chip)
+    const provChip = page.locator('#scenario-provenance-chip');
+    await expect(provChip).toBeVisible();
+    await expect(provChip).toContainText(/precomputed|live/);
+    await provChip.click();
+    await page.waitForURL(/\/method/);
+    await page.locator('text=Return to Incident Command Deck').click();
+    await page.waitForURL('/');
   });
 
   test('U4-02: All 14 states reachable and captured', async ({ page }) => {
@@ -262,6 +287,9 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     await page.route('/api/runs?limit=1', async (route) => route.fulfill({ json: { runs: [] } }));
     await page.goto('/');
     await page.waitForSelector('.intersection-node');
+    if (await page.locator('#clear-btn').isVisible()) {
+      await page.locator('#clear-btn').click();
+    }
     await page.screenshot({ path: path.join(u4Dir, '01-idle.png') });
 
     // 2. Loading state
