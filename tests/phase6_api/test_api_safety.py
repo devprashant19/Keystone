@@ -13,9 +13,11 @@ from jaal.tools.tools import (
     EvaluateContingencyInput,
     GetCaseEvidenceInput,
     RecordCommanderDecisionInput,
+    CheckSystemHealthInput,
     get_corridor_inventory,
     evaluate_contingency,
     record_commander_decision,
+    check_system_health,
     sanitize_output,
     ALLOWED_CORRIDORS
 )
@@ -44,7 +46,8 @@ def test_ag_01_no_cypher_surface():
         GetCorridorInventoryInput,
         EvaluateContingencyInput,
         GetCaseEvidenceInput,
-        RecordCommanderDecisionInput
+        RecordCommanderDecisionInput,
+        CheckSystemHealthInput,
     ]
     for model in tool_models:
         field_names = model.model_fields.keys()
