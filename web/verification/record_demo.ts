@@ -124,6 +124,13 @@ test('Record Deterministic Demo Walkthrough in One Continuous Take (1440x900)', 
   await page.waitForTimeout(5000); // Readability floor for Beat 7
 
   // Re-capture Scene 2: Abstention from live seeded state
+  // The right rail scrolls; the ABSTAIN body sits below the fold on first paint.
+  // Bring the decision block into view so the still shows the full reasoning
+  // rather than a sentence cut mid-clause. The component is not at fault -- the
+  // capture was.
+  await page.locator('#abstention-body-text').evaluate((el) =>
+      el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await page.waitForTimeout(250);
   await checkVisibleIds('Scene 2 Abstention');
   await page.screenshot({ path: path.join(demoDir, 'scene2_abstention.png') });
 

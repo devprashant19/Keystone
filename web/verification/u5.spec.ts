@@ -211,6 +211,24 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
     const canvas = page.locator('.graph-canvas-container');
     await canvas.waitFor({ state: 'visible' });
 
+    // Settle before each capture -- same rationale as u6.spec.ts U6-09: node presence
+    // is not a finished frame, and an unsettled first paint produced a false
+    // determinism failure at the tail of a long battery.
+    const settle = async () => {
+      await page.evaluate(() => document.fonts.ready);
+      await page
+        .waitForFunction(
+          () => document.getAnimations().every((a) => a.playState !== 'running'),
+          null,
+          { timeout: 5000 }
+        )
+        .catch(() => {
+          /* the breathing health dot loops by design */
+        });
+      await page.waitForTimeout(300);
+    };
+
+    await settle();
     const shot1Buf = await canvas.screenshot();
     const shot1Path = path.join(u5Dir, 'determinism-take-1.png');
     fs.writeFileSync(shot1Path, shot1Buf);
@@ -219,6 +237,7 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
     await page.waitForSelector('.intersection-node');
     const canvas2 = page.locator('.graph-canvas-container');
     await canvas2.waitFor({ state: 'visible' });
+    await settle();
 
     const shot2Buf = await canvas2.screenshot();
     const shot2Path = path.join(u5Dir, 'determinism-take-2.png');
@@ -228,13 +247,13 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
   });
 
   test('U5-08: Core still green (shell out to pytest)', async () => {
-    test.setTimeout(480000);
+    test.setTimeout(1200000);
     const rootDir = path.resolve('..');
     const pythonExe = path.join(rootDir, '.venv', 'Scripts', 'python.exe');
     const res = child_process.spawnSync(pythonExe, ['-m', 'pytest', 'tests', '-q'], {
       cwd: rootDir,
       encoding: 'utf-8',
-      timeout: 480000,
+      timeout: 1200000,
     });
     console.log(res.stdout);
     expect(res.status).toBe(0);

@@ -72,6 +72,13 @@ test.describe('Demo Scenes & Storyboard Capture (Live API)', () => {
     const reasonText = page.locator('text=NO_PLAN_PRESERVES_ALL_CRITICAL_REQUIREMENTS');
     await expect(reasonText, 'Expected live run to return NO_PLAN_PRESERVES_ALL_CRITICAL_REQUIREMENTS').toBeVisible();
     await expect(page.locator('#approve-action-btn')).toBeDisabled();
+    // The right rail scrolls; the ABSTAIN body sits below the fold on first paint.
+    // Bring the decision block into view so the still shows the full reasoning
+    // rather than a sentence cut mid-clause. The component is not at fault -- the
+    // capture was.
+    await page.locator('#abstention-body-text').evaluate((el) =>
+      el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await page.waitForTimeout(250);
     await checkVisibleIds('Scene 2');
     await page.screenshot({ path: path.join(demoDir, 'scene2_abstention.png') });
 

@@ -139,10 +139,22 @@ test.describe('U3 — Motion System Verification Battery', () => {
     await page.waitForSelector('.metric-tile');
 
     const initialTiles = await page.locator('.metric-tile [data-testid="metric-value"]').allTextContents();
+    expect(initialTiles.length).toBeGreaterThan(0);
     for (const val of initialTiles) {
-      // Must either be — or a non-negative number / string
       expect(val.length).toBeGreaterThan(0);
+      expect(val).not.toBe('NaN');
+      expect(val).not.toBe('undefined');
+      expect(val).not.toBe('null');
     }
+
+    // Verify verification slot transitions directly between real values without count-up
+    const toggleBtn = page.locator('#cycle-digit-btn');
+    const digitEl = page.locator('#tabular-test-element');
+    await expect(digitEl).toHaveText('0');
+    await toggleBtn.click();
+    await expect(digitEl).toHaveText('8');
+    await toggleBtn.click();
+    await expect(digitEl).toHaveText('0');
   });
 
   test('U3-08: Zero fake progress timers driving progress UI', async () => {
