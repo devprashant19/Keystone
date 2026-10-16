@@ -1,5 +1,18 @@
 {
+  "_fixture_note": "SYNTHETIC. No real feeder, tower, relay or radio-coverage data exists for this area; every entity, latency and carrier assignment below is an assumption, labelled data_origin=synthetic throughout. Design principle, declared before measuring outcomes: power feeders and alert backhaul run ALONG arterial corridors, so each is assigned a carrier_corridor_id and is severed when that corridor fails. Carriers are spread across 7 of 14 corridors rather than clustered on 2, and towers have mixed redundancy (some dual-fed, some single-fed) so that a single failure degrades without always breaching. Prior version had 2 towers / 2 relays / 3 links on 2 corridors, which left the alert layer unable to interact with the road layer. Five redundant point-to-point microwave backhaul links (mw_*) carry no corridor, giving every tower a second disjoint path from a command source; without them the backhaul was a tree and 7 of 14 single corridor failures orphaned relays outright, saturating the fixture.",
   "power_feeders": [
+    {
+      "id": "pf_kashmere",
+      "name": "Kashmere Gate Substation Feeder",
+      "carrier_corridor_id": "road_sham_nath_sushruta_kashmere",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "pf_monastery",
+      "name": "Monastery Market Feeder",
+      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "data_origin": "synthetic"
+    },
     {
       "id": "pf_chandrawal",
       "name": "Chandrawal Grid Feeder",
@@ -7,69 +20,479 @@
       "data_origin": "synthetic"
     },
     {
-      "id": "pf_kashmere",
-      "name": "Kashmere Gate Substation Feeder",
-      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "id": "pf_redfort",
+      "name": "Red Fort Distribution Feeder",
+      "carrier_corridor_id": "road_ring_kashmere_redfort",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "pf_ito",
+      "name": "ITO Junction Feeder",
+      "carrier_corridor_id": "road_vikas_marg_ito",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "pf_cp",
+      "name": "Connaught Place Feeder",
+      "carrier_corridor_id": "road_barakhamba_cp_mandihouse",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "pf_ridge",
+      "name": "Ridge Line Feeder",
+      "carrier_corridor_id": "road_ridge_sushruta_hindurao",
       "data_origin": "synthetic"
     }
   ],
   "towers": [
     {
-      "id": "tower_north_ridge",
-      "name": "North Ridge Telecom Tower",
+      "id": "tower_civil_lines",
+      "name": "Civil Lines Command Tower",
       "is_command_source": true,
-      "fed_by": ["pf_chandrawal"],
-      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "fed_by": [
+        "pf_ridge",
+        "pf_kashmere"
+      ],
       "data_origin": "synthetic"
     },
     {
-      "id": "tower_isbt",
-      "name": "ISBT Relay Tower",
+      "id": "tower_kashmere",
+      "name": "Kashmere Gate Tower",
+      "is_command_source": true,
+      "fed_by": [
+        "pf_kashmere",
+        "pf_redfort"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_monastery",
+      "name": "Monastery Market Tower",
       "is_command_source": false,
-      "fed_by": ["pf_kashmere"],
-      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "fed_by": [
+        "pf_monastery"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_chandgiram",
+      "name": "Chandgiram Akhara Tower",
+      "is_command_source": false,
+      "fed_by": [
+        "pf_chandrawal"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_redfort",
+      "name": "Red Fort North Tower",
+      "is_command_source": false,
+      "fed_by": [
+        "pf_redfort"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_ito",
+      "name": "ITO Junction Tower",
+      "is_command_source": false,
+      "fed_by": [
+        "pf_ito"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_cp",
+      "name": "Connaught Place Tower",
+      "is_command_source": false,
+      "fed_by": [
+        "pf_cp"
+      ],
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "tower_hindurao",
+      "name": "Hindu Rao Ridge Tower",
+      "is_command_source": false,
+      "fed_by": [
+        "pf_ridge"
+      ],
       "data_origin": "synthetic"
     }
   ],
   "relay_contacts": [
     {
-      "id": "relay_civil_lines",
-      "name": "Civil Lines Relay Contact",
+      "id": "relay_lnjp",
+      "name": "LNJP Hospital Relay",
+      "is_required_target": true,
+      "covers_facility": "hosp_lnjp",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_gbpant",
+      "name": "GB Pant Hospital Relay",
+      "is_required_target": true,
+      "covers_facility": "hosp_gb_pant",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_sushruta",
+      "name": "Sushruta Trauma Relay",
       "is_required_target": true,
       "covers_facility": "hosp_sushruta",
       "data_origin": "synthetic"
     },
     {
-      "id": "relay_delhi_gate",
-      "name": "Delhi Gate Relay Contact",
+      "id": "relay_hindurao",
+      "name": "Hindu Rao Hospital Relay",
       "is_required_target": true,
+      "covers_facility": "hosp_hindu_rao",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_dfs",
+      "name": "DFS Headquarters Relay",
+      "is_required_target": true,
+      "covers_facility": "fire_dfs_hq",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_kgfire",
+      "name": "Kashmere Gate Fire Relay",
+      "is_required_target": true,
+      "covers_facility": "fire_kashmere_gate",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_roopnagar",
+      "name": "Roop Nagar Fire Relay",
+      "is_required_target": true,
+      "covers_facility": "fire_roop_nagar",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_chandrawal",
+      "name": "Chandrawal WTP Relay",
+      "is_required_target": true,
+      "covers_facility": "wtp_chandrawal",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_drain12",
+      "name": "Drain 12 Regulator Relay",
+      "is_required_target": true,
+      "covers_facility": "regulator_drain12",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_station_backup",
+      "name": "New Delhi Station Backup Relay",
+      "is_required_target": false,
       "covers_facility": "hosp_lnjp",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_monastery_backup",
+      "name": "Monastery Backup Relay",
+      "is_required_target": false,
+      "covers_facility": "wtp_chandrawal",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "relay_ito_backup",
+      "name": "ITO Backup Relay",
+      "is_required_target": false,
+      "covers_facility": "regulator_drain12",
       "data_origin": "synthetic"
     }
   ],
   "alert_arcs": [
     {
-      "link_id": "link_t1_t2",
-      "source": "tower_north_ridge",
-      "target": "tower_isbt",
-      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "link_id": "bh_cl_kg",
+      "source": "tower_civil_lines",
+      "target": "tower_kashmere",
+      "carrier_corridor_id": "road_sham_nath_sushruta_kashmere",
+      "latency_min": 1.0,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_cl_kg",
+      "source": "tower_kashmere",
+      "target": "tower_civil_lines",
+      "carrier_corridor_id": "road_sham_nath_sushruta_kashmere",
+      "latency_min": 1.0,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_kg_mon",
+      "source": "tower_kashmere",
+      "target": "tower_monastery",
+      "carrier_corridor_id": "road_ring_kashmere_monastery",
       "latency_min": 1.2,
       "data_origin": "synthetic"
     },
     {
-      "link_id": "link_t2_rc1",
-      "source": "tower_isbt",
-      "target": "relay_civil_lines",
+      "link_id": "bh_kg_mon",
+      "source": "tower_monastery",
+      "target": "tower_kashmere",
+      "carrier_corridor_id": "road_ring_kashmere_monastery",
+      "latency_min": 1.2,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_mon_cg",
+      "source": "tower_monastery",
+      "target": "tower_chandgiram",
+      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "latency_min": 1.1,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_mon_cg",
+      "source": "tower_chandgiram",
+      "target": "tower_monastery",
+      "carrier_corridor_id": "road_ring_monastery_chandgiram",
+      "latency_min": 1.1,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_kg_rf",
+      "source": "tower_kashmere",
+      "target": "tower_redfort",
+      "carrier_corridor_id": "road_ring_kashmere_redfort",
+      "latency_min": 1.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_kg_rf",
+      "source": "tower_redfort",
+      "target": "tower_kashmere",
+      "carrier_corridor_id": "road_ring_kashmere_redfort",
+      "latency_min": 1.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_rf_ito",
+      "source": "tower_redfort",
+      "target": "tower_ito",
+      "carrier_corridor_id": "road_ring_delhigate_ito",
+      "latency_min": 1.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_rf_ito",
+      "source": "tower_ito",
+      "target": "tower_redfort",
+      "carrier_corridor_id": "road_ring_delhigate_ito",
+      "latency_min": 1.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_ito_cp",
+      "source": "tower_ito",
+      "target": "tower_cp",
+      "carrier_corridor_id": "road_vikas_marg_ito",
+      "latency_min": 1.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_ito_cp",
+      "source": "tower_cp",
+      "target": "tower_ito",
+      "carrier_corridor_id": "road_vikas_marg_ito",
+      "latency_min": 1.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_cl_hr",
+      "source": "tower_civil_lines",
+      "target": "tower_hindurao",
+      "carrier_corridor_id": "road_ridge_sushruta_hindurao",
+      "latency_min": 1.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "bh_cl_hr",
+      "source": "tower_hindurao",
+      "target": "tower_civil_lines",
+      "carrier_corridor_id": "road_ridge_sushruta_hindurao",
+      "latency_min": 1.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_rf_lnjp",
+      "source": "tower_redfort",
+      "target": "relay_lnjp",
       "carrier_corridor_id": null,
       "latency_min": 0.8,
       "data_origin": "synthetic"
     },
     {
-      "link_id": "link_t2_rc2",
-      "source": "tower_isbt",
-      "target": "relay_delhi_gate",
+      "link_id": "lh_rf_gbpant",
+      "source": "tower_redfort",
+      "target": "relay_gbpant",
+      "carrier_corridor_id": null,
+      "latency_min": 0.9,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_cl_sushruta",
+      "source": "tower_civil_lines",
+      "target": "relay_sushruta",
+      "carrier_corridor_id": null,
+      "latency_min": 0.8,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_hr_hindurao",
+      "source": "tower_hindurao",
+      "target": "relay_hindurao",
+      "carrier_corridor_id": null,
+      "latency_min": 0.9,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_cp_dfs",
+      "source": "tower_cp",
+      "target": "relay_dfs",
+      "carrier_corridor_id": null,
+      "latency_min": 0.7,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_kg_kgfire",
+      "source": "tower_kashmere",
+      "target": "relay_kgfire",
+      "carrier_corridor_id": null,
+      "latency_min": 0.8,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_hr_roopnagar",
+      "source": "tower_hindurao",
+      "target": "relay_roopnagar",
+      "carrier_corridor_id": null,
+      "latency_min": 1.1,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_cg_chandrawal",
+      "source": "tower_chandgiram",
+      "target": "relay_chandrawal",
+      "carrier_corridor_id": null,
+      "latency_min": 1.0,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_ito_drain12",
+      "source": "tower_ito",
+      "target": "relay_drain12",
+      "carrier_corridor_id": null,
+      "latency_min": 0.9,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_ito_station_backup",
+      "source": "tower_ito",
+      "target": "relay_station_backup",
       "carrier_corridor_id": null,
       "latency_min": 1.5,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_mon_backup",
+      "source": "tower_monastery",
+      "target": "relay_monastery_backup",
+      "carrier_corridor_id": null,
+      "latency_min": 1.2,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "lh_cp_ito_backup",
+      "source": "tower_cp",
+      "target": "relay_ito_backup",
+      "carrier_corridor_id": null,
+      "latency_min": 1.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_rf",
+      "source": "tower_civil_lines",
+      "target": "tower_redfort",
+      "carrier_corridor_id": null,
+      "latency_min": 2.2,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_rf",
+      "source": "tower_redfort",
+      "target": "tower_civil_lines",
+      "carrier_corridor_id": null,
+      "latency_min": 2.2,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_kg_cp",
+      "source": "tower_kashmere",
+      "target": "tower_cp",
+      "carrier_corridor_id": null,
+      "latency_min": 2.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_kg_cp",
+      "source": "tower_cp",
+      "target": "tower_kashmere",
+      "carrier_corridor_id": null,
+      "latency_min": 2.6,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_cg",
+      "source": "tower_civil_lines",
+      "target": "tower_chandgiram",
+      "carrier_corridor_id": null,
+      "latency_min": 2.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_cg",
+      "source": "tower_chandgiram",
+      "target": "tower_civil_lines",
+      "carrier_corridor_id": null,
+      "latency_min": 2.4,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_kg_ito",
+      "source": "tower_kashmere",
+      "target": "tower_ito",
+      "carrier_corridor_id": null,
+      "latency_min": 2.8,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_kg_ito",
+      "source": "tower_ito",
+      "target": "tower_kashmere",
+      "carrier_corridor_id": null,
+      "latency_min": 2.8,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_mon",
+      "source": "tower_civil_lines",
+      "target": "tower_monastery",
+      "carrier_corridor_id": null,
+      "latency_min": 2.3,
+      "data_origin": "synthetic"
+    },
+    {
+      "link_id": "mw_cl_mon",
+      "source": "tower_monastery",
+      "target": "tower_civil_lines",
+      "carrier_corridor_id": null,
+      "latency_min": 2.3,
       "data_origin": "synthetic"
     }
   ]

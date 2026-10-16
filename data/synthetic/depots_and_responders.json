@@ -1,31 +1,32 @@
 {
+  "_fixture_note": "SYNTHETIC. Two scarce response origins. Selection history, declared on structural criteria and recorded in full: (1) baseline must be feasible at the frozen 6.8 km allowance; (2) stressed share must fall in a 20-70% band so the fixture is neither vacuous nor saturated; (3) no single corridor failure may isolate a depot outright. A single depot at int_delhi_gate satisfied (1) but failed (3): four corridors cut it off entirely, leaving 8 of 9 critical facilities unreachable and saturating the fixture at 57% f1-alone. A second origin at int_connaught_place (co-located with fire_dfs_hq, the Delhi Fire Service HQ, criticality 10) removes that single point of failure. The earlier two-depot pair int_civil_lines + int_delhi_gate covered both ends of the arterial ring and was too robust (14% stressed), which produced zero two-failure interaction cases.",
   "depots": [
     {
-      "id": "depot_north",
-      "name": "North Emergency Depot",
-      "at_intersection": "int_civil_lines",
+      "id": "depot_south",
+      "name": "Delhi Gate Response Depot",
+      "at_intersection": "int_delhi_gate",
       "dispatch_delay_min": 3.0,
       "data_origin": "synthetic"
     },
     {
-      "id": "depot_south",
-      "name": "South Emergency Depot",
-      "at_intersection": "int_delhi_gate",
+      "id": "depot_central",
+      "name": "DFS Headquarters Response Depot",
+      "at_intersection": "int_connaught_place",
       "dispatch_delay_min": 3.0,
       "data_origin": "synthetic"
     }
   ],
   "responders": [
     {
-      "id": "resp_north_1",
-      "kind": "ambulance",
-      "home_depot_id": "depot_north",
-      "data_origin": "synthetic"
-    },
-    {
       "id": "resp_south_1",
       "kind": "ambulance",
       "home_depot_id": "depot_south",
+      "data_origin": "synthetic"
+    },
+    {
+      "id": "resp_central_1",
+      "kind": "ambulance",
+      "home_depot_id": "depot_central",
       "data_origin": "synthetic"
     }
   ]
