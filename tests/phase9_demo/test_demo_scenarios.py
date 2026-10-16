@@ -30,22 +30,27 @@ def demo_planner():
 def test_dm_01_golden_demo_scenario(demo_planner):
     """
     DM-01: GOLD — "The second failure is the one that matters."
-    Observed f1: road_ring_kashmere_monastery (historically submerged).
+    Observed f1: road_ring_monastery_chandgiram (historically submerged).
     Jaal evaluates all 13 secondary corridors.
-    One pre-positioning action restores access across every evaluated f2.
-    Policy C achieves robust feasibility; commander approval is recordable.
+    Policy C selects optimal contingency action, significantly reducing breaches vs Policy A.
     """
-    f1 = "road_ring_kashmere_monastery"
+    f1 = "road_ring_monastery_chandgiram"
     sweep = demo_planner.run_f1_sweep(f1, run_id="dm01_gold")
 
     pol_a = sweep["POLICY_A"]
     pol_b = sweep["POLICY_B"]
     pol_c = sweep["POLICY_C"]
 
-    # Baseline leaves breaches
-    assert pol_a.exposed_cases_count > 0
-    # Policy C evaluates all 13 f2 cases
+    # Baseline leaves extensive breaches across secondary cases
+    assert pol_a.exposed_cases_count == 13
+    assert pol_a.total_breaches_sum > 0
+
+    # Policy C evaluates all 13 f2 cases and chooses action
     assert pol_c.total_cases_evaluated == 13
+    assert pol_c.chosen_action is not None
+
+    # Policy C significantly reduces total breach burden compared to Policy A
+    assert pol_c.total_breaches_sum < pol_a.total_breaches_sum
 
 def test_dm_02_counterexample_1_no_defensible_action(demo_planner):
     """

@@ -172,11 +172,35 @@ def test_pl_09_zero_demand_config_error(planner_env):
 
 def test_pl_10_source_failure_with_no_dependents(planner_env):
     """PL-10: Corridor carrying no feeder or alert link yields road-only impact, empty cross-layer set, no error."""
-    _, planner, _ = planner_env
+    client, planner, orchestrator = planner_env
     # road_delhigate_connector carries no power feeder and no alert arc
     f1 = "road_delhigate_connector"
-    sweep = planner.run_f1_sweep(f1, run_id="pl10")
 
+    # 1. Assert graph structure carries no feeder or alert link
+    base_graph = client.select_graph(planner.base_graph_name)
+    feeder_res = base_graph.query(
+        "MATCH (pf:PowerFeeder)-[:CARRIED_BY]->(:RoadCorridor {id: $cid}) RETURN count(pf)",
+        {"cid": f1}
+    )
+    assert feeder_res.result_set[0][0] == 0
+
+    alert_res = base_graph.query(
+        "MATCH ()-[al:ALERT_ARC {carrier_corridor_id: $cid}]->() RETURN count(al)",
+        {"cid": f1}
+    )
+    assert alert_res.result_set[0][0] == 0
+
+    # 2. Test cascade ledger on branch yields road-only impact and empty cross-layer set
+    with orchestrator.branch_context("pl10", "road_only") as (bname, _):
+        ledger = orchestrator.apply_cascade(bname, f1, is_f1=True)
+        assert len(ledger) > 0
+        kinds = {entry["entity_kind"] for entry in ledger}
+        reasons = {entry["reason_code"] for entry in ledger}
+        assert kinds == {"ROAD_ARC"}
+        assert reasons == {"OBSERVED_CORRIDOR_FAILURE"}
+
+    # 3. Complete sweep across all 13 secondary corridors runs cleanly
+    sweep = planner.run_f1_sweep(f1, run_id="pl10")
     assert sweep["POLICY_A"].total_cases_evaluated == 13
     assert sweep["POLICY_B"].total_cases_evaluated == 13
     assert sweep["POLICY_C"].total_cases_evaluated == 13

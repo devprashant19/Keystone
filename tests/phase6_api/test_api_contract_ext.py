@@ -155,14 +155,12 @@ def test_pre_07_runs_list(api_client):
     assert create_res.status_code == 200
     run_id = create_res.json()["run_id"]
 
-    # Record decision if not abstained
-    run_data = create_res.json()
-    if not run_data["recommendation"]["abstain"]:
-        dec_res = api_client.post(
-            f"/api/run/{run_id}/decision",
-            json={"verdict": "APPROVE", "rationale": "Commander standard contingency approval", "actor": "CMD_TEST"}
-        )
-        assert dec_res.status_code == 200
+    # Record decision unconditionally
+    dec_res = api_client.post(
+        f"/api/run/{run_id}/decision",
+        json={"verdict": "REJECT", "rationale": "Commander contingency review: rejected due to breach burden", "actor": "CMD_TEST"}
+    )
+    assert dec_res.status_code == 200
 
     # Query /api/runs
     res = api_client.get("/api/runs?limit=10")
@@ -179,6 +177,9 @@ def test_pre_07_runs_list(api_client):
     assert "abstain" in r0
     assert "headline_interaction_only_count" in r0
     assert "status" in r0
+    assert r0.get("decision") is not None
+    assert r0["decision"]["verdict"] == "rejected"
+    assert r0["decision"]["actor"] == "CMD_TEST"
 
 def test_pre_08_chain_assembled(api_client):
     """

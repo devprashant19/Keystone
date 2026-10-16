@@ -43,6 +43,25 @@ def test_dv02_topology_matches_file(world_graph):
     total_arcs = world_graph.query("MATCH ()-[r:ROAD_ARC]->() RETURN count(r)").result_set[0][0]
     assert total_arcs == 28
 
+    # Assert 1 single connected component over all intersections
+    arc_rows = world_graph.query("MATCH (a:Intersection)-[r:ROAD_ARC]->(b:Intersection) RETURN DISTINCT a.id, b.id").result_set
+    all_ints = {r[0] for r in world_graph.query("MATCH (i:Intersection) RETURN i.id").result_set}
+    adj = {n: set() for n in all_ints}
+    for u, v in arc_rows:
+        adj[u].add(v)
+        adj[v].add(u)
+    visited = set()
+    start_node = next(iter(all_ints))
+    queue = [start_node]
+    visited.add(start_node)
+    while queue:
+        curr = queue.pop(0)
+        for nbr in adj[curr]:
+            if nbr not in visited:
+                visited.add(nbr)
+                queue.append(nbr)
+    assert len(visited) == 13, f"Expected 1 connected component of 13 intersections, reached {len(visited)}"
+
 def test_dv03_provenance_completeness(world_graph):
     """DV-03: Zero nodes/relationships lack data_origin; synthetic layers all 'synthetic'."""
     null_node_origin = world_graph.query("MATCH (n) WHERE n.data_origin IS NULL RETURN count(n)").result_set[0][0]

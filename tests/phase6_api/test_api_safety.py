@@ -131,9 +131,22 @@ def test_ag_07_invalid_tool_args_rejected():
 
 def test_ag_08_invented_metric_blocked():
     """AG-08: Text with unverified metric is blocked/sanitized."""
-    # Verifies sanitize_output and allowlist enforce verified data
-    corridor = "road_ring_kashmere_monastery"
-    assert corridor in ALLOWED_CORRIDORS
+    from jaal.agent.agent import JaalAgent, extract_numbers, collect_tool_grounding_facts
+    agent = JaalAgent()
+    # Execute query
+    res = agent.query("What fails if monastery_chandgiram floods?")
+    assert res.grounded is True
+
+    # Harvest valid metrics from tool outputs
+    valid_entities, valid_numbers = collect_tool_grounding_facts(res.tool_trace)
+    assert "88888" not in valid_numbers
+
+    # Inject an ungrounded hallucinated number into narration text
+    invented_text = f"{res.answer} Additionally, 88888 homes lost power."
+    detected_nums = extract_numbers(invented_text)
+    assert "88888" in detected_nums
+    ungrounded = detected_nums - valid_numbers - {"0", "1"}
+    assert "88888" in ungrounded
 
 def test_ag_09_prompt_injection_safety(api_client):
     """AG-09: Injected prompt text renders as plain escaped string, changes nothing, invokes no tool."""

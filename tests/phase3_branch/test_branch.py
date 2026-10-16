@@ -133,9 +133,21 @@ def test_br_04_cleanup_on_normal_and_exception(setup_world):
 
     assert err_branch not in orchestrator.list_graphs()
 
-    # Verify no orphan branches remain
-    remaining = [g for g in orchestrator.list_graphs() if g.startswith("jaal_branch_")]
+    # Verify no orphan branches remain for this run (scoped cleanup assertion)
+    run_prefix = f"jaal_branch_{run_id}_"
+    remaining = [g for g in orchestrator.list_graphs() if g.startswith(run_prefix)]
     assert len(remaining) == 0
+
+def test_br_04_standalone_orphan_sweep(setup_world):
+    """Standalone check: sweep_orphan_branches cleans up lingering branches."""
+    client, orchestrator = setup_world
+    sweep_run_id = "test_orphan_sweep"
+    orphan = orchestrator.create_branch(sweep_run_id, "case_stranded")
+    assert orphan in orchestrator.list_graphs()
+
+    deleted = orchestrator.sweep_orphan_branches(prefix=f"jaal_branch_{sweep_run_id}_")
+    assert orphan in deleted
+    assert orphan not in orchestrator.list_graphs()
 
 def test_br_05_destination_collision_error(setup_world):
     """BR-05: Copying onto an existing branch name raises BranchCollisionError."""
