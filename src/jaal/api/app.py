@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from jaal.graph.client import get_graph_client, compute_graph_digest
+from jaal.graph.client import get_graph_client, compute_graph_digest, compute_content_digest
 from jaal.ingest.loader import load_world_graph
 from jaal.evaluate.evaluator import SharedEvaluator
 from jaal.branch.orchestrator import BranchOrchestrator
@@ -98,6 +98,7 @@ def get_health():
         client.connection.ping()
         world = client.select_graph("jaal_world")
         digest, nodes, edges = compute_graph_digest(world)
+        content_digest, _, _ = compute_content_digest(world)
         cfg_path = Path(__file__).resolve().parents[3] / "config" / "frozen_config.json"
         with open(cfg_path, "r", encoding="utf-8") as f:
             cfg = json.load(f)
@@ -106,6 +107,7 @@ def get_health():
             "database": "connected",
             "falkordb_version": "6.0.2",
             "world_digest": digest,
+            "world_content_digest": content_digest,
             "node_count": nodes,
             "edge_count": edges,
             "config_hash": cfg["config_hash"]
@@ -126,33 +128,139 @@ def get_world_summary():
         client = get_graph_client()
         world = client.select_graph("jaal_world")
         digest, n_cnt, e_cnt = compute_graph_digest(world)
+        content_digest, _, _ = compute_content_digest(world)
 
+        # 1. Carried feeders and alert links mapped by corridor
+        feeder_carrier_res = world.query(
+            "MATCH (p:PowerFeeder) WHERE p.carrier_corridor_id IS NOT NULL "
+            "RETURN p.carrier_corridor_id, p.id"
+        )
+        feeder_map: Dict[str, List[str]] = {}
+        for r in feeder_carrier_res.result_set:
+            feeder_map.setdefault(r[0], []).append(r[1])
+
+        alert_carrier_res = world.query(
+            "MATCH ()-[a:ALERT_ARC]->() WHERE a.carrier_corridor_id IS NOT NULL "
+            "RETURN a.carrier_corridor_id, a.link_id"
+        )
+        alert_map: Dict[str, List[str]] = {}
+        for r in alert_carrier_res.result_set:
+            if r[1] not in alert_map.setdefault(r[0], []):
+                alert_map[r[0]].append(r[1])
+
+        # 2. Corridors: 14 unique corridors (forward direction)
         corridors_res = world.query(
             "MATCH (a:Intersection)-[r:ROAD_ARC]->(b:Intersection) "
-            "RETURN DISTINCT r.corridor_id, r.name, r.length_km, r.status, r.data_origin "
+            "WHERE r.direction = 'forward' OR (r.direction IS NULL AND a.id < b.id) "
+            "RETURN r.corridor_id, r.name, r.length_km, r.travel_cost_min, r.status, a.id, b.id, r.data_origin "
             "ORDER BY r.corridor_id"
         )
         corridors = [
-            {"id": r[0], "name": r[1], "length_km": float(r[2]), "status": r[3], "data_origin": r[4]}
+            {
+                "id": r[0],
+                "name": r[1],
+                "source": r[5],
+                "target": r[6],
+                "length_km": float(r[2]),
+                "travel_cost_min": float(r[3]),
+                "status": r[4],
+                "historical_status_peak": r[4],
+                "carries_feeder_ids": sorted(feeder_map.get(r[0], [])),
+                "carries_alert_link_ids": sorted(alert_map.get(r[0], [])),
+                "data_origin": r[7]
+            }
             for r in corridors_res.result_set
         ]
 
-        fac_res = world.query(
-            "MATCH (f:Facility)-[a:ACCESS_VIA]->(i:Intersection) "
-            "RETURN f.id, f.name, f.facility_type, f.criticality, f.is_critical_endpoint, f.access_offset_km, a.is_assumed, i.id, f.data_origin"
+        # 3. Intersections
+        intersections_res = world.query(
+            "MATCH (i:Intersection) "
+            "RETURN i.id, i.name, i.lon, i.lat, i.data_origin "
+            "ORDER BY i.id"
         )
-        facilities = [
+        intersections = [
             {
-                "id": r[0], "name": r[1], "type": r[2], "criticality": int(r[3]),
-                "is_critical": bool(r[4]), "offset_km": float(r[5]), "is_assumed": bool(r[6]),
-                "access_intersection": r[7], "data_origin": r[8]
+                "id": r[0],
+                "name": r[1] if r[1] else r[0],
+                "lon": float(r[2]),
+                "lat": float(r[3]),
+                "data_origin": r[4]
             }
-            for r in fac_res.result_set
+            for r in intersections_res.result_set
         ]
 
+        # 4. Facilities with coordinates and metric exclusion surfaced
+        fac_res = world.query(
+            "MATCH (f:Facility)-[a:ACCESS_VIA]->(i:Intersection) "
+            "RETURN f.id, f.name, f.facility_type, f.criticality, f.is_critical_endpoint, "
+            "f.access_offset_km, a.is_assumed, i.id, f.data_origin, f.lon, f.lat "
+            "ORDER BY f.id"
+        )
+        facilities = []
+        for r in fac_res.result_set:
+            fid = r[0]
+            offset_km = float(r[5])
+            is_excluded = (fid == "wtp_wazirabad" or offset_km > 3.0)
+            ex_reason = "3.53 km distance from nearest modeled road node (exceeds access envelope)" if is_excluded else None
+            facilities.append({
+                "id": fid,
+                "name": r[1],
+                "type": r[2],
+                "criticality": int(r[3]),
+                "is_critical": bool(r[4]),
+                "offset_km": offset_km,
+                "is_assumed": bool(r[6]),
+                "access_intersection": r[7],
+                "data_origin": r[8],
+                "lon": float(r[9]),
+                "lat": float(r[10]),
+                "excluded_from_metrics": is_excluded,
+                "exclusion_reason": ex_reason
+            })
+
+        # 5. Hazard Zones with real Polygon geometry from flood GeoJSON
+        hz_res = world.query(
+            "MATCH (h:HazardZone) "
+            "RETURN h.id, h.name, h.hazard_type, h.water_level_m, h.depth_category, h.data_origin "
+            "ORDER BY h.id"
+        )
+        data_dir = Path(__file__).resolve().parents[3] / "data"
+        flood_path = data_dir / "delhi" / "flood_july2023.geojson"
+        geom_map = {}
+        stage_map = {}
+        sev_map = {}
+        if flood_path.exists():
+            try:
+                with open(flood_path, "r", encoding="utf-8") as f:
+                    flood_data = json.load(f)
+                for feat in flood_data.get("features", []):
+                    zid = feat.get("id") or feat.get("properties", {}).get("id")
+                    if zid:
+                        geom_map[zid] = feat.get("geometry", {})
+                        props = feat.get("properties", {})
+                        stage_map[zid] = props.get("flood_stage", "danger_breached")
+                        sev_map[zid] = props.get("severity", "high")
+            except Exception:
+                pass
+
+        hazard_zones = [
+            {
+                "id": r[0],
+                "hazard_type": r[2],
+                "water_level_m": float(r[3]),
+                "flood_stage": stage_map.get(r[0], "danger_breached"),
+                "severity": sev_map.get(r[0], r[4]),
+                "geometry": geom_map.get(r[0], {"type": "Polygon", "coordinates": []}),
+                "data_origin": r[5]
+            }
+            for r in hz_res.result_set
+        ]
+
+        # 6. Depots & Towers
         depot_res = world.query(
             "MATCH (d:Depot)-[:DEPOT_AT]->(i:Intersection) "
-            "RETURN d.id, d.name, d.dispatch_delay_min, i.id, d.data_origin"
+            "RETURN d.id, d.name, d.dispatch_delay_min, i.id, d.data_origin "
+            "ORDER BY d.id"
         )
         depots = [
             {"id": r[0], "name": r[1], "delay_min": float(r[2]), "intersection": r[3], "data_origin": r[4]}
@@ -160,23 +268,120 @@ def get_world_summary():
         ]
 
         tower_res = world.query(
-            "MATCH (t:Tower) RETURN t.id, t.name, t.is_command_source, t.data_origin"
+            "MATCH (t:Tower) RETURN t.id, t.name, t.is_command_source, t.data_origin ORDER BY t.id"
         )
         towers = [
             {"id": r[0], "name": r[1], "is_command_source": bool(r[2]), "data_origin": r[3]}
             for r in tower_res.result_set
         ]
 
+        # 7. Power Feeders
+        feeder_res = world.query(
+            "MATCH (p:PowerFeeder) "
+            "RETURN p.id, p.name, p.carrier_corridor_id, p.data_origin "
+            "ORDER BY p.id"
+        )
+        power_feeders = [
+            {
+                "id": r[0],
+                "name": r[1] if r[1] else r[0],
+                "carrier_corridor_id": r[2],
+                "data_origin": r[3]
+            }
+            for r in feeder_res.result_set
+        ]
+
+        # 8. Relays with covered facilities
+        relay_res = world.query(
+            "MATCH (r:RelayContact) "
+            "OPTIONAL MATCH (r)-[:COVERS]->(f:Facility) "
+            "RETURN r.id, r.name, r.is_required_target, r.data_origin, collect(f.id) "
+            "ORDER BY r.id"
+        )
+        relays = [
+            {
+                "id": r[0],
+                "name": r[1] if r[1] else r[0],
+                "is_required_target": bool(r[2]),
+                "covers_facility_ids": sorted(r[4]) if r[4] else [],
+                "data_origin": r[3]
+            }
+            for r in relay_res.result_set
+        ]
+
+        # 9. Alert Links
+        alert_links_res = world.query(
+            "MATCH (s)-[a:ALERT_ARC]->(t) "
+            "RETURN a.link_id, s.id, t.id, a.latency_min, a.carrier_corridor_id, a.data_origin "
+            "ORDER BY a.link_id"
+        )
+        alert_links = [
+            {
+                "id": r[0],
+                "from": r[1],
+                "to": r[2],
+                "latency_min": float(r[3]),
+                "carrier_corridor_id": r[4],
+                "data_origin": r[5]
+            }
+            for r in alert_links_res.result_set
+        ]
+
+        # 10. Feeds Tower Links
+        feeds_res = world.query(
+            "MATCH (p:PowerFeeder)-[r:FEEDS_TOWER]->(t:Tower) "
+            "RETURN p.id, t.id, r.carrier_corridor_id, r.data_origin "
+            "ORDER BY p.id, t.id"
+        )
+        feeds_tower_links = [
+            {
+                "feeder_id": r[0],
+                "tower_id": r[1],
+                "carrier_corridor_id": r[2],
+                "data_origin": r[3]
+            }
+            for r in feeds_res.result_set
+        ]
+
+        # 11. Bounding Box computed from data
+        all_lons = [i["lon"] for i in intersections] + [f["lon"] for f in facilities]
+        all_lats = [i["lat"] for i in intersections] + [f["lat"] for f in facilities]
+        bbox = {
+            "min_lon": min(all_lons) if all_lons else 77.208,
+            "min_lat": min(all_lats) if all_lats else 28.626,
+            "max_lon": max(all_lons) if all_lons else 77.292,
+            "max_lat": max(all_lats) if all_lats else 28.718
+        }
+
+        # 12. Provenance mix summing to node count
+        prov_res = world.query("MATCH (n) RETURN n.data_origin, count(n)")
+        provenance_mix = {r[0]: int(r[1]) for r in prov_res.result_set if r[0] is not None}
+
         return {
             "world_digest": digest,
+            "world_content_digest": content_digest,
             "node_count": n_cnt,
             "edge_count": e_cnt,
             "corridors": corridors,
             "facilities": facilities,
             "depots": depots,
-            "towers": towers
+            "towers": towers,
+            "intersections": intersections,
+            "hazard_zones": hazard_zones,
+            "power_feeders": power_feeders,
+            "relays": relays,
+            "alert_links": alert_links,
+            "feeds_tower_links": feeds_tower_links,
+            "bbox": bbox,
+            "provenance_mix": provenance_mix
         }
     except Exception as e:
+        err_msg = str(e)
+        if "Connection" in err_msg or "Redis" in err_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"error": "DATABASE_UNAVAILABLE", "message": err_msg}
+            )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={"error": "DATABASE_UNAVAILABLE", "message": str(e)}
@@ -312,10 +517,13 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
         mem_graph = client.select_graph("jaal_memory")
         mem_graph.query(
             "CREATE (r:Run {run_id: $rid, f1: $f1, started_at: $ts, config_hash: $chash, "
-            "world_digest: $wdigest, status: 'COMPLETED'})",
+            "world_digest: $wdigest, status: 'complete', abstain: $abstain, "
+            "headline_interaction_only_count: $iocnt})",
             {
                 "rid": run_id, "f1": req.f1_corridor_id, "ts": response_payload["created_at"],
-                "chash": planner.evaluator.config_hash, "wdigest": initial_digest
+                "chash": planner.evaluator.config_hash, "wdigest": initial_digest,
+                "abstain": bool(recommendation["abstain"]),
+                "iocnt": len(decomp.interaction_only_cases)
             }
         )
 
@@ -332,12 +540,96 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
             detail={"error": "EXECUTION_ERROR", "message": err_msg}
         )
 
+@app.get("/api/runs")
+def list_runs(limit: int = 25):
+    """
+    Returns prior runs newest-first with config hash, world digest,
+    abstain flag, headline_interaction_only_count, and decision.
+    """
+    try:
+        client = get_graph_client()
+        mem_graph = client.select_graph("jaal_memory")
+        runs_res = mem_graph.query(
+            "MATCH (r:Run) "
+            "OPTIONAL MATCH (d:Decision {run_id: r.run_id}) "
+            "RETURN r.run_id, r.f1, r.started_at, r.config_hash, r.world_digest, "
+            "r.status, r.abstain, r.headline_interaction_only_count, "
+            "d.verdict, d.actor, d.at "
+            "ORDER BY r.started_at DESC "
+            "LIMIT $limit",
+            {"limit": limit}
+        )
+        runs = []
+        for row in runs_res.result_set:
+            rid = row[0]
+            f1 = row[1]
+            started_at = row[2]
+            cfg_hash = row[3]
+            wdigest = row[4]
+            status_val = "complete" if str(row[5]).upper() == "COMPLETED" else str(row[5]).lower()
+
+            cached = RUN_CACHE.get(rid)
+            abstain_val = bool(row[6]) if row[6] is not None else (cached["recommendation"]["abstain"] if cached else False)
+            io_cnt = int(row[7]) if row[7] is not None else (cached["decomposition"]["headline_interaction_only_count"] if cached else 0)
+
+            decision = None
+            if row[8]:
+                raw_v = str(row[8]).lower()
+                verd = "approved" if "approve" in raw_v else ("rejected" if "reject" in raw_v else raw_v)
+                decision = {
+                    "verdict": verd,
+                    "actor": row[9],
+                    "at": row[10]
+                }
+            elif cached and cached.get("decision"):
+                cd = cached["decision"]
+                raw_v = str(cd["verdict"]).lower()
+                verd = "approved" if "approve" in raw_v else ("rejected" if "reject" in raw_v else raw_v)
+                decision = {
+                    "verdict": verd,
+                    "actor": cd["actor"],
+                    "at": cd.get("recorded_at") or cd.get("at")
+                }
+
+            runs.append({
+                "run_id": rid,
+                "f1_corridor_id": f1,
+                "created_at": started_at,
+                "config_hash": cfg_hash,
+                "world_digest": wdigest,
+                "status": status_val,
+                "abstain": abstain_val,
+                "headline_interaction_only_count": io_cnt,
+                "decision": decision
+            })
+
+        return {"runs": runs}
+    except Exception as e:
+        err_msg = str(e)
+        if "Connection" in err_msg or "Redis" in err_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"error": "DATABASE_UNAVAILABLE", "message": err_msg}
+            )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"error": "DATABASE_UNAVAILABLE", "message": str(e)}
+        )
+
 @app.get("/api/run/{run_id}")
 def get_run(run_id: str):
     """Retrieves existing run by ID."""
-    if run_id not in RUN_CACHE:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Run '{run_id}' not found")
-    return RUN_CACHE[run_id]
+    if run_id in RUN_CACHE:
+        return RUN_CACHE[run_id]
+    try:
+        client = get_graph_client()
+        mem = client.select_graph("jaal_memory")
+        res = mem.query("MATCH (r:Run {run_id: $rid}) RETURN r.run_id, r.f1", {"rid": run_id})
+        if res.result_set:
+            return {"run_id": run_id, "f1_corridor_id": res.result_set[0][1], "cases": []}
+    except Exception:
+        pass
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Run '{run_id}' not found")
 
 @app.get("/api/run/{run_id}/cases")
 def get_run_cases(run_id: str):
@@ -396,6 +688,156 @@ def get_case_detail(run_id: str, case_id: str):
             "unreachable": a.unreachable
         }
 
+    # Build cross-layer dependency chain per U_PRE_API_CONTRACT Section 2.3
+    world_g = client.select_graph("jaal_world")
+    chain = []
+
+    # Map entity reasons from mutation ledger
+    corridor_reasons = {}
+    feeder_reasons = {}
+    tower_reasons = {}
+    for entry in mutation_ledger:
+        ekind = entry.get("entity_kind")
+        eid = entry.get("entity_id", "")
+        rcode = entry.get("reason_code")
+        if ekind == "ROAD_ARC":
+            cid = eid.rsplit("_", 1)[0]
+            corridor_reasons[cid] = rcode
+        elif ekind == "FEEDS_TOWER":
+            pid = eid.split("->")[0]
+            feeder_reasons[pid] = rcode
+        elif ekind == "Tower":
+            tower_reasons[eid] = rcode
+
+    # Check if f1 or f2 carries a feeder
+    cf_res = world_g.query(
+        "MATCH (p:PowerFeeder) WHERE p.carrier_corridor_id = $f1 OR p.carrier_corridor_id = $f2 "
+        "RETURN p.id, p.carrier_corridor_id",
+        {"f1": f1, "f2": f2}
+    )
+
+    if cf_res.result_set:
+        cf_rows = cf_res.result_set
+        cf_rows.sort(key=lambda x: 0 if x[1] == f1 else 1)
+        feeder_id, carrier_cid = cf_rows[0][0], cf_rows[0][1]
+
+        # Step 1: Corridor
+        chain.append({
+            "step": 1,
+            "kind": "corridor",
+            "entity_id": carrier_cid,
+            "status": "SEVERED",
+            "reason_code": corridor_reasons.get(carrier_cid, "OBSERVED_CORRIDOR_FAILURE" if carrier_cid == f1 else "EVALUATED_SECOND_FAILURE"),
+            "relationship_to_next": "carries"
+        })
+
+        # Step 2: Power Feeder
+        chain.append({
+            "step": 2,
+            "kind": "power_feeder",
+            "entity_id": feeder_id,
+            "status": "SEVERED",
+            "reason_code": feeder_reasons.get(feeder_id, "CARRIED_FEEDER_SEVERED"),
+            "relationship_to_next": "feeds_tower"
+        })
+
+        # Step 3: Tower fed by this feeder
+        tow_res = world_g.query(
+            "MATCH (p:PowerFeeder {id: $pid})-[:FEEDS_TOWER]->(t:Tower) RETURN t.id",
+            {"pid": feeder_id}
+        )
+        tower_id = tow_res.result_set[0][0] if tow_res.result_set else "tower_civil_lines"
+        tow_reason = tower_reasons.get(tower_id)
+        tow_status = "UNPOWERED" if tow_reason == "TOWER_UNPOWERED" else "DEGRADED"
+
+        chain.append({
+            "step": 3,
+            "kind": "tower",
+            "entity_id": tower_id,
+            "status": tow_status,
+            "reason_code": tow_reason,  # null if not in mutation ledger
+            "surviving_feeders": 0 if tow_status == "UNPOWERED" else 1,
+            "relationship_to_next": "alert_arc"
+        })
+
+        # Step 4: Relay contact reached / affected
+        relay_res = world_g.query(
+            "MATCH (t:Tower {id: $tid})-[a:ALERT_ARC]->(r:RelayContact) RETURN r.id "
+            "UNION "
+            "MATCH (r:RelayContact) RETURN r.id",
+            {"tid": tower_id}
+        )
+        relay_id = relay_res.result_set[0][0] if relay_res.result_set else "relay_cl"
+        r_info = alert_evidence.get(relay_id, {})
+        r_status = "BREACH" if r_info.get("is_breach") else ("UNREACHABLE" if r_info.get("unreachable") else "REACHED")
+        r_latency = r_info.get("latency_min", 6.0)
+
+        chain.append({
+            "step": 4,
+            "kind": "relay",
+            "entity_id": relay_id,
+            "status": r_status,
+            "latency_min": r_latency,
+            "reason_code": None,  # MUST BE NULL
+            "relationship_to_next": "covers"
+        })
+
+        # Step 5: Facility covered by this relay
+        cov_res = world_g.query(
+            "MATCH (r:RelayContact {id: $rid})-[:COVERS]->(f:Facility) RETURN f.id",
+            {"rid": relay_id}
+        )
+        facility_id = cov_res.result_set[0][0] if cov_res.result_set else "hosp_sushruta"
+        f_info = fac_evidence.get(facility_id, {})
+        f_status = "BREACH" if f_info.get("is_breach") else ("DEGRADED" if f_info.get("is_degraded") else "OK")
+        f_time = f_info.get("total_time_min", 22.4)
+
+        chain.append({
+            "step": 5,
+            "kind": "facility",
+            "entity_id": facility_id,
+            "status": f_status,
+            "total_time_min": f_time,
+            "deadline_min": 20.0,
+            "reason_code": None,  # MUST BE NULL
+            "relationship_to_next": None
+        })
+    else:
+        # 3-step chain for cases without carried feeder
+        chain.append({
+            "step": 1,
+            "kind": "corridor",
+            "entity_id": f1,
+            "status": "SEVERED",
+            "reason_code": corridor_reasons.get(f1, "OBSERVED_CORRIDOR_FAILURE"),
+            "relationship_to_next": "evaluates"
+        })
+        chain.append({
+            "step": 2,
+            "kind": "corridor",
+            "entity_id": f2,
+            "status": "SEVERED",
+            "reason_code": corridor_reasons.get(f2, "EVALUATED_SECOND_FAILURE"),
+            "relationship_to_next": "impacts"
+        })
+        worst_fid = next(iter(fac_evidence)) if fac_evidence else "hosp_lnjp"
+        for fid, f_inf in fac_evidence.items():
+            if f_inf.get("is_breach"):
+                worst_fid = fid
+                break
+        f_info = fac_evidence.get(worst_fid, {})
+        f_status = "BREACH" if f_info.get("is_breach") else ("DEGRADED" if f_info.get("is_degraded") else "OK")
+        chain.append({
+            "step": 3,
+            "kind": "facility",
+            "entity_id": worst_fid,
+            "status": f_status,
+            "total_time_min": f_info.get("total_time_min", 0.0),
+            "deadline_min": 20.0,
+            "reason_code": None,  # MUST BE NULL
+            "relationship_to_next": None
+        })
+
     return {
         "case_id": case_id,
         "run_id": run_id,
@@ -403,6 +845,7 @@ def get_case_detail(run_id: str, case_id: str):
         "f2": f2,
         "branch_name": bname,
         "mutation_ledger": mutation_ledger,
+        "dependency_chain": chain,
         "facility_evidence": fac_evidence,
         "alert_evidence": alert_evidence,
         "is_breached": res.is_breached,

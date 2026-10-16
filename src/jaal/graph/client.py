@@ -72,3 +72,41 @@ def compute_graph_digest(graph) -> Tuple[str, int, int]:
     canonical_repr = "\n".join(sorted(node_data) + sorted(edge_data)).encode("utf-8")
     digest = hashlib.sha256(canonical_repr).hexdigest()
     return digest, len(node_data), len(edge_data)
+
+VOLATILE_FIELDS = {"ingested_at", "timestamp", "created_at", "started_at", "at", "updated_at"}
+
+def compute_content_digest(graph) -> Tuple[str, int, int]:
+    """
+    Computes a deterministic, stable SHA-256 digest over all nodes and relationships,
+    excluding volatile fields (ingested_at, timestamps) to identify 'the same world'
+    across reloads.
+    Returns: (sha256_hex_digest, node_count, edge_count)
+    """
+    node_res = graph.query("MATCH (n) RETURN labels(n) AS lbls, properties(n) AS props ORDER BY id(n)")
+    node_data = []
+    for row in node_res.result_set:
+        lbls = sorted(row[0]) if row[0] else []
+        props = row[1] if row[1] else {}
+        sorted_props = sorted(
+            (k, str(v)) for k, v in props.items()
+            if k not in VOLATILE_FIELDS and not k.endswith("_at")
+        )
+        node_data.append(f"NODE:{lbls}:{sorted_props}")
+    
+    edge_res = graph.query("MATCH (a)-[r]->(b) RETURN type(r) AS t, properties(r) AS props, a.id AS src, b.id AS dst ORDER BY id(r)")
+    edge_data = []
+    for row in edge_res.result_set:
+        rel_type = row[0]
+        props = row[1] if row[1] else {}
+        sorted_props = sorted(
+            (k, str(v)) for k, v in props.items()
+            if k not in VOLATILE_FIELDS and not k.endswith("_at")
+        )
+        src = row[2]
+        dst = row[3]
+        edge_data.append(f"EDGE:{rel_type}:{src}->{dst}:{sorted_props}")
+
+    canonical_repr = "\n".join(sorted(node_data) + sorted(edge_data)).encode("utf-8")
+    digest = hashlib.sha256(canonical_repr).hexdigest()
+    return digest, len(node_data), len(edge_data)
+
