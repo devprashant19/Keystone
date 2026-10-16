@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBadge } from '../components/primitives';
+import { DependencyChain } from '../graph/DependencyChain';
 
 interface EvidenceViewProps {
   caseId: string;
@@ -13,22 +14,56 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!caseId || !runId) return;
+    if (!caseId) return;
     setLoading(true);
-    fetch(`/api/run/${runId}/case/${caseId}`)
-      .then((res) => {
+
+    const loadEvidence = async () => {
+      try {
+        let activeRunId = runId;
+        if (!activeRunId) {
+          const runsRes = await fetch('/api/runs?limit=1');
+          if (runsRes.ok) {
+            const runsData = await runsRes.json();
+            if (runsData.runs && runsData.runs.length > 0) {
+              activeRunId = runsData.runs[0].run_id;
+            }
+          }
+        }
+        if (!activeRunId) {
+          throw new Error('No benchmark run found. Please trigger a sweep first.');
+        }
+
+        const res = await fetch(`/api/run/${activeRunId}/case/${caseId}`);
         if (!res.ok) throw new Error(`Evidence fetch failed: ${res.statusText}`);
-        return res.json();
-      })
-      .then((json) => {
+        const json = await res.json();
         setData(json);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err: any) {
         setError(err.message);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadEvidence();
   }, [caseId, runId]);
+
+  // Compute arithmetic from first facility evidence if available
+  const firstFacility = data?.facility_evidence ? (Object.values(data.facility_evidence)[0] as any) : null;
+  const dispatchDelay = firstFacility?.best_depot && firstFacility.depot_breakdown?.[firstFacility.best_depot]
+    ? firstFacility.depot_breakdown[firstFacility.best_depot].dispatch_delay_min
+    : 3.0;
+  const roadTime = firstFacility?.road_time_min || 0;
+  const offsetTime = firstFacility?.offset_km ? (firstFacility.offset_km / 24.0) * 60 : 0;
+  const totalTime = firstFacility?.total_time_min ?? (dispatchDelay + roadTime + offsetTime);
+
+  const arithmetic = firstFacility ? {
+    dispatch_min: dispatchDelay,
+    transit_min: roadTime,
+    offset_min: offsetTime,
+    total_min: totalTime,
+    deadline_min: 20.0,
+    is_breach: Boolean(firstFacility.is_breach),
+  } : undefined;
 
   return (
     <div
@@ -76,7 +111,16 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
       {error && <div style={{ color: 'var(--fail)', fontSize: 'var(--fs-cap)' }}>Error: {error}</div>}
 
       {data && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s4)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s4)' }}>
+          {/* Hero: Dependency Chain View */}
+          {data.dependency_chain && (
+            <DependencyChain
+              steps={data.dependency_chain}
+              arithmetic={arithmetic}
+            />
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s4)' }}>
           {/* Left Column: Mutation Ledger */}
           <div
             style={{
@@ -221,7 +265,8 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 };

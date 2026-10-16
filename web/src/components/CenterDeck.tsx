@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { WorldSummary } from '../graph/types';
+import { GraphContainer } from '../graph/GraphContainer';
 
 interface CenterDeckProps {
   viewMode: 'map' | 'topology';
@@ -12,66 +14,10 @@ interface CenterDeckProps {
   onToggleSynthetic: () => void;
   highlightSevered: boolean;
   onToggleSevered: () => void;
+  worldSummary?: WorldSummary | null;
+  onOpenEvidence?: (caseId: string) => void;
+  branchName?: string;
 }
-
-// Normalized coordinate layout for Delhi arterial intersections
-const INTERSECTION_POSITIONS: Record<string, { x: number; y: number; name: string }> = {
-  int_chandgiram: { x: 340, y: 80, name: 'Chandgiram Akhara' },
-  int_civil_lines: { x: 260, y: 120, name: 'Civil Lines' },
-  int_sushruta: { x: 220, y: 160, name: 'Sushruta Trauma' },
-  int_hindu_rao: { x: 180, y: 220, name: 'Hindu Rao' },
-  int_kashmere_gate: { x: 400, y: 180, name: 'Kashmere Gate / ISBT' },
-  int_monastery: { x: 440, y: 140, name: 'Monastery Market' },
-  int_old_delhi_station: { x: 300, y: 280, name: 'Old Delhi Station' },
-  int_red_fort: { x: 420, y: 270, name: 'Red Fort' },
-  int_delhi_gate: { x: 420, y: 380, name: 'Delhi Gate' },
-  int_connaught_place: { x: 280, y: 440, name: 'Connaught Place' },
-  int_mandi_house: { x: 360, y: 470, name: 'Mandi House' },
-  int_ito: { x: 460, y: 440, name: 'ITO Junction' },
-  int_vikas_marg: { x: 540, y: 460, name: 'Vikas Marg / Yamuna' },
-};
-
-// Schematic layout for Topology mode
-const TOPOLOGY_POSITIONS: Record<string, { x: number; y: number; name: string }> = {
-  int_chandgiram: { x: 350, y: 50, name: 'Chandgiram' },
-  int_civil_lines: { x: 200, y: 110, name: 'Civil Lines' },
-  int_sushruta: { x: 140, y: 180, name: 'Sushruta' },
-  int_hindu_rao: { x: 120, y: 270, name: 'Hindu Rao' },
-  int_kashmere_gate: { x: 440, y: 150, name: 'Kashmere Gate' },
-  int_monastery: { x: 520, y: 90, name: 'Monastery' },
-  int_old_delhi_station: { x: 260, y: 260, name: 'Old Delhi Stn' },
-  int_red_fort: { x: 460, y: 260, name: 'Red Fort' },
-  int_delhi_gate: { x: 440, y: 370, name: 'Delhi Gate' },
-  int_connaught_place: { x: 220, y: 420, name: 'Connaught Pl' },
-  int_mandi_house: { x: 320, y: 480, name: 'Mandi House' },
-  int_ito: { x: 480, y: 460, name: 'ITO' },
-  int_vikas_marg: { x: 580, y: 480, name: 'Vikas Marg' },
-};
-
-// Corridors connecting intersections
-const CORRIDOR_EDGES: Array<{
-  id: string;
-  source: string;
-  target: string;
-  name: string;
-  carriesFeeder?: boolean;
-  carriesAlert?: boolean;
-}> = [
-  { id: 'road_ring_monastery_chandgiram', source: 'int_chandgiram', target: 'int_monastery', name: 'Ring Rd Chandgiram-Monastery', carriesFeeder: true, carriesAlert: true },
-  { id: 'road_ring_kashmere_monastery', source: 'int_monastery', target: 'int_kashmere_gate', name: 'Ring Rd Monastery-Kashmere', carriesFeeder: true },
-  { id: 'road_ring_kashmere_redfort', source: 'int_kashmere_gate', target: 'int_red_fort', name: 'Ring Rd Kashmere-Red Fort' },
-  { id: 'road_ring_redfort_delhigate', source: 'int_red_fort', target: 'int_delhi_gate', name: 'Ring Rd Red Fort-Delhi Gate' },
-  { id: 'road_ring_delhigate_ito', source: 'int_delhi_gate', target: 'int_ito', name: 'Ring Rd Delhi Gate-ITO' },
-  { id: 'road_sham_nath_sushruta_kashmere', source: 'int_civil_lines', target: 'int_kashmere_gate', name: 'Sham Nath Marg' },
-  { id: 'road_ridge_sushruta_hindurao', source: 'int_sushruta', target: 'int_hindu_rao', name: 'Ridge Road' },
-  { id: 'road_rani_jhansi_hindurao_cp', source: 'int_hindu_rao', target: 'int_connaught_place', name: 'Rani Jhansi Marg' },
-  { id: 'road_rani_jhansi_to_station', source: 'int_hindu_rao', target: 'int_old_delhi_station', name: 'Rani Jhansi to Station' },
-  { id: 'road_chelmsford_cp_station', source: 'int_connaught_place', target: 'int_old_delhi_station', name: 'Chelmsford Rd' },
-  { id: 'road_barakhamba_cp_mandihouse', source: 'int_connaught_place', target: 'int_mandi_house', name: 'Barakhamba Rd' },
-  { id: 'road_delhigate_connector', source: 'int_mandi_house', target: 'int_delhi_gate', name: 'Delhi Gate Connector' },
-  { id: 'road_jln_marg_delhigate_cp', source: 'int_delhi_gate', target: 'int_connaught_place', name: 'JLN Marg' },
-  { id: 'road_vikas_marg_ito', source: 'int_ito', target: 'int_vikas_marg', name: 'Vikas Marg Yamuna Bridge' },
-];
 
 export const CenterDeck: React.FC<CenterDeckProps> = ({
   viewMode,
@@ -85,20 +31,61 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
   onToggleSynthetic,
   highlightSevered,
   onToggleSevered,
+  worldSummary: propWorldSummary,
+  onOpenEvidence,
+  branchName,
 }) => {
-  const [zoom, setZoom] = useState<number>(1);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [showEntityList, setShowEntityList] = useState<boolean>(false);
+  const [worldSummary, setWorldSummary] = useState<WorldSummary | null>(propWorldSummary || null);
+  const [selectedEntityId, setSelectedEntityId] = useState<string>('');
 
-  const coords = viewMode === 'map' ? INTERSECTION_POSITIONS : TOPOLOGY_POSITIONS;
+  useEffect(() => {
+    if (propWorldSummary) {
+      setWorldSummary(propWorldSummary);
+      return;
+    }
+    fetch('/api/world/summary')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load world summary');
+        return res.json();
+      })
+      .then((data: WorldSummary) => {
+        setWorldSummary(data);
+      })
+      .catch((err) => {
+        console.error('CenterDeck failed to fetch world summary:', err);
+      });
+  }, [propWorldSummary]);
 
   // Determine severed corridors based on frame index
   const isF1Severed = frameIndex >= 1 && Boolean(f1Corridor);
   const isF2Severed = frameIndex >= 3 && Boolean(f2Corridor);
 
-  const severedCorridors = new Set<string>();
-  if (isF1Severed) severedCorridors.add(f1Corridor);
-  if (isF2Severed) severedCorridors.add(f2Corridor);
+  const severedCorridorIds = new Set<string>();
+  if (isF1Severed) severedCorridorIds.add(f1Corridor);
+  if (isF2Severed) severedCorridorIds.add(f2Corridor);
+
+  // Counterfactual branch ID if in frame 2, 3, or 4
+  const activeBranchId = frameIndex >= 2 ? (branchName || `preview_${selectedCaseId || 'branch'}`) : null;
+
+  if (!worldSummary) {
+    return (
+      <main
+        style={{
+          flex: 1,
+          backgroundColor: 'var(--bg-void)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--ink-lo)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'var(--fs-cap)',
+        }}
+        role="main"
+      >
+        Connecting to FalkorDB World Topology…
+      </main>
+    );
+  }
 
   return (
     <main
@@ -113,357 +100,24 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
       role="main"
       aria-label="Delhi Road Network and Infrastructure Topology"
     >
-      {/* Top toolbar */}
-      <div
-        style={{
-          height: '44px',
-          borderBottom: '1px solid var(--line-hair)',
-          backgroundColor: 'var(--bg-panel)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 var(--s4)',
+      <GraphContainer
+        world={worldSummary}
+        viewMode={viewMode}
+        onToggleViewMode={onToggleViewMode}
+        selectedEntityId={selectedEntityId}
+        onSelectEntity={(id) => {
+          setSelectedEntityId(id);
+          onSelectEntity(id);
         }}
-      >
-        {/* View Mode Toggle: Map vs Topology */}
-        <div style={{ display: 'flex', gap: 'var(--s1)' }}>
-          <button
-            onClick={() => onToggleViewMode('map')}
-            style={{
-              padding: 'var(--s1) var(--s3)',
-              borderRadius: 'var(--r-ctl)',
-              border: '1px solid var(--line-hair)',
-              backgroundColor: viewMode === 'map' ? 'var(--bg-raised)' : 'transparent',
-              color: viewMode === 'map' ? 'var(--accent)' : 'var(--ink-lo)',
-              fontWeight: 600,
-              fontSize: 'var(--fs-cap)',
-              cursor: 'pointer',
-            }}
-          >
-            Geographic Map
-          </button>
-          <button
-            onClick={() => onToggleViewMode('topology')}
-            style={{
-              padding: 'var(--s1) var(--s3)',
-              borderRadius: 'var(--r-ctl)',
-              border: '1px solid var(--line-hair)',
-              backgroundColor: viewMode === 'topology' ? 'var(--bg-raised)' : 'transparent',
-              color: viewMode === 'topology' ? 'var(--accent)' : 'var(--ink-lo)',
-              fontWeight: 600,
-              fontSize: 'var(--fs-cap)',
-              cursor: 'pointer',
-            }}
-          >
-            Schematic Topology
-          </button>
-        </div>
-
-        {/* Legend buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
-          <button
-            onClick={onToggleSynthetic}
-            style={{
-              fontSize: 'var(--fs-micro)',
-              background: highlightSynthetic ? 'var(--bg-sunken)' : 'transparent',
-              border: '1px dashed var(--synthetic)',
-              color: 'var(--ink-mid)',
-              padding: '2px var(--s2)',
-              borderRadius: 'var(--r-chip)',
-              cursor: 'pointer',
-            }}
-            title="Toggle synthetic telecom/power overlay"
-          >
-            SYNTHETIC LAYERS
-          </button>
-
-          <button
-            onClick={onToggleSevered}
-            style={{
-              fontSize: 'var(--fs-micro)',
-              background: highlightSevered ? 'var(--fail-wash)' : 'transparent',
-              border: '1px solid var(--fail)',
-              color: 'var(--fail)',
-              padding: '2px var(--s2)',
-              borderRadius: 'var(--r-chip)',
-              cursor: 'pointer',
-            }}
-            title="Toggle severed corridors highlight"
-          >
-            SEVERED ARCS
-          </button>
-
-          <button
-            onClick={() => setShowEntityList(!showEntityList)}
-            style={{
-              fontSize: 'var(--fs-micro)',
-              background: 'var(--bg-raised)',
-              border: '1px solid var(--line-hair)',
-              color: 'var(--ink-lo)',
-              padding: '2px var(--s2)',
-              borderRadius: 'var(--r-chip)',
-              cursor: 'pointer',
-            }}
-            title="Accessible screen-reader entity table (AX-07)"
-          >
-            {showEntityList ? 'Hide Entity List' : 'Accessible Entity List'}
-          </button>
-
-          {/* Zoom controls */}
-          <div style={{ display: 'flex', gap: '2px', marginLeft: 'var(--s2)' }}>
-            <button
-              onClick={() => setZoom((z) => Math.min(z + 0.2, 2.0))}
-              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
-            >
-              +
-            </button>
-            <button
-              onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
-            >
-              −
-            </button>
-            <button
-              onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-              style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
-            >
-              0
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* SVG Canvas */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-        <svg
-          viewBox="0 0 700 550"
-          style={{
-            width: '100%',
-            height: '100%',
-            transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-            transformOrigin: 'center center',
-            transition: 'transform var(--dur-feedback) var(--ease-out)',
-          }}
-          role="img"
-          aria-label="Delhi Arterial Road Network Graph"
-        >
-          {/* Background grid */}
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--line-hair)" strokeWidth="0.5" strokeOpacity="0.4" />
-            </pattern>
-          </defs>
-          <rect width="700" height="550" fill="url(#grid)" />
-
-          {/* Yamuna River schematic curve */}
-          <path
-            d="M 370 20 Q 420 100 460 200 T 490 400 T 560 540"
-            fill="none"
-            stroke="var(--line-firm)"
-            strokeWidth="16"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <text x="500" y="320" fill="var(--ink-lo)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">
-            YAMUNA RIVER
-          </text>
-
-          {/* Corridors (Road Arcs) */}
-          {CORRIDOR_EDGES.map((edge) => {
-            const p1 = coords[edge.source];
-            const p2 = coords[edge.target];
-            if (!p1 || !p2) return null;
-
-            const isSevered = severedCorridors.has(edge.id);
-
-            let strokeColor = 'var(--ink-lo)';
-            let strokeWidth = 2.5;
-            let strokeDasharray = 'none';
-
-            if (isSevered) {
-              strokeColor = 'var(--fail)';
-              strokeWidth = 3;
-              strokeDasharray = '4 4';
-            } else if (frameIndex >= 2 && !isSevered) {
-              strokeColor = 'var(--synthetic)';
-            }
-
-            return (
-              <g key={edge.id} onClick={() => onSelectEntity(edge.id)} style={{ cursor: 'pointer' }}>
-                <line
-                  x1={p1.x}
-                  y1={p1.y}
-                  x2={p2.x}
-                  y2={p2.y}
-                  stroke={strokeColor}
-                  strokeWidth={strokeWidth}
-                  strokeDasharray={strokeDasharray}
-                  strokeLinecap="round"
-                />
-                {isSevered && (
-                  <circle
-                    cx={(p1.x + p2.x) / 2}
-                    cy={(p1.y + p2.y) / 2}
-                    r="8"
-                    fill="var(--fail)"
-                  />
-                )}
-                {isSevered && (
-                  <text
-                    x={(p1.x + p2.x) / 2}
-                    y={(p1.y + p2.y) / 2 + 3}
-                    textAnchor="middle"
-                    fill="var(--ink-hi)"
-                    fontSize="var(--fs-micro)"
-                    fontWeight="700"
-                  >
-                    ✕
-                  </text>
-                )}
-              </g>
-            );
-          })}
-
-          {/* Intersections */}
-          {Object.entries(coords).map(([id, pos]) => (
-            <g key={id} onClick={() => onSelectEntity(id)} style={{ cursor: 'pointer' }}>
-              <circle
-                cx={pos.x}
-                cy={pos.y}
-                r="5"
-                fill="var(--bg-raised)"
-                stroke="var(--line-hair)"
-                strokeWidth="2"
-              />
-              <text
-                x={pos.x}
-                y={pos.y - 8}
-                textAnchor="middle"
-                fill="var(--ink-mid)"
-                fontSize="var(--fs-micro)"
-                fontFamily="var(--font-sans)"
-              >
-                {pos.name}
-              </text>
-            </g>
-          ))}
-
-          {/* Facilities: LNJP Hospital & Sushruta Trauma Centre */}
-          {/* LNJP attached to Delhi Gate */}
-          <g transform={`translate(${coords.int_delhi_gate.x + 25}, ${coords.int_delhi_gate.y + 10})`}>
-            <rect width="14" height="14" rx="2" fill="var(--bg-raised)" stroke="var(--ok)" strokeWidth="1.5" />
-            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="var(--fs-micro)" fontWeight="700">H</text>
-            <text x="20" y="11" fill="var(--ink-hi)" fontSize="var(--fs-micro)" fontWeight="600">LNJP Hospital</text>
-            <line x1="-5" y1="7" x2="-25" y2="-10" stroke="var(--ink-lo)" strokeDasharray="2 2" />
-          </g>
-
-          {/* Sushruta attached to Civil Lines */}
-          <g transform={`translate(${coords.int_civil_lines.x - 90}, ${coords.int_civil_lines.y - 20})`}>
-            <rect width="14" height="14" rx="2" fill="var(--bg-raised)" stroke="var(--ok)" strokeWidth="1.5" />
-            <text x="7" y="11" textAnchor="middle" fill="var(--ok)" fontSize="var(--fs-micro)" fontWeight="700">H</text>
-            <text x="20" y="11" fill="var(--ink-hi)" fontSize="var(--fs-micro)" fontWeight="600">Sushruta Trauma</text>
-            <line x1="14" y1="7" x2="90" y2="20" stroke="var(--ink-lo)" strokeDasharray="2 2" />
-          </g>
-
-          {/* Depots */}
-          {/* North Depot at Civil Lines */}
-          <g transform={`translate(${coords.int_civil_lines.x - 20}, ${coords.int_civil_lines.y + 15})`}>
-            <polygon points="6,0 12,12 0,12" fill="var(--accent)" />
-            <text x="16" y="10" fill="var(--accent)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">Depot North</text>
-          </g>
-
-          {/* South Depot at Delhi Gate */}
-          <g transform={`translate(${coords.int_delhi_gate.x - 30}, ${coords.int_delhi_gate.y + 20})`}>
-            <polygon points="6,0 12,12 0,12" fill="var(--accent)" />
-            <text x="16" y="10" fill="var(--accent)" fontSize="var(--fs-micro)" fontFamily="var(--font-mono)">Depot South</text>
-          </g>
-
-          {/* Synthetic Telecom Towers (shown if highlightSynthetic is true) */}
-          {highlightSynthetic && (
-            <>
-              {/* North Ridge Tower */}
-              <g transform={`translate(${coords.int_chandgiram.x + 30}, ${coords.int_chandgiram.y - 20})`}>
-                <circle cx="6" cy="6" r="6" fill="var(--bg-panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
-                <text x="16" y="9" fill="var(--synthetic)" fontSize="var(--fs-micro)">🗼 Tower Ridge (HQ)</text>
-              </g>
-              {/* ISBT Relay Tower */}
-              <g transform={`translate(${coords.int_kashmere_gate.x + 20}, ${coords.int_kashmere_gate.y - 10})`}>
-                <circle cx="6" cy="6" r="6" fill="var(--bg-panel)" stroke="var(--synthetic)" strokeDasharray="2 2" />
-                <text x="16" y="9" fill="var(--synthetic)" fontSize="var(--fs-micro)">🗼 Tower ISBT</text>
-              </g>
-            </>
-          )}
-        </svg>
-
-        {/* Counterfactual Branch banner watermark when in frame 2, 3, or 4 */}
-        {frameIndex >= 2 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 'var(--s3)',
-              left: 'var(--s3)',
-              backgroundColor: 'var(--branch-wash)',
-              border: '1px solid var(--branch)',
-              color: 'var(--branch)',
-              padding: 'var(--s1) var(--s3)',
-              borderRadius: 'var(--r-ctl)',
-              fontSize: 'var(--fs-micro)',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--s2)',
-              boxShadow: 'var(--branch-glow)'
-            }}
-          >
-            <span>COUNTERFACTUAL BRANCH ACTIVE</span>
-            <span style={{ color: 'var(--ink-lo)' }}>•</span>
-            <span className="mono">jaal_branch_{selectedCaseId || 'preview'}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Accessible Entity List Overlay (AX-07) */}
-      {showEntityList && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '0',
-            left: '0',
-            right: '0',
-            maxHeight: '220px',
-            backgroundColor: 'var(--bg-panel)',
-            borderTop: '1px solid var(--line-hair)',
-            padding: 'var(--s3) var(--s4)',
-            overflowY: 'auto',
-            zIndex: 10,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s2)' }}>
-            <strong style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)' }}>Network Entity Table (Screen-Reader Equivalent)</strong>
-            <button onClick={() => setShowEntityList(false)} style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer' }}>Close ✕</button>
-          </div>
-          <table style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left' }}>
-                <th style={{ padding: 'var(--s1)' }}>Entity ID</th>
-                <th style={{ padding: 'var(--s1)' }}>Type</th>
-                <th style={{ padding: 'var(--s1)' }}>Status</th>
-                <th style={{ padding: 'var(--s1)' }}>Provenance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {CORRIDOR_EDGES.map((c) => (
-                <tr key={c.id} style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                  <td className="mono" style={{ padding: 'var(--s1)', color: 'var(--ink-hi)' }}>{c.id}</td>
-                  <td style={{ padding: 'var(--s1)', color: 'var(--ink-mid)' }}>Road Corridor</td>
-                  <td style={{ padding: 'var(--s1)' }}>{severedCorridors.has(c.id) ? 'SEVERED' : 'OPERATIONAL'}</td>
-                  <td style={{ padding: 'var(--s1)', color: 'var(--ink-lo)' }}>reference_derived</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+        branchId={activeBranchId}
+        severedCorridorIds={severedCorridorIds}
+        showSyntheticOverlay={highlightSynthetic}
+        onToggleSynthetic={onToggleSynthetic}
+        highlightSevered={highlightSevered}
+        onToggleSevered={onToggleSevered}
+        onOpenEvidence={onOpenEvidence}
+        selectedCaseId={selectedCaseId}
+      />
     </main>
   );
 };

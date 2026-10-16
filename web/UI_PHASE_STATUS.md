@@ -37,3 +37,40 @@ SCREENSHOTS: web/verification/u1/{greyscale,icons}.png
 FAILED: none (initial attempt 1 failed routing on /method because App.tsx route was not bound to window.location.pathname; fixed in attempt 2)
 FALLBACK APPLIED: none
 NEXT: U2 — graph visualization
+
+---
+
+## U2 — Graph Visualization Engine
+STATUS: PASS
+AT: 2026-10-14T17:32:13Z
+RAN: npx playwright test verification/u2.spec.ts
+OUTPUT:
+```text
+Running 15 tests using 1 worker
+
+  ok  1 [chromium] › verification\u2.spec.ts:14:3 › U2 — Graph Visualization Engine Battery › U2-01: Live counts drive the render (1.8s)
+  ok  2 [chromium] › verification\u2.spec.ts:28:3 › U2 — Graph Visualization Engine Battery › U2-02: No hard-coded graph data in web/src/graph (6ms)
+  ok  3 [chromium] › verification\u2.spec.ts:56:3 › U2 — Graph Visualization Engine Battery › U2-03: Layout determinism produces pixel-identical screenshots (2.9s)
+  ok  4 [chromium] › verification\u2.spec.ts:74:3 › U2 — Graph Visualization Engine Battery › U2-04: View coordination persists selection across tab switch (2.0s)
+  ok  5 [chromium] › verification\u2.spec.ts:97:3 › U2 — Graph Visualization Engine Battery › U2-05: Severed legibility in greyscale (1.8s)
+  ok  6 [chromium] › verification\u2.spec.ts:124:3 › U2 — Graph Visualization Engine Battery › U2-06: Cross-layer connectors visible and survive band collapse (809ms)
+  ok  7 [chromium] › verification\u2.spec.ts:139:3 › U2 — Graph Visualization Engine Battery › U2-07: Dependency chain arithmetic components sum to total exactly (1.5s)
+  ok  8 [chromium] › verification\u2.spec.ts:160:3 › U2 — Graph Visualization Engine Battery › U2-08: No-ledger honesty renders cause not recorded on missing ledger (1.7s)
+  ok  9 [chromium] › verification\u2.spec.ts:169:3 › U2 — Graph Visualization Engine Battery › U2-09: Excluded facility renders at 40% opacity with EXCLUDED chip and no access line (1.4s)
+  ok 10 [chromium] › verification\u2.spec.ts:184:3 › U2 — Graph Visualization Engine Battery › U2-10: Branch boundary present on counterfactual, absent on base world (2.0s)
+  ok 11 [chromium] › verification\u2.spec.ts:202:3 › U2 — Graph Visualization Engine Battery › U2-11: Keyboard entity list navigable with Tab and Arrow keys (2.0s)
+  ok 12 [chromium] › verification\u2.spec.ts:221:3 › U2 — Graph Visualization Engine Battery › U2-12: Hit targets register selection inside node and edge bounding areas (1.6s)
+Measured p95 frame time: 17.80ms
+  ok 13 [chromium] › verification\u2.spec.ts:230:3 › U2 — Graph Visualization Engine Battery › U2-13: Frame budget p95 frame time < 20ms during pan, zoom, selection (2.9s)
+  ok 14 [chromium] › verification\u2.spec.ts:263:3 › U2 — Graph Visualization Engine Battery › U2-14: Label collision: critical facility labels never suppressed (2.2s)
+  ok 15 [chromium] › verification\u2.spec.ts:273:3 › U2 — Graph Visualization Engine Battery › U2-15: Tooltip displays real API response fields after 400ms hover (3.3s)
+
+  15 passed (32.6s)
+```
+P0 CHECKS: U2-01 ✓ U2-02 ✓ U2-03 ✓ U2-04 ✓ U2-05 ✓ U2-06 ✓ U2-07 ✓ U2-08 ✓ U2-09 ✓ U2-10 ✓ U2-11 ✓ U2-15 ✓
+P1 CHECKS: U2-12 ✓ U2-13 (p95: 17.80ms < 20ms) ✓ U2-14 ✓
+SCREENSHOTS: web/verification/u2/{geographic_view,schematic_view,greyscale_severed,dependency_chain}.png
+FAILED: none (initial attempt 1 failed direct URL evidence drill-through when runId was not in memory; resolved by jaal_memory fallback in API /api/run/{id}; pointer-events none added to survey grid rect)
+FALLBACK APPLIED: none
+NEXT: U3 — motion system
+
