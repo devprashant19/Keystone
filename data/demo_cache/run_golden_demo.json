@@ -1,0 +1,201 @@
+{
+  "run_id": "run_golden_demo",
+  "f1_corridor_id": "road_ring_monastery_chandgiram",
+  "created_at": "2026-10-15T00:00:00.000000+00:00",
+  "world_digest": "1043c792e07c0974fa9e829b9c59bb7f7492070cfe117e0f5b9336f06a821d3b",
+  "config_hash": "ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35",
+  "decomposition": {
+    "f1_alone_breach": true,
+    "f1_alone_cases": [
+      "road_barakhamba_cp_mandihouse",
+      "road_chelmsford_cp_station",
+      "road_delhigate_connector",
+      "road_jln_marg_delhigate_cp",
+      "road_rani_jhansi_hindurao_cp",
+      "road_rani_jhansi_to_station",
+      "road_ridge_sushruta_hindurao",
+      "road_ring_delhigate_ito",
+      "road_ring_kashmere_monastery",
+      "road_ring_kashmere_redfort",
+      "road_ring_redfort_delhigate",
+      "road_sham_nath_sushruta_kashmere",
+      "road_vikas_marg_ito"
+    ],
+    "f2_alone_cases": [],
+    "interaction_only_cases": [],
+    "neither_stressed_cases": [],
+    "headline_interaction_only_count": 0,
+    "total_cases": 13
+  },
+  "policies": {
+    "A": {
+      "name": "POLICY_A_NO_ACTION",
+      "exposed_count": 13,
+      "total_breaches": 51,
+      "cost": 0.0
+    },
+    "B": {
+      "name": "POLICY_B_STATIC_HEURISTIC",
+      "chosen_action": {
+        "action_id": "act_prep_depot_central",
+        "action_kind": "PREPOSITION_DEPOT",
+        "target_id": "depot_central",
+        "cost": 1.0,
+        "description": "Pre-position responder at DFS Headquarters Response Depot (dispatch delay 1.0 min)"
+      },
+      "exposed_count": 13,
+      "total_breaches": 19,
+      "cost": 1.0
+    },
+    "C": {
+      "name": "POLICY_C_PREMORTEM",
+      "chosen_action": {
+        "action_id": "act_relay_relay_chandrawal",
+        "action_kind": "DEPLOY_MOBILE_RELAY",
+        "target_id": "relay_chandrawal",
+        "cost": 1.5,
+        "description": "Deploy mobile mesh relay to Chandrawal WTP Relay"
+      },
+      "abstain": true,
+      "exposed_count": 7,
+      "total_breaches": 38,
+      "cost": 0.0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_barakhamba_cp_mandihouse",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_barakhamba_cp_mandihouse",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 2,
+      "breaches_c": 1
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_chelmsford_cp_station",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_chelmsford_cp_station",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_delhigate_connector",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_delhigate_connector",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 9,
+      "breaches_c": 8
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_jln_marg_delhigate_cp",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_jln_marg_delhigate_cp",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_rani_jhansi_hindurao_cp",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_rani_jhansi_hindurao_cp",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_rani_jhansi_to_station",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_rani_jhansi_to_station",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_ridge_sushruta_hindurao",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_ridge_sushruta_hindurao",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 3,
+      "breaches_c": 2
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_ring_delhigate_ito",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_ring_delhigate_ito",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_ring_kashmere_monastery",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_ring_kashmere_monastery",
+      "verdict": "DEGRADED",
+      "interaction_only": false,
+      "breaches_a": 1,
+      "breaches_c": 0
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_ring_kashmere_redfort",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_ring_kashmere_redfort",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 11,
+      "breaches_c": 10
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_ring_redfort_delhigate",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_ring_redfort_delhigate",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 9,
+      "breaches_c": 8
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_sham_nath_sushruta_kashmere",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_sham_nath_sushruta_kashmere",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 9,
+      "breaches_c": 8
+    },
+    {
+      "case_id": "road_ring_monastery_chandgiram__road_vikas_marg_ito",
+      "f1": "road_ring_monastery_chandgiram",
+      "f2": "road_vikas_marg_ito",
+      "verdict": "BREACH",
+      "interaction_only": false,
+      "breaches_a": 2,
+      "breaches_c": 1
+    }
+  ],
+  "recommendation": {
+    "verdict": "ABSTAIN \u2014 NO ROBUST PLAN",
+    "abstain": true,
+    "reason": "NO_PLAN_PRESERVES_ALL_CRITICAL_REQUIREMENTS",
+    "action": null,
+    "exposed_cases": [
+      "road_barakhamba_cp_mandihouse",
+      "road_delhigate_connector",
+      "road_ridge_sushruta_hindurao",
+      "road_ring_kashmere_redfort",
+      "road_ring_redfort_delhigate",
+      "road_sham_nath_sushruta_kashmere",
+      "road_vikas_marg_ito"
+    ],
+    "exposed_count": 7
+  },
+  "decision": null
+}
