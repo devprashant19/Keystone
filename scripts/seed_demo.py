@@ -208,7 +208,45 @@ def seed_demo():
         }
     )
 
-    # 6. Print DEMO READY block
+    # 6. Pre-warm agent tool cache for the two demo questions
+    import time
+    from jaal.agent.agent import JaalAgent, _AGENT_TOOL_CACHE
+
+    agent = JaalAgent()
+    demo_q1 = "What fails if monastery_chandgiram floods?"
+    demo_q2 = "If the Kashmere Gate to Monastery corridor fails, which critical facilities lose access and what should we do?"
+
+    # Invalidate BOTH the on-disk and in-memory agent tool caches before pre-warming.
+    #
+    # The cache is keyed by (run_id, tool, args) and carries no world digest, so a
+    # cache written against an older fixture would otherwise be reloaded at import and
+    # served as if current -- and those numbers would pass the grounding check, because
+    # they were genuine tool output once. Deleting the file here guarantees the cache
+    # can only ever contain results computed against the world this script just seeded.
+    agent_cache_file = DEMO_CACHE_DIR / "agent_tool_cache.json"
+    if agent_cache_file.exists():
+        agent_cache_file.unlink()
+    _AGENT_TOOL_CACHE.clear()
+
+    # Pre-warm Q1
+    t0 = time.perf_counter()
+    r1_live = agent.query(demo_q1)
+    t1 = time.perf_counter()
+    r1_cached = agent.query(demo_q1)
+    t2 = time.perf_counter()
+
+    # Pre-warm Q2
+    t3 = time.perf_counter()
+    r2_live = agent.query(demo_q2)
+    t4 = time.perf_counter()
+    r2_cached = agent.query(demo_q2)
+    t5 = time.perf_counter()
+
+    print("--- Agent Cache Pre-Warming ---")
+    print(f"Q1 ('monastery_chandgiram'): live={t1-t0:.2f}s -> cached={(t2-t1)*1000:.2f}ms (grounded={r1_cached.grounded})")
+    print(f"Q2 ('kashmere_monastery'):   live={t4-t3:.2f}s -> cached={(t5-t4)*1000:.2f}ms (grounded={r2_cached.grounded})")
+
+    # 7. Print DEMO READY block
     config_hash = planner.evaluator.config_hash
     decomposition_str = "104/48/30/0"
 
