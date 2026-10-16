@@ -15,6 +15,7 @@ Architecture & Safety Constraints:
 
 import re
 import json
+from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, Set
 from pydantic import BaseModel, Field
 
@@ -167,6 +168,8 @@ def collect_tool_grounding_facts(trace: List[ToolCallTrace]) -> Tuple[Set[str], 
                 valid_numbers.add(str(val))
                 if isinstance(val, float) and val.is_integer():
                     valid_numbers.add(str(int(val)))
+                elif isinstance(val, int):
+                    valid_numbers.add(f"{val}.0")
             elif isinstance(val, str):
                 valid_entities.update(extract_entity_ids(val))
                 valid_numbers.update(extract_numbers(val))
@@ -180,6 +183,7 @@ def collect_tool_grounding_facts(trace: List[ToolCallTrace]) -> Tuple[Set[str], 
                     walk(el)
 
         walk(item.raw_output)
+        walk(item.metrics_returned)
 
     return valid_entities, valid_numbers
 
@@ -208,6 +212,62 @@ def find_corridors_in_prompt(text: str) -> List[str]:
             seen.add(cid)
             ordered.append(cid)
     return ordered
+
+
+# Process-lifetime tool cache: (run_id, tool_name, json_args) -> tool_result
+_AGENT_TOOL_CACHE: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
+CACHE_FILE_PATH = Path(__file__).resolve().parents[3] / "data" / "demo_cache" / "agent_tool_cache.json"
+
+def _load_tool_cache():
+    global _AGENT_TOOL_CACHE
+    if CACHE_FILE_PATH.exists():
+        try:
+            with open(CACHE_FILE_PATH, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+                for entry in raw:
+                    key = (entry["run_id"], entry["tool"], entry["args"])
+                    _AGENT_TOOL_CACHE[key] = entry["result"]
+        except Exception:
+            pass
+
+def _save_tool_cache():
+    try:
+        CACHE_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        raw = []
+        for (run_id, tool, args_str), res in _AGENT_TOOL_CACHE.items():
+            raw.append({
+                "run_id": run_id,
+                "tool": tool,
+                "args": args_str,
+                "result": res
+            })
+        with open(CACHE_FILE_PATH, "w", encoding="utf-8") as f:
+            json.dump(raw, f, indent=2)
+    except Exception:
+        pass
+
+_load_tool_cache()
+
+def get_cached_tool_result(run_id: str, tool_name: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    key = (run_id, tool_name, json.dumps(args, sort_keys=True))
+    return _AGENT_TOOL_CACHE.get(key)
+
+def set_cached_tool_result(run_id: str, tool_name: str, args: Dict[str, Any], result: Dict[str, Any]):
+    key = (run_id, tool_name, json.dumps(args, sort_keys=True))
+    _AGENT_TOOL_CACHE[key] = result
+    _save_tool_cache()
+
+def resolve_run_id_for_corridor(corridor_id: str) -> str:
+    try:
+        idx_path = Path(__file__).resolve().parents[3] / "data" / "demo_cache" / "by_corridor.json"
+        if idx_path.exists():
+            with open(idx_path, "r", encoding="utf-8") as f:
+                mapping = json.load(f)
+                if corridor_id in mapping:
+                    return mapping[corridor_id]
+    except Exception:
+        pass
+    return "run_" + str(corridor_id)
 
 
 class JaalAgent:
@@ -266,7 +326,14 @@ class JaalAgent:
         )
 
         if is_health_query and not corridors:
-            res = check_system_health(CheckSystemHealthInput(ping="agent_diagnostic"))
+            tool_args = {"ping": "agent_diagnostic"}
+            cached = get_cached_tool_result("world", "check_system_health", tool_args)
+            if cached is not None:
+                res = cached
+            else:
+                res = check_system_health(CheckSystemHealthInput(ping="agent_diagnostic"))
+                set_cached_tool_result("world", "check_system_health", tool_args, res)
+
             trace = ToolCallTrace(
                 tool="check_system_health",
                 arguments={"ping": "agent_diagnostic"},
@@ -289,7 +356,14 @@ class JaalAgent:
 
         # Intent B: Corridor inventory
         elif any(w in lower_prompt for w in ["inventory", "list corridors", "all corridors", "corridors list"]):
-            res = get_corridor_inventory(GetCorridorInventoryInput())
+            tool_args = {}
+            cached = get_cached_tool_result("world", "get_corridor_inventory", tool_args)
+            if cached is not None:
+                res = cached
+            else:
+                res = get_corridor_inventory(GetCorridorInventoryInput())
+                set_cached_tool_result("world", "get_corridor_inventory", tool_args, res)
+
             cids = [c["corridor_id"] for c in res["corridors"]]
             sample_cids = cids[:4]
             trace = ToolCallTrace(
@@ -314,7 +388,15 @@ class JaalAgent:
                 f2 = "road_ring_kashmere_monastery" if f1 != "road_ring_kashmere_monastery" else "road_ring_delhigate_ito"
 
             try:
-                res = get_case_evidence(GetCaseEvidenceInput(f1_corridor_id=f1, f2_corridor_id=f2))
+                run_id = resolve_run_id_for_corridor(f1)
+                tool_args = {"f1_corridor_id": f1, "f2_corridor_id": f2}
+                cached = get_cached_tool_result(run_id, "inspect_causal_chain", tool_args)
+                if cached is not None:
+                    res = cached
+                else:
+                    res = get_case_evidence(GetCaseEvidenceInput(f1_corridor_id=f1, f2_corridor_id=f2))
+                    set_cached_tool_result(run_id, "inspect_causal_chain", tool_args, res)
+
                 breached = res["is_breached"]
                 total_breaches = res["total_breaches"]
                 fac_keys = list(res.get("facility_evidence", {}).keys())
@@ -350,7 +432,15 @@ class JaalAgent:
         elif corridors:
             f1 = corridors[0]
             try:
-                res = evaluate_contingency(EvaluateContingencyInput(f1_corridor_id=f1))
+                run_id = resolve_run_id_for_corridor(f1)
+                tool_args = {"f1_corridor_id": f1}
+                cached = get_cached_tool_result(run_id, "evaluate_contingency", tool_args)
+                if cached is not None:
+                    res = cached
+                else:
+                    res = evaluate_contingency(EvaluateContingencyInput(f1_corridor_id=f1))
+                    set_cached_tool_result(run_id, "evaluate_contingency", tool_args, res)
+
                 decomp = res["three_way_decomposition"]
                 pol_c = res["policy_c_recommendation"]
 
@@ -358,27 +448,39 @@ class JaalAgent:
                 f2_alone_cnt = len(decomp["f2_alone_cases"]) if isinstance(decomp["f2_alone_cases"], list) else decomp["f2_alone_cases"]
                 interaction_cnt = decomp.get("interaction_only_count", len(decomp["interaction_only_cases"]) if isinstance(decomp["interaction_only_cases"], list) else 0)
 
+                ents = [f1]
+                if pol_c.get("chosen_action"):
+                    if pol_c["chosen_action"].get("action_id"):
+                        ents.append(pol_c["chosen_action"]["action_id"])
+                    if pol_c["chosen_action"].get("target_id"):
+                        ents.append(pol_c["chosen_action"]["target_id"])
+                for exp_case in pol_c.get("exposed_cases", [])[:4]:
+                    ents.append(exp_case)
+
                 trace = ToolCallTrace(
                     tool="evaluate_contingency",
                     arguments={"f1_corridor_id": f1},
-                    entities_returned=[f1],
+                    entities_returned=ents,
                     metrics_returned={
                         "f1_alone_count": f1_alone_cnt,
                         "f2_alone_count": f2_alone_cnt,
                         "interaction_only_count": interaction_cnt,
                         "total_cases": decomp["total_cases"],
+                        "exposed_cases_count": pol_c["exposed_cases_count"],
                         "abstain": pol_c["abstain"]
                     },
                     raw_output=res
                 )
                 tool_traces.append(trace)
 
+                target_str = f" targeting {pol_c['chosen_action']['target_id']}" if (pol_c.get("chosen_action") and pol_c["chosen_action"].get("target_id")) else ""
                 if pol_c["abstain"]:
                     answer = (
                         f"Contingency sweep for primary failure {f1} evaluated {decomp['total_cases']} cases. "
                         f"Decomposition reveals {f1_alone_cnt} f1-alone cases, {f2_alone_cnt} f2-alone cases, "
                         f"and {interaction_cnt} interaction-only cases. "
-                        f"Policy C returns ABSTAIN: {pol_c['abstain_reason']}."
+                        f"Policy C returns ABSTAIN: {pol_c['abstain_reason']}. "
+                        f"Candidate action{target_str} still leaves {pol_c['exposed_cases_count']} exposed cases."
                     )
                 else:
                     action_id = pol_c["chosen_action"]["action_id"] if pol_c["chosen_action"] else "NONE"
@@ -386,7 +488,7 @@ class JaalAgent:
                         f"Contingency sweep for primary failure {f1} evaluated {decomp['total_cases']} cases. "
                         f"Decomposition yields {f1_alone_cnt} f1-alone cases, {f2_alone_cnt} f2-alone cases, "
                         f"and {interaction_cnt} interaction-only cases. "
-                        f"Policy C recommends action {action_id} with {pol_c['exposed_cases_count']} exposed cases."
+                        f"Policy C recommends action {action_id}{target_str} with {pol_c['exposed_cases_count']} exposed cases."
                     )
             except Exception as e:
                 return AgentResponse(

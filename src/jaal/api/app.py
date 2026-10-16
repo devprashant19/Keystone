@@ -432,7 +432,7 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
         initial_digest, _, _ = compute_graph_digest(world)
 
         # 1. Three-way decomposition (PL-07: calculated & published before policy comparison)
-        decomp = planner.compute_three_way_decomposition(req.f1_corridor_id)
+        decomp = planner.compute_three_way_decomposition(req.f1_corridor_id, run_id=f"{run_id}_decomp")
 
         # 2. Run sweep across Policies A, B, C
         sweep = planner.run_f1_sweep(req.f1_corridor_id, run_id=run_id)
@@ -734,7 +734,7 @@ def get_case_detail(run_id: str, case_id: str):
     client = get_graph_client()
     planner = PreMortemPlanner(client)
 
-    with planner.orchestrator.branch_context("evidence_drill", f"{run_id}_{case_id}") as (bname, bgraph):
+    with planner.orchestrator.branch_context("evidence_drill", f"{run_id}_{case_id}", nonce=uuid.uuid4().hex[:8]) as (bname, bgraph):
         ledger_f1 = planner.orchestrator.apply_cascade(bname, f1, is_f1=True, run_id=run_id, branch_id=bname)
         ledger_f2 = planner.orchestrator.apply_cascade(bname, f2, is_f1=False, run_id=run_id, branch_id=bname)
         res = planner.evaluator.evaluate_graph(bgraph, case_id)

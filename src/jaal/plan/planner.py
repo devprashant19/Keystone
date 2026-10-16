@@ -3,6 +3,7 @@ jaal.plan.planner - Pre-mortem scenario planner, three-way decomposition, and po
 """
 
 import json
+import uuid
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, Tuple, Set
@@ -148,7 +149,7 @@ class PreMortemPlanner:
         if cnt == 0:
             raise ValueError("Configuration error: no critical endpoints found in graph (zero demand)")
 
-    def compute_three_way_decomposition(self, f1: str) -> ThreeWayDecomposition:
+    def compute_three_way_decomposition(self, f1: str, run_id: Optional[str] = None) -> ThreeWayDecomposition:
         """
         PL-07: Three-way case decomposition for a given f1:
         - f1-alone
@@ -162,9 +163,10 @@ class PreMortemPlanner:
             raise ValueError(f"Unknown corridor f1: {f1}")
 
         f2_candidates = [c for c in all_corridors if c != f1]
+        decomp_run = run_id or f"decomp_{uuid.uuid4().hex[:8]}"
 
         # 1. Evaluate f1 alone
-        with self.orchestrator.branch_context("decomp", f"f1_{f1}") as (bname, bgraph):
+        with self.orchestrator.branch_context(decomp_run, f"f1_{f1}") as (bname, bgraph):
             self.orchestrator.apply_cascade(bname, f1, is_f1=True)
             res_f1 = self.evaluator.evaluate_graph(bgraph, f"f1_alone_{f1}")
             f1_alone_breach = res_f1.is_breached
@@ -172,7 +174,7 @@ class PreMortemPlanner:
         # 2. Evaluate each f2 alone
         f2_alone_results: Dict[str, bool] = {}
         for f2 in f2_candidates:
-            with self.orchestrator.branch_context("decomp", f"f2_{f2}") as (bname, bgraph):
+            with self.orchestrator.branch_context(decomp_run, f"f2_{f2}") as (bname, bgraph):
                 self.orchestrator.apply_cascade(bname, f2, is_f1=False)
                 res_f2 = self.evaluator.evaluate_graph(bgraph, f"f2_alone_{f2}")
                 f2_alone_results[f2] = res_f2.is_breached
@@ -184,7 +186,7 @@ class PreMortemPlanner:
         neither_stressed_cases: List[str] = []
 
         for f2 in f2_candidates:
-            with self.orchestrator.branch_context("decomp", f"joint_{f1}_{f2}") as (bname, bgraph):
+            with self.orchestrator.branch_context(decomp_run, f"joint_{f1}_{f2}") as (bname, bgraph):
                 self.orchestrator.apply_cascade(bname, f1, is_f1=True)
                 self.orchestrator.apply_cascade(bname, f2, is_f1=False)
                 res_joint = self.evaluator.evaluate_graph(bgraph, f"joint_{f1}_{f2}")
