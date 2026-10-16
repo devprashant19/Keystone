@@ -382,7 +382,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
 
               {/* Severed ✕ marker at midpoint */}
               {isSevered && (
-                <g transform={`translate(${midX}, ${midY})`}>
+                <g className="severed-marker" transform={`translate(${midX}, ${midY})`}>
                   <circle r="7" fill="var(--bg-void)" stroke="var(--fail)" strokeWidth="1.5" />
                   <line x1="-3" y1="-3" x2="3" y2="3" stroke="var(--fail)" strokeWidth="1.5" />
                   <line x1="3" y1="-3" x2="-3" y2="3" stroke="var(--fail)" strokeWidth="1.5" />

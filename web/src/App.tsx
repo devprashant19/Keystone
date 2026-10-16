@@ -8,6 +8,7 @@ import { DecisionModal } from './components/DecisionModal';
 import { HistoryModal } from './components/HistoryModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
 import { PresenterTour } from './components/PresenterTour';
+import { AgentPanel } from './components/AgentPanel';
 import { EvidenceView } from './routes/EvidenceView';
 import { MethodView } from './routes/MethodView';
 import { WorldSummary } from './graph/types';
@@ -63,6 +64,7 @@ export const App: React.FC = () => {
   const [highlightSevered, setHighlightSevered] = useState<boolean>(false);
 
   // Modals state
+  const [isAgentOpen, setIsAgentOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState<boolean>(false);
   const [decisionModal, setDecisionModal] = useState<{ isOpen: boolean; verdict: 'APPROVE' | 'REJECT' }>({
@@ -147,13 +149,20 @@ export const App: React.FC = () => {
       .catch((err) => console.log('No prior runs:', err));
   }, []);
 
+  const handleCloseTour = useCallback(() => {
+    setIsTourOpen(false);
+    setCurrentFrame(4);
+  }, []);
+
   // 2. Global Keyboard Shortcuts (?, Esc, Left, Right)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '?') {
         setIsShortcutsOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
-        setIsTourOpen(false);
+        if (isTourOpen) {
+          handleCloseTour();
+        }
         setIsShortcutsOpen(false);
         setIsHistoryOpen(false);
         setDecisionModal({ isOpen: false, verdict: 'APPROVE' });
@@ -165,7 +174,7 @@ export const App: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isTourOpen]);
+  }, [isTourOpen, handleCloseTour]);
 
   // Presenter mode state transitions across all 7 beats (Step D-2)
   const applyTourStepState = useCallback(async (stepIndex: number) => {
@@ -176,6 +185,7 @@ export const App: React.FC = () => {
       setHighlightSevered(false);
     } else if (stepIndex === 2) {
       setViewMode('topology');
+      setCurrentFrame(0);
     } else if (stepIndex === 3) {
       setViewMode('map');
       setSelectedF1('road_ring_monastery_chandgiram');
@@ -374,8 +384,11 @@ export const App: React.FC = () => {
         onStartTour={() => {
           setIsTourOpen(true);
           setTourStep(1);
+          setCurrentFrame(0);
         }}
         isTourActive={isTourOpen}
+        onToggleAgent={() => setIsAgentOpen(!isAgentOpen)}
+        isAgentOpen={isAgentOpen}
       />
 
       {/* 503 DB Unavailable Banner */}
@@ -434,29 +447,36 @@ export const App: React.FC = () => {
         />
 
         {/* Center Deck (Flex) */}
-        <CenterDeck
-          viewMode={viewMode}
-          onToggleViewMode={setViewMode}
-          selectedCaseId={selectedCaseId}
-          f1Corridor={selectedF1}
-          f2Corridor={f2Corridor}
-          frameIndex={currentFrame}
-          onSelectEntity={(id) => {
-            if (id.startsWith('road_')) {
-              setSelectedCaseId(`${selectedF1}__${id}`);
-            }
-          }}
-          highlightSynthetic={highlightSynthetic}
-          onToggleSynthetic={() => setHighlightSynthetic(!highlightSynthetic)}
-          highlightSevered={highlightSevered}
-          onToggleSevered={() => setHighlightSevered(!highlightSevered)}
-          worldSummary={worldSummary}
-          branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
-          onOpenEvidence={(caseId) => {
-            setEvidenceCaseId(caseId);
-            setCurrentRoute(`/evidence/${caseId}`);
-          }}
-        />
+        <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <CenterDeck
+            viewMode={viewMode}
+            onToggleViewMode={setViewMode}
+            selectedCaseId={selectedCaseId}
+            f1Corridor={selectedF1}
+            f2Corridor={f2Corridor}
+            frameIndex={currentFrame}
+            onSelectEntity={(id) => {
+              if (id.startsWith('road_')) {
+                setSelectedCaseId(`${selectedF1}__${id}`);
+              }
+            }}
+            highlightSynthetic={highlightSynthetic}
+            onToggleSynthetic={() => setHighlightSynthetic(!highlightSynthetic)}
+            highlightSevered={highlightSevered}
+            onToggleSevered={() => setHighlightSevered(!highlightSevered)}
+            worldSummary={worldSummary}
+            branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
+            onOpenEvidence={(caseId) => {
+              setEvidenceCaseId(caseId);
+              setCurrentRoute(`/evidence/${caseId}`);
+            }}
+          />
+
+          <AgentPanel
+            isOpen={isAgentOpen}
+            onClose={() => setIsAgentOpen(false)}
+          />
+        </div>
 
         {/* Right Rail (380px) */}
         <RightRail
@@ -516,7 +536,7 @@ export const App: React.FC = () => {
         isOpen={isTourOpen}
         currentStep={tourStep}
         onStepChange={setTourStep}
-        onClose={() => setIsTourOpen(false)}
+        onClose={handleCloseTour}
         onApplyStepState={applyTourStepState}
       />
     </div>

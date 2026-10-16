@@ -420,7 +420,205 @@ AT: 2026-10-15T10:25 IST
    - `web/verification/demo/scene2_abstention.png` (245,034 bytes)
    - `web/verification/demo/scene3_null_result.png` (246,924 bytes)
    - `web/verification/demo/still_503_unavailable.png` (49,597 bytes)
-   - `web/verification/demo/still_method_provenance.png` (120,583 bytes)
+   - `web/verification/demo/still_method_provenance.png` (120,583 bytes)---
 
+## E-1 — Schematic View Layout & Collision Resolution
+STATUS: PASS
+AT: 2026-10-16T00:36 IST
+RAN: 
+  - `npm run build` (clean in 962ms)
+  - `npx playwright test verification/u2.spec.ts -g "U2-14"` (passed in 4.7s)
+  - `npx playwright test verification/presenter.spec.ts` (4 passed in 9.1s)
+CHANGES:
+  1. `web/src/graph/SchematicView.tsx`:
+     - Replaced nested translate transforms with deterministic absolute SVG coordinates across ALERT / POWER / ROAD bands.
+     - Road band: 6 columns ordered by longitude (`col_x = [140, 280, 420, 560, 700, 840]`), latitude-ordered within columns, staggered Y label offsets ensuring >=24px separation.
+     - Power band: 3 distinct Y tiers (`powerTop + 25`, `powerTop + 75`, `powerTop + 125`) with X coordinates aligned with carrier corridor midpoints.
+     - Alert band: Towers on 2 distinct tiers (`alertTop + 25`, `alertTop + 55`), Relays on 3 distinct tiers (`alertTop + 85`, `alertTop + 120`, `alertTop + 155`), with $\Delta Y \ge 30$ and large horizontal separations.
+     - Carrier connectors: pure vertical lines for carried feeders ($dx \le 25$), orthogonal routing otherwise.
+     - `carries` badges: deduplicated within 35px and suppressed if connector length $< 40$px.
+     - Every label rendered with `className="map-label-text"` and `data-label-id`.
+  2. `web/src/graph/projection.ts`:
+     - Updated `computeSchematicRoadLayout` with the deterministic 6-column layout.
+  3. `web/verification/u2.spec.ts`:
+     - Extended `U2-14` to test zero pairwise overlap in both `#tab-geographic` and `#tab-schematic` at 1440x900 and 1280x800 viewports.
+  4. Verified screenshots re-captured and stored on disk:
+     - `web/verification/presenter/step_2.png`
+     - `web/verification/u2/schematic_view.png`
+OUTPUT:
+```text
+  ok 1 [chromium] › verification\u2.spec.ts:266:3 › U2 — Graph Visualization Engine Battery › U2-14: Label collision: critical facility labels never suppressed and zero pairwise overlap in geographic and schematic (2.6s)
+  1 passed (4.7s)
+```
+---
 
+## E-2 — Decision Text Clipping Resolution
+STATUS: PASS
+AT: 2026-10-16T00:39 IST
+RAN:
+  - `npm run build` (clean in 1.01s)
+  - `npx playwright test verification/u4.spec.ts -g "D-0.b"` (1 passed in 5.6s)
+CHANGES:
+  1. `web/src/components/RightRail.tsx`:
+     - Added `overflowY: 'auto'`, `scrollbarWidth: 'thin'`, and clean whitespace handling to `#abstention-body-text` to ensure zero clipping while providing clear scroll affordance.
+     - Added `flexShrink: 0` to `#decision-action-block` guaranteeing action buttons (`APPROVE PLAN` / `REJECT PLAN`) remain permanently docked and visible at the bottom across all viewports.
+     - Constrained `#abstention-exposed-cases` with `maxHeight: '120px'`, `overflowY: 'auto'`, and `scrollbarWidth: 'thin'`.
+  2. `web/verification/u4.spec.ts`:
+     - Strengthened `D-0.b` to run across both 1440x900 and 1280x800 viewports.
+     - Added explicit DOM measurements asserting `scrollHeight <= clientHeight` (zero vertical clipping) and `scrollWidth <= clientWidth` (zero horizontal clipping) on `#abstention-body-text`.
+     - Added bounding box assertion verifying action buttons remain docked inside the viewport bounds.
+OUTPUT:
+```text
+  ok 1 [chromium] › verification\u4.spec.ts:649:3 › U4 — Screens, States and Control Wiring Battery › D-0.b: Decision text clipping — ABSTAIN body fully readable at 1440x900 and 1280x800 (3.0s)
+  1 passed (5.6s)
+```
+---
+
+## E-3 — Frame/Legend Coherence Resolution
+STATUS: PASS
+AT: 2026-10-16T00:44 IST
+RAN:
+  - `npm run build` (clean in 876ms)
+  - `npx playwright test verification/u4.spec.ts -g "D-0.d"` (1 passed in 5.4s)
+  - `npx playwright test verification/u4.spec.ts` (19 passed in 27.5s)
+CHANGES:
+  1. `web/src/App.tsx`:
+     - Added `handleCloseTour` callback ensuring whenever Presenter Tour is completed or dismissed (via button, Enter on step 7, or Escape), `currentFrame` resets cleanly to frame 4 (Outcome).
+     - Wired `onStartTour` to explicitly reset `currentFrame` to 0 for Step 1.
+     - Verified all completed runs (`handleRunSweep`, tour step 3 golden demo, past runs history, initial load) open on frame 4 (Outcome).
+  2. `web/src/graph/GeographicView.tsx` & `web/src/graph/SchematicView.tsx`:
+     - Added `severed-marker` class to the midpoint severed ✕ glyphs and `corridor-group severed` to severed corridors.
+  3. `web/src/graph/GraphContainer.tsx`:
+     - Added `data-severed-count` to `#toggle-severed` legend button.
+  4. `web/verification/u4.spec.ts`:
+     - Strengthened `D-0.d` to assert:
+       1) Completed run opens on frame 4 (`#frame-step-4.active`).
+       2) Legend `#toggle-severed` count matches canvas `.severed-marker` count exactly (> 0).
+       3) Presenter mode entry resets to frame 0 for Step 1 (`#frame-step-0.active`).
+       4) Tour dismissal via Escape or completion leaves frame 4 active with legend severed count matching canvas arcs (> 0).
+OUTPUT:
+```text
+  ok 1 [chromium] › verification\u4.spec.ts:708:3 › U4 — Screens, States and Control Wiring Battery › D-0.d: Frame/legend coherence — completed run opens on frame 4 (Outcome) with matching severed count in normal use and presenter mode (1.7s)
+  19 passed (27.5s)
+```
+---
+
+## E-4 — Case List Verdict Column Clipping Resolution
+STATUS: PASS
+AT: 2026-10-16T00:48 IST
+RAN:
+  - `npm run build` (clean in 883ms)
+  - `npx playwright test verification/u4.spec.ts -g "E-4"` (1 passed in 4.7s)
+CHANGES:
+  1. `web/src/components/LeftRail.tsx`:
+     - Applied `tableLayout: 'fixed'` to the Scenario Cases table with `<colgroup>` allocating `calc(100% - 110px)` to secondary corridor and an explicit fixed `110px` to the verdict column.
+     - Added `width: '110px'`, `minWidth: '110px'`, and `whiteSpace: 'nowrap'` on the verdict header and table cells.
+     - Constrained corridor names with `overflow: 'hidden'`, `textOverflow: 'ellipsis'`, and `whiteSpace: 'nowrap'` so long corridor names never steal column width from verdicts.
+  2. `web/src/components/primitives.tsx`:
+     - Added `whiteSpace: 'nowrap'`, `flexShrink: 0`, and `boxSizing: 'border-box'` to `StatusBadge` and its text container.
+  3. `web/verification/u4.spec.ts`:
+     - Added `E-4: Case List verdict column not clipped` test running at both 1440x900 and 1280x800.
+     - Asserted `scrollWidth === clientWidth` on every status badge across all rows.
+     - Asserted no truncated verdict strings ("BREAC", "DEGRADE").
+OUTPUT:
+```text
+  ok 1 [chromium] › verification\u4.spec.ts:759:3 › U4 — Screens, States and Control Wiring Battery › E-4: Case List verdict column not clipped — scrollWidth === clientWidth on all row badges at 1440 and 1280 (2.2s)
+  1 passed (4.7s)
+```
+---
+
+## E-5 — Canonical Figures Automation & Verification
+STATUS: PASS
+AT: 2026-10-16T00:50 IST
+RAN:
+  - `python scripts/report_facts.py`
+  - `pytest tests/phase9_demo/test_report_facts.py -v` (1 passed in 0.16s)
+CHANGES:
+  1. `scripts/report_facts.py`:
+     - Built canonical live-query utility that reads real API/FalkorDB state and prints the ground-truth facts block.
+     - Rule strictly enforced: Never type these numbers from memory; always run and paste `scripts/report_facts.py`.
+  2. `tests/phase9_demo/test_report_facts.py`:
+     - Added test asserting `scripts/report_facts.py` runs and matches graph ground truth: 13 intersections, 10 facilities, 14 corridors, and frozen decomposition 104/48/30/0.
+CANONICAL SYSTEM FACTS OUTPUT (PASTED DIRECTLY FROM `scripts/report_facts.py`):
+
+### Canonical System Facts (Live Query)
+- **Entity Counts by Label**:
+  - Intersections: 13
+  - Facilities: 10
+  - Corridors: 14
+  - Power Feeders: 7
+  - Towers: 8
+  - Relays: 12
+  - Depots: 2
+  - Hazard Zones: 6
+  - Alert Links: 36
+  - Feeds Tower Links: 10
+- **Facility IDs (10):**
+  `fire_dfs_hq, fire_kashmere_gate, fire_roop_nagar, hosp_gb_pant, hosp_hindu_rao, hosp_lnjp, hosp_sushruta, regulator_drain12, wtp_chandrawal, wtp_wazirabad`
+- **Corridor IDs (14):**
+  `road_barakhamba_cp_mandihouse, road_chelmsford_cp_station, road_delhigate_connector, road_jln_marg_delhigate_cp, road_rani_jhansi_hindurao_cp, road_rani_jhansi_to_station, road_ridge_sushruta_hindurao, road_ring_delhigate_ito, road_ring_kashmere_monastery, road_ring_kashmere_redfort, road_ring_monastery_chandgiram, road_ring_redfort_delhigate, road_sham_nath_sushruta_kashmere, road_vikas_marg_ito`
+- **Current Content Digest:** `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a`
+- **Current Config Hash:** `ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35`
+- **FalkorDB Version:** `6.0.2`
+- **Frozen Decomposition (6.8 km SLA):**
+  - f1-alone: 104
+  - f2-alone: 48
+  - unstressed: 30
+  - interaction-only: 0
+  - total scenarios: 182 (104 + 48 + 30 + 0 = 182)
+- **Verification Battery Test Counts:**
+  - Pytest Core Suite: 78 tests passed
+  - Playwright UI/E2E Suite: 87 tests passed
+
+---
+
+## E-6 — Track 01 Agent Layer (Incident Copilot)
+STATUS: PASS
+AT: 2026-10-16T11:02 IST
+RAN:
+  - `pytest tests/phase9_demo/test_agent.py -v` (11 passed in 40.5s)
+  - `npm run build` (clean in 883ms)
+  - `npx playwright test verification/u4.spec.ts -g "E-6"` (1 passed in 51.3s)
+CHANGES:
+  1. `src/jaal/tools/tools.py` & `src/jaal/tools/__init__.py`:
+     - Implemented 5 strictly validated Pydantic tools (`extra: "forbid"`):
+       - `get_corridor_inventory`: queries 14 arterial corridors from `jaal_world`.
+       - `evaluate_contingency`: clones `jaal_world` to 13 branches, evaluates counterfactual second-failure closures.
+       - `get_case_evidence` (alias: `inspect_causal_chain`): evaluates pair $(f_1, f_2)$ Dijkstra and alert walks.
+       - `check_system_health`: validates FalkorDB connectivity, node counts, and version `6.0.2`.
+       - `record_commander_decision`: gated write-tool requiring `confirmed: true`.
+  2. `src/jaal/agent/agent.py`:
+     - Built `JaalAgent` with deterministic intent dispatching across natural language queries.
+     - Strict Grounding Post-Validation (AG-08): extracts all numeric tokens ($\ge 2$) and entity IDs; suppresses ungrounded prose if any token is ungrounded.
+     - Adversarial & prompt injection defense (AG-09): safely rejects attempts to override instructions.
+     - Write-action gating (AG-06): unconfirmed mutations are strictly refused.
+  3. `src/jaal/agent/mcp_server.py`:
+     - Built Model Context Protocol (MCP) JSON-RPC 2.0 stdio server exposing all 5 tools.
+  4. `src/jaal/api/app.py`:
+     - Added `POST /api/agent/query` returning `{ prompt, answer, tool_trace, grounded, citations, abstain }`.
+  5. `web/src/components/AgentPanel.tsx`:
+     - Added Incident Copilot drawer with toggle button in `Header.tsx` (`#toggle-agent-panel`), input (`#agent-query-input`), submit button (`#agent-submit-btn`), tool selection chips (`.agent-tool-chip`), grounding badge (`#agent-grounded-badge`), answer container (`#agent-answer-text`), citations (`#agent-citations`), and close button (`#close-agent-btn`).
+     - Decoupled operation: main deck remains 100% operational when agent panel is closed.
+  6. Verification & Tests:
+     - 11 unit tests in `tests/phase9_demo/test_agent.py` covering tool selection, grounding suppression, injection defense, write-gating, MCP protocol, and FastAPI endpoint.
+     - Playwright E2E test in `verification/u4.spec.ts` asserting tool trace visibility, grounded response, injection rejection, and deck independence.
+OUTPUT:
+```text
+  ok 1 [chromium] › verification\u4.spec.ts:791:3 › U4 — Screens, States and Control Wiring Battery › E-6: Track 01 Copilot Agent — tool trace visible, grounded narration, injection resilience, and deck independence (49.7s)
+  1 passed (51.3s)
+```
+---
+
+## E-7 — Submission Timing and Rules Verification
+STATUS: PASS
+AT: 2026-10-16T11:04 IST
+CHANGES & VERIFICATIONS:
+  1. `README.md` & `PHASE_STATUS.md`:
+     - Recorded official submission window: Submissions OPEN 17 Oct 2026 01:03 IST and close 18 Oct 23:59 IST.
+     - Recorded team immutability: Team composition cannot be altered in the portal after submission.
+     - Recorded team profile: Team `codeXHW9QQ` ("Parser") is currently solo (1 of 4 seats utilized).
+     - Recorded buffer policy: Submissions will be submitted with comfortable margin prior to the 23:59 IST close.
+  2. `RULES_VERIFIED.md` (created in project root and updated across planning docs):
+     - Corrected Rule 3: Official Rule 3 literally states that if the product still works once FalkorDB is removed, the graph is decoration.
+     - The earlier planning note categorizing that as a paraphrase was wrong; the build satisfies the stricter reading via the AB-02 abstention: removing FalkorDB terminates branch copying (`GRAPH.COPY`), cross-layer dependency walks, Dijkstra evaluations, and triggers an immediate 503 / AB-02 service halt.
 

@@ -171,6 +171,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
               id="toggle-severed"
               onClick={onToggleSevered}
               className={`legend-severed ${highlightSevered ? 'active' : ''}`}
+              data-severed-count={severedCorridorIds.size}
               style={{
                 fontSize: 'var(--fs-micro)',
                 background: highlightSevered ? 'var(--fail-wash)' : 'transparent',

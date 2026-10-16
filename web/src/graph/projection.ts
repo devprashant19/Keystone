@@ -72,32 +72,59 @@ export function computeSchematicRoadLayout(
   const result: Record<string, Point> = {};
   if (!intersections || intersections.length === 0) return result;
 
-  // Sort by longitude ascending
+  // Sort intersections by longitude ascending
   const sorted = [...intersections].sort((a, b) => a.lon - b.lon);
-
-  // Group into columns dynamically based on number of nodes
   const total = sorted.length;
+
+  // Derive column positions across the horizontal span
   const colCount = Math.max(3, Math.min(6, Math.ceil(Math.sqrt(total) * 1.5)));
-  const itemsPerCol = Math.ceil(total / colCount);
-
   const colWidth = (bandRight - bandLeft) / (colCount + 1);
-  const rowHeight = (bandBottom - bandTop) / (itemsPerCol + 1);
 
+  // Partition sorted nodes into columns deterministically
+  // For 13 nodes into 6 columns: columns distribute as [2, 2, 3, 2, 2, 2]
+  const basePerCol = Math.floor(total / colCount);
+  const remainder = total % colCount;
+  const colSizes: number[] = [];
   for (let c = 0; c < colCount; c++) {
-    const colItems = sorted.slice(c * itemsPerCol, (c + 1) * itemsPerCol);
-    // Sort descending by latitude (north on top)
+    // Put extra items in the center column
+    const isCenter = c === Math.floor(colCount / 2);
+    colSizes.push(basePerCol + (isCenter ? remainder : 0));
+  }
+
+  let offset = 0;
+  for (let c = 0; c < colCount; c++) {
+    const size = colSizes[c] || basePerCol;
+    const colItems = sorted.slice(offset, offset + size);
+    offset += size;
+
+    // Within each column, sort descending by latitude (north on top)
     colItems.sort((a, b) => b.lat - a.lat);
 
+    const colX = Math.round((bandLeft + (c + 1) * colWidth) / 10) * 10;
+    const isEvenCol = c % 2 === 0;
+
     colItems.forEach((item, r) => {
-      const rawX = bandLeft + (c + 1) * colWidth;
-      const rawY = bandTop + (r + 1) * rowHeight;
-      // Nudge to 24px grid
-      const grid = 24;
-      const snapX = Math.round(rawX / grid) * grid;
-      const snapY = Math.round(rawY / grid) * grid;
-      result[item.id] = { x: snapX, y: snapY };
+      let nodeY: number;
+      if (colItems.length === 1) {
+        nodeY = bandTop + 125;
+      } else if (colItems.length === 2) {
+        nodeY = r === 0
+          ? bandTop + (isEvenCol ? 45 : 75)
+          : bandTop + (isEvenCol ? 190 : 225);
+      } else {
+        // 3 or more items
+        const step = (bandBottom - bandTop - 60) / Math.max(colItems.length - 1, 1);
+        nodeY = bandTop + 35 + r * step;
+      }
+
+      result[item.id] = {
+        x: colX,
+        y: Math.round(nodeY),
+      };
     });
   }
 
   return result;
 }
+
+

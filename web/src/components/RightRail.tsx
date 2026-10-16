@@ -421,6 +421,8 @@ export const RightRail: React.FC<RightRailProps> = ({
                 marginBottom: 'var(--s2)',
                 wordBreak: 'normal',
                 whiteSpace: 'normal',
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
               }}
             >
               No single allowed action preserves all critical SLAs across every evaluated second failure. Jaal refuses to recommend a plan that leaves known breaches.
@@ -434,8 +436,9 @@ export const RightRail: React.FC<RightRailProps> = ({
                   flexDirection: 'column',
                   gap: '4px',
                   marginTop: 'var(--s1)',
-                  maxHeight: '130px',
+                  maxHeight: '120px',
                   overflowY: 'auto',
+                  scrollbarWidth: 'thin',
                 }}
               >
                 {recommendation.exposed_cases.map((caseId: string) => (
@@ -544,7 +547,7 @@ export const RightRail: React.FC<RightRailProps> = ({
       </div>
     </div>
 
-      {/* Pinned Decision and Evidence Block (Guaranteed visible at 1440x900) */}
+      {/* Pinned Decision and Evidence Block (Guaranteed visible at 1440x900 and 1280x800) */}
       <div
         id="decision-action-block"
         style={{
@@ -555,6 +558,7 @@ export const RightRail: React.FC<RightRailProps> = ({
           flexDirection: 'column',
           gap: 'var(--s2)',
           zIndex: 5,
+          flexShrink: 0,
         }}
       >
         <div style={{ display: 'flex', gap: 'var(--s2)' }}>

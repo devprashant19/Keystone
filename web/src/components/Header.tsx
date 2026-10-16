@@ -11,6 +11,8 @@ interface HeaderProps {
   onOpenShortcuts?: () => void;
   onStartTour?: () => void;
   isTourActive?: boolean;
+  onToggleAgent?: () => void;
+  isAgentOpen?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,6 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenShortcuts,
   onStartTour,
   isTourActive,
+  onToggleAgent,
+  isAgentOpen,
 }) => {
   const [reducedMotion, setReducedMotion] = React.useState<boolean>(() => {
     return typeof document !== 'undefined' && document.documentElement.getAttribute('data-reduced-motion') === 'true';
@@ -232,6 +236,27 @@ export const Header: React.FC<HeaderProps> = ({
             title="Guided Tour Walkthrough (?tour=1)"
           >
             Guided tour
+          </button>
+        )}
+
+        {onToggleAgent && (
+          <button
+            id="toggle-agent-panel"
+            onClick={onToggleAgent}
+            style={{
+              background: isAgentOpen ? 'var(--branch)' : 'var(--bg-raised)',
+              border: '1px solid var(--branch)',
+              color: isAgentOpen ? 'var(--bg-void)' : 'var(--branch)',
+              padding: 'var(--s1) var(--s3)',
+              borderRadius: 'var(--r-ctl)',
+              cursor: 'pointer',
+              fontSize: 'var(--fs-cap)',
+              fontWeight: 700,
+            }}
+            title="Track 01 Copilot Agent (Grounded Narration over Deterministic Tools)"
+            aria-label="Toggle Agent Panel"
+          >
+            ⚡ Copilot
           </button>
         )}
 

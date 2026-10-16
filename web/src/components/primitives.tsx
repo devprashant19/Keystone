@@ -156,22 +156,25 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, size = 
         fontFamily: 'var(--font-mono)',
         fontWeight: 600,
         letterSpacing: '0.04em',
-        lineHeight: 1
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
+        boxSizing: 'border-box',
       }}
     >
       {enc.iconGlyph === 'filled-dot' && (
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: enc.colorVar }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: enc.colorVar, flexShrink: 0 }} />
       )}
       {enc.iconGlyph === 'hollow-ring' && (
-        <span style={{ width: 6, height: 6, borderRadius: '50%', border: `1.5px solid ${enc.colorVar}` }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', border: `1.5px solid ${enc.colorVar}`, flexShrink: 0 }} />
       )}
       {enc.iconGlyph === 'half-dot' && (
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: enc.colorVar, opacity: 0.7 }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: enc.colorVar, opacity: 0.7, flexShrink: 0 }} />
       )}
       {enc.iconGlyph === 'cross' && (
-        <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 'bold' }}>✕</span>
+        <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 'bold', flexShrink: 0 }}>✕</span>
       )}
-      <span>{text}</span>
+      <span style={{ whiteSpace: 'nowrap' }}>{text}</span>
     </span>
   );
 };

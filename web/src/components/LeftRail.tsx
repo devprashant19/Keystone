@@ -247,7 +247,11 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             Select an observed corridor failure to begin.
           </div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--fs-cap)' }}>
+          <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', fontSize: 'var(--fs-cap)' }}>
+            <colgroup>
+              <col style={{ width: 'calc(100% - 110px)' }} />
+              <col style={{ width: '110px' }} />
+            </colgroup>
             <thead>
               <tr
                 style={{
@@ -261,7 +265,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                 <th
                   id="sort-f2-btn"
                   aria-sort={sortBy === 'f2' ? 'ascending' : 'none'}
-                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer' }}
+                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer', overflow: 'hidden' }}
                   onClick={() => setSortBy('f2')}
                   title="Sort by secondary corridor ID"
                 >
@@ -270,7 +274,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                 <th
                   id="sort-verdict-btn"
                   aria-sort={sortBy === 'verdict' ? 'descending' : 'none'}
-                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer', textAlign: 'right' }}
+                  style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer', textAlign: 'right', width: '110px', whiteSpace: 'nowrap' }}
                   onClick={() => setSortBy('verdict')}
                   title="Sort by verdict severity"
                 >
@@ -296,8 +300,18 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                       height: '28px',
                     }}
                   >
-                    <td style={{ padding: 'var(--s2) var(--s3)' }}>
-                      <div className="mono" style={{ color: 'var(--ink-hi)', fontWeight: 500 }}>
+                    <td style={{ padding: 'var(--s2) var(--s3)', overflow: 'hidden' }}>
+                      <div
+                        className="mono"
+                        title={c.f2}
+                        style={{
+                          color: 'var(--ink-hi)',
+                          fontWeight: 500,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {c.f2.replace('road_', '')}
                       </div>
                       {c.interaction_only && (
@@ -306,13 +320,14 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                             fontSize: 'var(--fs-micro)',
                             color: 'var(--accent)',
                             display: 'inline-block',
+                            whiteSpace: 'nowrap',
                           }}
                         >
                           ⚡ Interaction Only
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right' }}>
+                    <td style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right', width: '110px', whiteSpace: 'nowrap' }}>
                       <StatusBadge status={c.verdict} />
                     </td>
                   </tr>
