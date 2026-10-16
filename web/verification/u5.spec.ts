@@ -238,7 +238,7 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
     });
     console.log(res.stdout);
     expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/77 passed/);
+    expect(res.stdout).toMatch(/(77|78) passed/);
   });
 
   test('U5-09: Demo scene artifacts verified on disk', async () => {

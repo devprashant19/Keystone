@@ -610,4 +610,92 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     }
     expect(violations, `Derived metric computations found in components:\n${violations.join('\n')}`).toEqual([]);
   });
+
+  test('D-0.a: Run state machine mutually exclusive — evaluating and complete labels never co-exist', async ({ page }) => {
+    await page.goto('/');
+    const evalLabel = page.locator('text=EVALUATING 13 SCENARIO BRANCHES…');
+    const completeLabel = page.locator('#sweep-complete-badge');
+
+    // 1. Idle state
+    expect(await evalLabel.count()).toBe(0);
+    expect(await completeLabel.count()).toBe(0);
+
+    // 2. Delayed route to inspect running state
+    let fulfillPromise: (value: any) => void;
+    const pendingPromise = new Promise((resolve) => { fulfillPromise = resolve; });
+    await page.route('/api/run', async (route) => {
+      await pendingPromise;
+      await route.fulfill({ json: MOCK_RUN_BASE });
+    });
+
+    await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
+    await page.locator('#run-sweep-btn').click();
+
+    // In running state:
+    await expect(evalLabel).toBeVisible();
+    expect(await completeLabel.count()).toBe(0);
+
+    // Fulfill to enter complete state:
+    fulfillPromise!(null);
+    await expect(page.locator('#run-sweep-btn')).toHaveText('RUN AGAIN');
+    await expect(completeLabel).toBeVisible();
+    expect(await evalLabel.count()).toBe(0);
+
+    // At no point can both be in the DOM
+    const bothInDom = (await evalLabel.count() > 0) && (await completeLabel.count() > 0);
+    expect(bothInDom).toBe(false);
+  });
+
+  test('D-0.b: Decision text clipping — ABSTAIN body fully readable at 1440x900', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const abstainedRun = {
+      ...MOCK_RUN_BASE,
+      recommendation: {
+        verdict: 'ABSTAIN',
+        abstain: true,
+        reason: 'NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS',
+        exposed_cases: [
+          'case_01', 'case_02', 'case_03', 'case_04', 'case_05',
+          'case_06', 'case_07', 'case_08', 'case_09', 'case_10',
+          'case_11', 'case_12', 'case_13'
+        ],
+        exposed_count: 13,
+      },
+    };
+    await page.route('/api/run', async (route) => route.fulfill({ json: abstainedRun }));
+    await page.goto('/');
+    await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
+    await page.locator('#run-sweep-btn').click();
+
+    const bodyText = page.locator('#abstention-body-text');
+    await expect(bodyText).toBeVisible();
+    const textContent = await bodyText.innerText();
+    expect(textContent).toContain('No single allowed action preserves all critical SLAs');
+    expect(textContent).toContain('Jaal refuses to recommend a plan that leaves known breaches.');
+
+    // Assert buttons remain pinned and fully visible
+    await expect(page.locator('#approve-action-btn')).toBeVisible();
+    await expect(page.locator('#reject-action-btn')).toBeVisible();
+
+    // Check that abstention-body-text bounding box is completely inside the viewport
+    const box = await bodyText.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      expect(box.y + box.height).toBeLessThanOrEqual(900);
+      expect(box.y).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test('D-0.d: Frame/legend coherence — completed run opens on frame 4 (Outcome)', async ({ page }) => {
+    await page.route('/api/run', async (route) => route.fulfill({ json: MOCK_RUN_BASE }));
+    await page.goto('/');
+    await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
+    await page.locator('#run-sweep-btn').click();
+
+    // Check active frame button is frame 4 (Outcome)
+    const activeFrame = page.locator('#frame-step-4.active');
+    await expect(activeFrame).toBeVisible();
+    const activeFrameText = await activeFrame.innerText();
+    expect(activeFrameText).toContain('4 Outcome');
+  });
 });

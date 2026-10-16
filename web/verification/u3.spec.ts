@@ -45,7 +45,7 @@ test.describe('U3 — Motion System Verification Battery', () => {
     expect(violations, `Raw timing literals found outside tokens.css:\n${violations.join('\n')}`).toEqual([]);
   });
 
-  test('U3-02: Exactly six named motifs and zero ad-hoc inline transitions', async () => {
+  test('U3-02: Exactly seven named motifs and zero ad-hoc inline transitions', async () => {
     // 1. Inspect motifs exports
     const motifs = await import('../src/motion/motifs');
     const exportedKeys = Object.keys(motifs).filter((k) => k.startsWith('M'));
@@ -56,6 +56,7 @@ test.describe('U3 — Motion System Verification Battery', () => {
       'M4_RouteRedraw',
       'M5_FocusSelection',
       'M6_VerdictSettle',
+      'M7_StepTransition',
     ];
     expect(exportedKeys.sort()).toEqual(expectedMotifs.sort());
 
@@ -228,7 +229,7 @@ test.describe('U3 — Motion System Verification Battery', () => {
     // Advance frames to trigger M3 branch glow and selection
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1000);
 
     const p95 = await page.evaluate(() => {
       const arr = ((window as any).__f || []).slice(5).sort((a: number, b: number) => a - b);

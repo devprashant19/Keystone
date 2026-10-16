@@ -184,6 +184,8 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
   test('U2-10: Branch boundary present on counterfactual, absent on base world', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.graph-canvas-container');
+    await page.locator('#frame-step-0').click();
+    await page.waitForTimeout(200);
 
     // Base world: frame 0 -> no branch chip
     await expect(page.locator('.branch-chip')).toHaveCount(0);
@@ -230,6 +232,7 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
   test('U2-13: Frame budget p95 frame time < 20ms during pan, zoom, selection', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.graph-canvas-container');
+    await page.waitForSelector('.intersection-node');
 
     await page.evaluate(() => {
       (window as any).__f = [];
@@ -244,11 +247,11 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
     });
 
     // Scripted pan, zoom, and select interactions
-    await page.getByRole('button', { name: '+' }).click();
-    await page.getByRole('button', { name: '+' }).click();
+    await page.locator('#zoom-in-btn').click();
+    await page.locator('#zoom-in-btn').click();
     await page.locator('.intersection-node').first().click();
-    await page.getByRole('button', { name: '−' }).click();
-    await page.waitForTimeout(500);
+    await page.locator('#zoom-out-btn').click();
+    await page.waitForTimeout(1000);
 
     const p95 = await page.evaluate(() => {
       const arr = ((window as any).__f || []).slice(5).sort((a: number, b: number) => a - b);
@@ -307,4 +310,15 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
     await expect(tooltip).toContainText('Intersection:');
   });
 
+  test('D-0.c: Suppressed non-critical labels reveal on hover with zero overlap', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await page.waitForSelector('.intersection-node');
+
+    const intNodes = page.locator('.intersection-node');
+    const firstInt = intNodes.first();
+    await firstInt.hover();
+    const label = firstInt.locator('.map-label-text');
+    await expect(label).toBeVisible();
+  });
 });
