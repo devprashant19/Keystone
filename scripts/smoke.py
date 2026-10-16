@@ -47,16 +47,18 @@ def compute_graph_digest(graph):
     canonical_repr = "\n".join(node_data + edge_data).encode("utf-8")
     return hashlib.sha256(canonical_repr).hexdigest(), len(node_data), len(edge_data)
 
-def load_delhi_world(graph):
+# NOTE: This world is an isolated engine probe for SM-07 and SM-08 performance gates,
+# NOT the product fixture. All entity IDs use the 'probe_' prefix so they cannot collide
+# with product fixture IDs, and operations run on 'probe_world' rather than 'jaal_world'.
+def load_probe_world(graph):
     """
-    Loads Delhi road corridors, infrastructure, and synthetic power/alert layers into graph.
+    Loads isolated probe road corridors, infrastructure, and probe power/alert layers into graph.
     """
     # 1. Road corridors
     road_file = DELHI_DATA_DIR / "road_corridors.geojson"
     with open(road_file, "r", encoding="utf-8") as f:
         roads = json.load(f)
     
-    # Track unique intersections
     intersections = {}
     corridors = []
     for feat in roads["features"]:
@@ -72,7 +74,6 @@ def load_delhi_world(graph):
         intersections[e_node] = coords[-1]
         corridors.append((cid, cname, l_km, s_node, e_node, status))
     
-    # Ingest intersections
     for iid, coords in intersections.items():
         graph.query(
             "MERGE (i:Intersection {id: $id}) "
@@ -80,8 +81,6 @@ def load_delhi_world(graph):
             {"id": iid, "lon": coords[0], "lat": coords[1]}
         )
     
-    # Ingest road arcs (2 directed arcs per corridor sharing corridor_id)
-    # Assumed speed 24 km/h -> travel_cost_min = (length_km / 24.0) * 60.0
     for cid, cname, l_km, s_node, e_node, status in corridors:
         t_cost = (l_km / 24.0) * 60.0
         # Forward arc
@@ -112,7 +111,6 @@ def load_delhi_world(graph):
         fname = props["name"]
         ftype = props.get("type", "facility")
         crit = int(props.get("criticality", 5))
-        # Snapping: map to closest intersection in Delhi network
         snap_target = "int_delhi_gate" if "hosp_lnjp" in fid else "int_civil_lines"
         offset_km = 0.5
         is_assumed = False
@@ -136,12 +134,12 @@ def load_delhi_world(graph):
             {"fid": fid, "iid": snap_target, "off": offset_km, "assumed": is_assumed}
         )
     
-    # 3. Synthetic Depots & Responders
+    # 3. Probe Depots & Responders (prefixed with probe_)
     graph.query(
-        "MERGE (d1:Depot {id: 'depot_north', name: 'North Emergency Depot', at_intersection: 'int_civil_lines', dispatch_delay_min: 3.0, data_origin: 'synthetic'}) "
-        "MERGE (d2:Depot {id: 'depot_south', name: 'South Emergency Depot', at_intersection: 'int_delhi_gate', dispatch_delay_min: 3.0, data_origin: 'synthetic'}) "
-        "MERGE (r1:Responder {id: 'resp_north_1', kind: 'ambulance', home_depot_id: 'depot_north', data_origin: 'synthetic'}) "
-        "MERGE (r2:Responder {id: 'resp_south_1', kind: 'ambulance', home_depot_id: 'depot_south', data_origin: 'synthetic'}) "
+        "MERGE (d1:Depot {id: 'probe_depot_north', name: 'Probe North Emergency Depot', at_intersection: 'int_civil_lines', dispatch_delay_min: 3.0, data_origin: 'synthetic'}) "
+        "MERGE (d2:Depot {id: 'probe_depot_south', name: 'Probe South Emergency Depot', at_intersection: 'int_delhi_gate', dispatch_delay_min: 3.0, data_origin: 'synthetic'}) "
+        "MERGE (r1:Responder {id: 'probe_resp_north_1', kind: 'ambulance', home_depot_id: 'probe_depot_north', data_origin: 'synthetic'}) "
+        "MERGE (r2:Responder {id: 'probe_resp_south_1', kind: 'ambulance', home_depot_id: 'probe_depot_south', data_origin: 'synthetic'}) "
         "WITH d1, d2, r1, r2 "
         "MATCH (i1:Intersection {id: 'int_civil_lines'}), (i2:Intersection {id: 'int_delhi_gate'}) "
         "MERGE (d1)-[:DEPOT_AT]->(i1) "
@@ -150,20 +148,20 @@ def load_delhi_world(graph):
         "MERGE (r2)-[:STATIONED_AT]->(d2)"
     )
 
-    # 4. Synthetic Power Feeders & Towers & Alert Arcs
+    # 4. Probe Power Feeders & Towers & Alert Arcs (prefixed with probe_)
     graph.query(
-        "MERGE (pf1:PowerFeeder {id: 'pf_chandrawal', name: 'Chandrawal Grid Feeder', carrier_corridor_id: 'road_ring_monastery_chandgiram', data_origin: 'synthetic'}) "
-        "MERGE (pf2:PowerFeeder {id: 'pf_kashmere', name: 'Kashmere Gate Substation Feeder', carrier_corridor_id: 'road_ring_kashmere_monastery', data_origin: 'synthetic'}) "
-        "MERGE (t1:Tower {id: 'tower_north_ridge', name: 'North Ridge Telecom Tower', is_command_source: true, data_origin: 'synthetic'}) "
-        "MERGE (t2:Tower {id: 'tower_isbt', name: 'ISBT Relay Tower', is_command_source: false, data_origin: 'synthetic'}) "
-        "MERGE (rc1:RelayContact {id: 'relay_civil_lines', name: 'Civil Lines Relay Contact', is_required_target: true, data_origin: 'synthetic'}) "
-        "MERGE (rc2:RelayContact {id: 'relay_delhi_gate', name: 'Delhi Gate Relay Contact', is_required_target: true, data_origin: 'synthetic'}) "
+        "MERGE (pf1:PowerFeeder {id: 'probe_pf_chandrawal', name: 'Probe Chandrawal Feeder', carrier_corridor_id: 'road_ring_monastery_chandgiram', data_origin: 'synthetic'}) "
+        "MERGE (pf2:PowerFeeder {id: 'probe_pf_kashmere', name: 'Probe Kashmere Feeder', carrier_corridor_id: 'road_ring_kashmere_monastery', data_origin: 'synthetic'}) "
+        "MERGE (t1:Tower {id: 'probe_tower_north_ridge', name: 'Probe North Ridge Tower', is_command_source: true, data_origin: 'synthetic'}) "
+        "MERGE (t2:Tower {id: 'probe_tower_isbt', name: 'Probe ISBT Tower', is_command_source: false, data_origin: 'synthetic'}) "
+        "MERGE (rc1:RelayContact {id: 'probe_relay_civil_lines', name: 'Probe Civil Lines Relay', is_required_target: true, data_origin: 'synthetic'}) "
+        "MERGE (rc2:RelayContact {id: 'probe_relay_delhi_gate', name: 'Probe Delhi Gate Relay', is_required_target: true, data_origin: 'synthetic'}) "
         "WITH pf1, pf2, t1, t2, rc1, rc2 "
-        "MERGE (t1)-[a0:ALERT_ARC {link_id: 'link_t1_t2'}]->(t2) "
+        "MERGE (t1)-[a0:ALERT_ARC {link_id: 'probe_link_t1_t2'}]->(t2) "
         "ON CREATE SET a0.carrier_corridor_id = 'road_ring_monastery_chandgiram', a0.latency_min = 1.2, a0.data_origin = 'synthetic' "
-        "MERGE (t2)-[a1:ALERT_ARC {link_id: 'link_t2_rc1'}]->(rc1) "
+        "MERGE (t2)-[a1:ALERT_ARC {link_id: 'probe_link_t2_rc1'}]->(rc1) "
         "ON CREATE SET a1.latency_min = 0.8, a1.data_origin = 'synthetic' "
-        "MERGE (t2)-[a2:ALERT_ARC {link_id: 'link_t2_rc2'}]->(rc2) "
+        "MERGE (t2)-[a2:ALERT_ARC {link_id: 'probe_link_t2_rc2'}]->(rc2) "
         "ON CREATE SET a2.latency_min = 1.5, a2.data_origin = 'synthetic' "
         "WITH rc1, rc2 "
         "MATCH (f_trauma:Facility {id: 'hosp_sushruta'}), (f_lnjp:Facility {id: 'hosp_lnjp'}) "
@@ -394,32 +392,32 @@ def main():
     v_graph.delete()
 
     # -------------------------------------------------------------
-    # Load jaal_world for SM-07 and SM-08
+    # Load probe_world for SM-07 and SM-08
     # -------------------------------------------------------------
-    print("\n--- Loading jaal_world for SM-07 and SM-08 ---")
-    g_world = db.select_graph("jaal_world")
+    print("\n--- Loading probe_world for SM-07 and SM-08 ---")
+    g_world = db.select_graph("probe_world")
     try:
         g_world.delete()
     except Exception:
         pass
-    g_world = db.select_graph("jaal_world")
-    load_delhi_world(g_world)
+    g_world = db.select_graph("probe_world")
+    load_probe_world(g_world)
     initial_digest, node_cnt, edge_cnt = compute_graph_digest(g_world)
-    print(f"jaal_world loaded: nodes={node_cnt}, edges={edge_cnt}, digest={initial_digest}")
+    print(f"probe_world loaded: nodes={node_cnt}, edges={edge_cnt}, digest={initial_digest}")
 
     # -------------------------------------------------------------
     # SM-07: Latency Gate (30 copy+delete cycles)
     # -------------------------------------------------------------
     print("\n--- Running SM-07 Latency Gate ---")
     # Warmup
-    db.connection.execute_command("GRAPH.COPY", "jaal_world", "jaal_warmup")
-    db.select_graph("jaal_warmup").delete()
+    db.connection.execute_command("GRAPH.COPY", "probe_world", "probe_warmup")
+    db.select_graph("probe_warmup").delete()
     
     durations = []
     for i in range(30):
         t0 = time.perf_counter()
-        branch_name = f"jaal_bench_{i}"
-        db.connection.execute_command("GRAPH.COPY", "jaal_world", branch_name)
+        branch_name = f"probe_bench_{i}"
+        db.connection.execute_command("GRAPH.COPY", "probe_world", branch_name)
         db.select_graph(branch_name).delete()
         dur_ms = (time.perf_counter() - t0) * 1000.0
         durations.append(dur_ms)
@@ -457,8 +455,8 @@ def main():
     digest_pre, _, _ = compute_graph_digest(g_world)
     
     # Perform branch copy and destructive mutations on branch
-    db.connection.execute_command("GRAPH.COPY", "jaal_world", "jaal_mutation_branch")
-    g_branch = db.select_graph("jaal_mutation_branch")
+    db.connection.execute_command("GRAPH.COPY", "probe_world", "probe_mutation_branch")
+    g_branch = db.select_graph("probe_mutation_branch")
     # Mutate branch: delete road arcs and unpower towers
     g_branch.query("MATCH ()-[r:ROAD_ARC]->() DELETE r")
     g_branch.query("MATCH (t:Tower) DETACH DELETE t")
@@ -533,6 +531,10 @@ def main():
         "distinct_error_paths": (socket_timeout_err != server_timeout_err)
     }
     print(f"SM-10 Result: socket_err={socket_timeout_err}, server_timeout_ok={server_timeout_accepted}")
+    try:
+        g_world.delete()
+    except Exception:
+        pass
 
     # -------------------------------------------------------------
     # Generate SMOKE_RESULTS.md

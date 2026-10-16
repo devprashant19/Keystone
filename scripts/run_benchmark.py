@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import Dict, Any, List
 
-from jaal.graph.client import get_graph_client, compute_graph_digest
+from jaal.graph.client import get_graph_client, compute_graph_digest, compute_content_digest
 from jaal.ingest.loader import load_world_graph
 from jaal.evaluate.evaluator import SharedEvaluator
 from jaal.branch.orchestrator import BranchOrchestrator
@@ -39,6 +39,7 @@ def run_benchmark():
     base_graph = client.select_graph("jaal_world")
     load_world_graph(base_graph, data_root=project_root / "data")
     digest, node_cnt, edge_cnt = compute_graph_digest(base_graph)
+    content_digest, _, _ = compute_content_digest(base_graph)
 
     evaluator = SharedEvaluator(cfg_file)
     orchestrator = BranchOrchestrator(client)
@@ -219,8 +220,9 @@ def run_benchmark():
     # 3. Assemble BENCHMARK_RESULTS.md
     bm_md = f"""# Jaal Pre-Mortem Benchmark Results
 
+**World Digest (mutation-guard):** `{digest}`  
+**World Content Digest (stable across reloads):** `{content_digest}`  
 **Config Hash:** `{config_hash}`  
-**World Digest:** `{digest}`  
 **FalkorDB Image:** `falkordb/falkordb:6.0.2@sha256:107455e862a824e45e8e9f5a7fbfdf5e00a08b14e13eae2577c72fd9e3f59ba6`  
 **Execution Timestamp:** {time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}  
 **Sweep Runtime:** {elapsed_sweep:.2f}s across {len(case_rows)} ordered cases.
