@@ -257,17 +257,41 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
     });
 
     console.log(`Measured p95 frame time: ${p95.toFixed(2)}ms`);
-    expect(p95).toBeLessThan(25);
+    expect(p95).toBeLessThan(20);
   });
 
-  test('U2-14: Label collision: critical facility labels never suppressed', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/');
-    await page.waitForSelector('.facility-node');
-    await expect(page.locator('.facility-node', { hasText: 'LNJP' })).toBeVisible();
+  test('U2-14: Label collision: critical facility labels never suppressed and zero pairwise overlap', async ({ page }) => {
+    for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/');
+      await page.waitForSelector('.facility-node');
+      await expect(page.locator('.facility-node', { hasText: 'LNJP' })).toBeVisible();
 
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.locator('.facility-node', { hasText: 'LNJP' })).toBeVisible();
+      // Check pairwise overlap of all rendered label bounding boxes in Geographic view
+      const overlaps = await page.evaluate(() => {
+        const labels = Array.from(document.querySelectorAll('.map-label-text'));
+        const boxes = labels.map((l) => {
+          const r = l.getBoundingClientRect();
+          return { id: l.getAttribute('data-label-id') || l.textContent || '', rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
+        }).filter((b) => b.rect.w > 0 && b.rect.h > 0);
+
+        const collisions: string[] = [];
+        for (let i = 0; i < boxes.length; i++) {
+          for (let j = i + 1; j < boxes.length; j++) {
+            const a = boxes[i].rect;
+            const b = boxes[j].rect;
+            // Overlap check with 1px buffer
+            const isOverlap = a.x < b.x + b.w - 1 && a.x + a.w > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1;
+            if (isOverlap) {
+              collisions.push(`${boxes[i].id} collides with ${boxes[j].id}`);
+            }
+          }
+        }
+        return collisions;
+      });
+
+      expect(overlaps, `Found label collisions at ${viewport.width}x${viewport.height}: ${overlaps.join(', ')}`).toEqual([]);
+    }
   });
 
   test('U2-15: Tooltip displays real API response fields after 400ms hover', async ({ page }) => {

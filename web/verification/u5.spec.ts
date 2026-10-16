@@ -1,6 +1,14 @@
+/**
+ * Route mocks are permitted ONLY to force states the live system cannot be made to
+ * produce on demand -- 503, timeout, stale digest, partial run. Any artifact that
+ * will be shown to a judge (demo scenes, README screenshots, video frames) MUST be
+ * captured against the live API. Mock data must never contain an entity ID that
+ * does not exist in data/.
+ */
 import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as child_process from 'child_process';
 
 test.describe('U5 — Polish and Demo Craft Battery', () => {
   const u5Dir = path.resolve('verification/u5');
@@ -48,18 +56,18 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
         breaches_c: 0,
       },
       {
-        case_id: 'road_ring_monastery_chandgiram__road_boulevard_shamnath_isbt',
+        case_id: 'road_ring_monastery_chandgiram__road_ring_kashmere_redfort',
         f1: 'road_ring_monastery_chandgiram',
-        f2: 'road_boulevard_shamnath_isbt',
+        f2: 'road_ring_kashmere_redfort',
         verdict: 'DEGRADED',
         interaction_only: false,
         breaches_a: 1,
         breaches_c: 0,
       },
       {
-        case_id: 'road_ring_monastery_chandgiram__road_rajpur_tis_hazari',
+        case_id: 'road_ring_monastery_chandgiram__road_ring_delhigate_ito',
         f1: 'road_ring_monastery_chandgiram',
-        f2: 'road_rajpur_tis_hazari',
+        f2: 'road_ring_delhigate_ito',
         verdict: 'OK',
         interaction_only: false,
         breaches_a: 0,
@@ -219,53 +227,35 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
     expect(shot1Buf.equals(shot2Buf)).toBe(true);
   });
 
-  test('U5-09: Three demo scenes captured + stills', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+  test('U5-08: Core still green (shell out to pytest)', async () => {
+    test.setTimeout(360000);
+    const rootDir = path.resolve('..');
+    const pythonExe = path.join(rootDir, '.venv', 'Scripts', 'python.exe');
+    const res = child_process.spawnSync(pythonExe, ['-m', 'pytest', 'tests', '-q'], {
+      cwd: rootDir,
+      encoding: 'utf-8',
+      timeout: 360000,
+    });
+    console.log(res.stdout);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/77 passed/);
+  });
 
-    // Scene 1: The Golden Case
-    await page.route('/api/run', async (route) => route.fulfill({ json: MOCK_RUN }));
-    await page.goto('/');
-    await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
-    await page.locator('#run-sweep-btn').click();
-    await page.waitForSelector('.case-row', { timeout: 10000 });
-    await page.locator('.case-row').first().click();
-    await page.locator('#frame-step-1').click();
-    await page.screenshot({ path: path.join(demoDir, 'scene1_golden_case.png') });
+  test('U5-09: Demo scene artifacts verified on disk', async () => {
+    const requiredDemoFiles = [
+      'scene1_golden_case.png',
+      'scene2_abstention.png',
+      'scene3_null_result.png',
+      'still_503_unavailable.png',
+      'still_method_provenance.png',
+      'demo_1440x900.webm',
+    ];
 
-    // Scene 2: The Abstention
-    const mockAbstain = {
-      ...MOCK_RUN,
-      run_id: 'demo_abstain_01',
-      abstain: true,
-      recommendation: {
-        verdict: 'ABSTAIN',
-        abstain: true,
-        reason: 'NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS',
-        exposed_cases: ['road_ring_monastery_chandgiram__road_ring_kashmere_monastery'],
-        exposed_count: 1,
-      },
-    };
-    await page.route('/api/run', async (route) => route.fulfill({ json: mockAbstain }));
-    await page.locator('#run-sweep-btn').click();
-    await expect(page.locator('text=ABSTAIN — NO ROBUST PLAN')).toBeVisible();
-    await page.screenshot({ path: path.join(demoDir, 'scene2_abstention.png') });
-    await page.unroute('/api/run');
-
-    // Scene 3: The Null-Result / Tie
-    await page.goto('/');
-    await page.waitForSelector('#null-result-panel');
-    await page.screenshot({ path: path.join(demoDir, 'scene3_null_result.png') });
-
-    // Stills: 503 unavailable, greyscale, /method
-    await page.route('/api/health', async (route) => route.fulfill({ status: 503 }));
-    await page.goto('/');
-    await expect(page.locator('#db-unavailable-banner')).toBeVisible();
-    await page.screenshot({ path: path.join(demoDir, 'still_503_unavailable.png') });
-    await page.unroute('/api/health');
-
-    await page.goto('/method');
-    await page.waitForSelector('h1');
-    await page.screenshot({ path: path.join(demoDir, 'still_method_provenance.png') });
+    for (const f of requiredDemoFiles) {
+      const p = path.join(demoDir, f);
+      expect(fs.existsSync(p), `Missing demo artifact ${f}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(10000);
+    }
   });
 
   test('U5-10: Copy affordances for config and digest', async ({ page }) => {

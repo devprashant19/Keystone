@@ -1,3 +1,10 @@
+/**
+ * Route mocks are permitted ONLY to force states the live system cannot be made to
+ * produce on demand -- 503, timeout, stale digest, partial run. Any artifact that
+ * will be shown to a judge (demo scenes, README screenshots, video frames) MUST be
+ * captured against the live API. Mock data must never contain an entity ID that
+ * does not exist in data/.
+ */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import * as fs from 'fs';
@@ -77,9 +84,9 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
         breaches_c: 0,
       },
       {
-        case_id: 'road_ring_monastery_chandgiram__road_boulevard_shamnath_isbt',
+        case_id: 'road_ring_monastery_chandgiram__road_ring_kashmere_redfort',
         f1: 'road_ring_monastery_chandgiram',
-        f2: 'road_boulevard_shamnath_isbt',
+        f2: 'road_ring_kashmere_redfort',
         verdict: 'DEGRADED',
         interaction_only: false,
         breaches_a: 1,
@@ -427,7 +434,7 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     await expect(runBtn).toBeDisabled();
   });
 
-  test('U4-05: Null-result panel renders with 26/24 split text', async ({ page }) => {
+  test('U4-05: Null-result panel renders with 104/48/30 decomposition text', async ({ page }) => {
     await page.route('/api/run', async (route) => route.fulfill({ json: MOCK_RUN_BASE }));
     await page.goto('/');
     await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
@@ -437,7 +444,7 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     await expect(nullPanel).toBeVisible();
     const panelText = await nullPanel.innerText();
     expect(panelText).toContain('EMPIRICAL FINDING: NULL INTERACTION');
-    expect(panelText).toContain('All 50 stressed cases are explained by a single failure (26 f1-alone, 24 f2-alone)');
+    expect(panelText).toContain('104 f1-alone, 48 f2-alone, 30 unstressed');
   });
 
   test('U4-06: Abstention renders ABSTAIN statement and disables approval', async ({ page }) => {

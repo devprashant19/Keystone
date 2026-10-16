@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as child_process from 'child_process';
 
 test.describe('U6 — Verification Battery and Sign-off Battery', () => {
   const u4Dir = path.resolve('verification/u4');
@@ -112,6 +113,16 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     }
   });
 
+  test('U6-03: Contrast matrix meets AA targets across all pairs (contrast.mjs)', async () => {
+    const res = child_process.spawnSync('node', ['verification/contrast.mjs'], {
+      cwd: path.resolve('.'),
+      encoding: 'utf-8',
+    });
+    console.log(res.stdout);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Overall Result: ALL CHECKS PASSED');
+  });
+
   test('U6-04: axe-core zero serious or critical violations across all 3 routes', async ({ page }) => {
     const routes = ['/', '/evidence/road_ring_monastery_chandgiram__road_ring_kashmere_monastery', '/method'];
     for (const r of routes) {
@@ -160,7 +171,7 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     expect(fs.existsSync(shotPath)).toBe(true);
   });
 
-  test('U6-08: Frame budget p95 < 25ms', async ({ page }) => {
+  test('U6-08: Frame budget p95 < 20ms', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.intersection-node');
 
@@ -177,7 +188,8 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
       return times[Math.floor(times.length * 0.95)];
     });
 
-    expect(p95).toBeLessThan(25.0);
+    console.log(`Measured U6-08 p95: ${p95.toFixed(2)}ms`);
+    expect(p95).toBeLessThan(20.0);
   });
 
   test('U6-09: Determinism — pixel-identical canvas render', async ({ page }) => {
@@ -208,6 +220,7 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
       'scene3_null_result.png',
       'still_503_unavailable.png',
       'still_method_provenance.png',
+      'demo_1440x900.webm',
     ];
 
     for (const f of requiredDemoFiles) {
