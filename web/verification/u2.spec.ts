@@ -263,15 +263,17 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
     expect(p95).toBeLessThan(20);
   });
 
-  test('U2-14: Label collision: critical facility labels never suppressed and zero pairwise overlap', async ({ page }) => {
+  test('U2-14: Label collision: critical facility labels never suppressed and zero pairwise overlap in geographic and schematic', async ({ page }) => {
     for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }]) {
       await page.setViewportSize(viewport);
       await page.goto('/');
+
+      // 1. Geographic View
+      await page.locator('#tab-geographic').click();
       await page.waitForSelector('.facility-node');
       await expect(page.locator('.facility-node', { hasText: 'LNJP' })).toBeVisible();
 
-      // Check pairwise overlap of all rendered label bounding boxes in Geographic view
-      const overlaps = await page.evaluate(() => {
+      const geoOverlaps = await page.evaluate(() => {
         const labels = Array.from(document.querySelectorAll('.map-label-text'));
         const boxes = labels.map((l) => {
           const r = l.getBoundingClientRect();
@@ -283,7 +285,6 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
           for (let j = i + 1; j < boxes.length; j++) {
             const a = boxes[i].rect;
             const b = boxes[j].rect;
-            // Overlap check with 1px buffer
             const isOverlap = a.x < b.x + b.w - 1 && a.x + a.w > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1;
             if (isOverlap) {
               collisions.push(`${boxes[i].id} collides with ${boxes[j].id}`);
@@ -292,8 +293,41 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
         }
         return collisions;
       });
+      expect(geoOverlaps, `Found Geographic label collisions at ${viewport.width}x${viewport.height}: ${geoOverlaps.join(', ')}`).toEqual([]);
 
-      expect(overlaps, `Found label collisions at ${viewport.width}x${viewport.height}: ${overlaps.join(', ')}`).toEqual([]);
+      // 2. Schematic View
+      await page.locator('#tab-schematic').click();
+      await page.waitForSelector('.band-road');
+      await page.waitForTimeout(200);
+
+      const schematicOverlaps = await page.evaluate(() => {
+        const labels = Array.from(document.querySelectorAll('.map-label-text'));
+        const boxes = labels.map((l) => {
+          const r = l.getBoundingClientRect();
+          return { id: l.getAttribute('data-label-id') || l.textContent || '', rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
+        }).filter((b) => b.rect.w > 0 && b.rect.h > 0);
+
+        const collisions: string[] = [];
+        for (let i = 0; i < boxes.length; i++) {
+          for (let j = i + 1; j < boxes.length; j++) {
+            const a = boxes[i].rect;
+            const b = boxes[j].rect;
+            const isOverlap = a.x < b.x + b.w - 1 && a.x + a.w > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1;
+            if (isOverlap) {
+              collisions.push(`${boxes[i].id} collides with ${boxes[j].id}`);
+            }
+          }
+        }
+        return { count: boxes.length, collisions };
+      });
+
+      expect(schematicOverlaps.count).toBeGreaterThanOrEqual(25);
+      expect(schematicOverlaps.collisions, `Found Schematic label collisions at ${viewport.width}x${viewport.height}: ${schematicOverlaps.collisions.join(', ')}`).toEqual([]);
+
+      if (viewport.width === 1440) {
+        const shot = await page.screenshot();
+        fs.writeFileSync(path.resolve('verification/u2/schematic_view.png'), shot);
+      }
     }
   });
 

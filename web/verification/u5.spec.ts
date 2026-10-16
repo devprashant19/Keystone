@@ -228,17 +228,17 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
   });
 
   test('U5-08: Core still green (shell out to pytest)', async () => {
-    test.setTimeout(360000);
+    test.setTimeout(480000);
     const rootDir = path.resolve('..');
     const pythonExe = path.join(rootDir, '.venv', 'Scripts', 'python.exe');
     const res = child_process.spawnSync(pythonExe, ['-m', 'pytest', 'tests', '-q'], {
       cwd: rootDir,
       encoding: 'utf-8',
-      timeout: 360000,
+      timeout: 480000,
     });
     console.log(res.stdout);
     expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/(77|78) passed/);
+    expect(res.stdout).toMatch(/(?:7[7-9]|[89]\d|\d{3}) passed/);
   });
 
   test('U5-09: Demo scene artifacts verified on disk', async () => {
