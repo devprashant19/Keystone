@@ -15,6 +15,16 @@ interface HeaderProps {
   isAgentOpen?: boolean;
 }
 
+type ThemeMode = 'light' | 'dark' | 'system';
+
+function getStoredTheme(): ThemeMode {
+  try {
+    const val = localStorage.getItem('keystone-theme');
+    if (val === 'light' || val === 'dark' || val === 'system') return val;
+  } catch (_) {}
+  return 'light';
+}
+
 export const Header: React.FC<HeaderProps> = ({
   worldDigest,
   configHash,
@@ -28,6 +38,25 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleAgent,
   isAgentOpen,
 }) => {
+  const [theme, setTheme] = React.useState<ThemeMode>(getStoredTheme);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('keystone-theme', theme);
+    } catch (_) {}
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }, [theme]);
+
+  const cycleTheme = () => {
+    setTheme((prev) => {
+      if (prev === 'light') return 'dark';
+      if (prev === 'dark') return 'system';
+      return 'light';
+    });
+  };
+
   const [reducedMotion, setReducedMotion] = React.useState<boolean>(() => {
     return typeof document !== 'undefined' && document.documentElement.getAttribute('data-reduced-motion') === 'true';
   });
@@ -200,6 +229,26 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+        <button
+          id="theme-toggle"
+          onClick={cycleTheme}
+          style={{
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--line-hair)',
+            color: 'var(--ink-hi)',
+            padding: 'var(--s1) var(--s2)',
+            borderRadius: 'var(--r-ctl)',
+            cursor: 'pointer',
+            fontSize: 'var(--fs-micro)',
+            fontWeight: 700,
+            letterSpacing: '0.03em',
+          }}
+          title={`Current Theme: ${theme.toUpperCase()} (Click to toggle Light / Dark / System)`}
+          aria-label={`Theme: ${theme.toUpperCase()}`}
+        >
+          {theme === 'light' ? '☀ LIGHT' : theme === 'dark' ? '☾ DARK' : '⚙ SYSTEM'}
+        </button>
+
         <button
           id="reduced-motion-toggle"
           onClick={toggleMotion}

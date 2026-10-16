@@ -677,3 +677,49 @@ VERIFICATIONS:
   - npm run build: 0 TypeScript errors (1.02s)
   - Dead-control sweep: all controls active (clear-btn, recompute-live-btn, corridor-click, provenance-chip)
 NEXT: K2 — Light Theme, Default On (Finora-inspired)
+
+---
+
+## K2 — Light Theme, Default On (Finora-inspired)
+STATUS: PASS
+AT: 2026-10-17T02:02 IST
+CHANGES & IMPLEMENTATIONS:
+  1. Default Light Theme (:root in web/src/tokens.css & index.html):
+     - Configured Finora-inspired light palette as the default-on system theme:
+       --bg-void: #f5f2eb (warm eggshell canvas)
+       --bg-panel: #fffdf9 (crisp cream panels)
+       --bg-raised: #ffffff (pure white cards & active controls)
+       --bg-sunken: #f0ece3 (sunken input beds)
+       --bg-header: #ffffff (crisp white header bar)
+       --line-hair: #000000 (1px hard black rule)
+       --line-firm: #000000 (2px hard black divider)
+       --line-focus: #0284c7 (sky-600 focus ring)
+       --ink-hi: #000000 (hard black primary text)
+       --ink-mid: #3f3f46 (zinc-700 secondary text)
+       --ink-lo: #52525b (zinc-600 captions, >=3:1)
+       --accent: #0284c7 (sky-600)
+       --branch: #7c3aed (violet-600)
+       --ok: #15803d (green-700)
+       --warn: #a16207 (yellow-700)
+       --fail: #b91c1c (red-700)
+       Washes: ok #dcfce7, warn #fef9c3, fail #fee2e2, branch #ede9fe
+     - Neo-brutalist border radii: 0px on panels (--r-panel: 0px), 2px on controls & chips (--r-ctl: 2px, --r-chip: 2px).
+     - Elevation: hard offset sticky elevation (0 2px 0 #000000).
+  2. Dark Theme & System Theme Media Query:
+     - Dark theme tokens isolated under [data-theme='dark'] selector.
+     - System preference media query (@media (prefers-color-scheme: dark)) bound to [data-theme='system'].
+     - <html lang='en' data-theme='light'> initialized in index.html to avoid theme flicker on cold paint.
+  3. Header Theme Toggle (#theme-toggle in web/src/components/Header.tsx):
+     - Tri-state cycle: ☀ LIGHT -> ☾ DARK -> ⚙ SYSTEM -> ☀ LIGHT.
+     - Persists mode to localStorage ('keystone-theme') safely wrapped in try/catch for sandbox resilience.
+     - Updates document.documentElement data-theme attribute reactively.
+  4. Contrast Verification (web/verification/contrast.mjs):
+     - Enhanced script to compute and print comprehensive WCAG contrast tables for BOTH light and dark themes.
+     - Every single pair satisfies WCAG AA targets (all >= 4.5:1 for body ink, >= 3:1 for low ink, status, and focus).
+VERIFICATIONS:
+  - contrast.mjs: ALL CHECKS PASSED across both light and dark themes
+  - Playwright U1 suite (npx playwright test verification/u1.spec.ts): 10 passed (8.0s)
+  - Playwright U4-01 & U6-01: #theme-toggle actively swept and verified live in browser DOM
+  - npm run build: 0 TypeScript errors (929ms)
+  - pytest test_k1_instant_engine.py: 3 passed (27.37s)
+NEXT: K3 — Rename to KEYSTONE

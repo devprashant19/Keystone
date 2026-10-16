@@ -1,44 +1,46 @@
 :root {
-  /* Surfaces — depth by value step, never by shadow */
-  --bg-void:    #070B12;   /* page background */
-  --bg-panel:   #0B1119;   /* panel base */
-  --bg-raised:  #111A25;   /* raised rows, cards, table headers */
-  --bg-sunken:  #060A10;   /* input wells, code, map plate */
-  --bg-header:  #17222F;   /* sticky header, tab strip */
+  /* LIGHT THEME (FINORA-INSPIRED NEO-BRUTALIST · DEFAULT ON) */
+  /* Surfaces */
+  --bg-void:    #f5f2eb;   /* warm eggshell canvas */
+  --bg-panel:   #fffdf9;   /* crisp cream panels */
+  --bg-raised:  #ffffff;   /* pure white cards, raised controls */
+  --bg-sunken:  #f0ece3;   /* sunken wells, input beds */
+  --bg-header:  #ffffff;   /* sticky header bar */
 
-  /* Lines — the only separators */
-  --line-hair:  #1E2A38;   /* default hairline */
-  --line-firm:  #2A3A4C;   /* section divider, table rule */
-  --line-focus: #49B4FF;   /* focus ring */
+  /* Lines & Dividers — 1px & 2px hard black */
+  --line-hair:  #000000;
+  --line-firm:  #000000;
+  --line-focus: #0284c7;
 
   /* Ink */
-  --ink-hi:     #E9EEF6;   /* primary text, numerals */
-  --ink-mid:    #9FB0C4;   /* labels, secondary */
-  --ink-lo:     #788FA8;   /* units, captions, disabled text (>=4.5:1 contrast) */
+  --ink-hi:     #000000;   /* primary high-contrast ink */
+  --ink-mid:    #3f3f46;   /* zinc-700 mid ink */
+  --ink-lo:     #52525b;   /* zinc-600 captions, labels (>=3:1) */
 
   /* Interaction */
-  --accent:     #49B4FF;
-  --accent-wash: rgba(73,180,255,0.14);
-  --accent-edge: rgba(73,180,255,0.42);
+  --accent:     #0284c7;   /* sky-600 */
+  --accent-wash: #e0f2fe;
+  --accent-edge: #0284c7;
 
   /* Overlays & Sanctioned Elevation */
-  --overlay-bg: rgba(7,11,18,0.85);
-  --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+  --overlay-bg: rgba(245, 242, 235, 0.92);
+  --elevation-sticky: 0 2px 0 #000000;
 
-  /* Counterfactual — the ONE sanctioned glow */
-  --branch:     #B57CFF;
-  --branch-wash: rgba(181,124,255,0.12);
-  --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
-  --bg-spotlight: rgba(6, 10, 16, 0.55);
+  /* Counterfactual */
+  --branch:     #7c3aed;   /* violet-600 */
+  --branch-wash: #ede9fe;
+  --branch-glow: 0 0 0 1px #7c3aed, 0 0 18px rgba(124, 58, 237, 0.20);
+  --bg-spotlight: rgba(240, 236, 227, 0.70);
 
-  /* Status — reserved, semantic, never decorative */
-  --ok:         #35C08A;
-  --ok-wash:    rgba(53,192,138,0.13);
-  --warn:       #E0A33E;   /* DEGRADED: cost worse, no deadline missed */
-  --warn-wash:  rgba(224,163,62,0.13);
-  --fail:       #F2564B;   /* BREACH / SEVERED only */
-  --fail-wash:  rgba(242,86,75,0.13);
-  --synthetic:  #7D8EA3;   /* synthetic-provenance stroke */
+  /* Status */
+  --ok:         #15803d;   /* green-700 */
+  --ok-wash:    #dcfce7;
+  --warn:       #a16207;   /* yellow-700 */
+  --warn-wash:  #fef9c3;
+  --fail:       #b91c1c;   /* red-700 */
+  --fail-wash:  #fee2e2;
+  --synthetic:  #475569;   /* slate-600 */
+  --synthetic-wash: #f1f5f9;
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -79,14 +81,91 @@
   --s6: 32px;
   --s7: 48px;
 
-  /* Radius — small and consistent */
+  /* Neo-brutalist Radius: 0 on panels, 2px on controls & chips */
   --r-chip:  2px;
-  --r-ctl:   4px;
-  --r-panel: 6px;
+  --r-ctl:   2px;
+  --r-panel: 0px;
 
   /* Layout */
   --h-header:   52px;
   --h-framebar: 56px;
   --w-rail-l:   300px;
   --w-rail-r:   380px;
+}
+
+[data-theme="dark"] {
+  /* DARK THEME TOKENS */
+  --bg-void:    #070B12;   /* page background */
+  --bg-panel:   #0B1119;   /* panel base */
+  --bg-raised:  #111A25;   /* raised rows, cards, table headers */
+  --bg-sunken:  #060A10;   /* input wells, code, map plate */
+  --bg-header:  #17222F;   /* sticky header, tab strip */
+
+  --line-hair:  #1E2A38;   /* default hairline */
+  --line-firm:  #2A3A4C;   /* section divider, table rule */
+  --line-focus: #49B4FF;   /* focus ring */
+
+  --ink-hi:     #E9EEF6;   /* primary text, numerals */
+  --ink-mid:    #9FB0C4;   /* labels, secondary */
+  --ink-lo:     #788FA8;   /* units, captions (>=4.5:1 contrast) */
+
+  --accent:     #49B4FF;
+  --accent-wash: rgba(73,180,255,0.14);
+  --accent-edge: rgba(73,180,255,0.42);
+
+  --overlay-bg: rgba(7,11,18,0.85);
+  --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+
+  --branch:     #B57CFF;
+  --branch-wash: rgba(181,124,255,0.12);
+  --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
+  --bg-spotlight: rgba(6, 10, 16, 0.55);
+
+  --ok:         #35C08A;
+  --ok-wash:    rgba(53,192,138,0.13);
+  --warn:       #E0A33E;
+  --warn-wash:  rgba(224,163,62,0.13);
+  --fail:       #F2564B;
+  --fail-wash:  rgba(242,86,75,0.13);
+  --synthetic:  #7D8EA3;
+  --synthetic-wash: rgba(125, 142, 163, 0.13);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --bg-void:    #070B12;
+    --bg-panel:   #0B1119;
+    --bg-raised:  #111A25;
+    --bg-sunken:  #060A10;
+    --bg-header:  #17222F;
+
+    --line-hair:  #1E2A38;
+    --line-firm:  #2A3A4C;
+    --line-focus: #49B4FF;
+
+    --ink-hi:     #E9EEF6;
+    --ink-mid:    #9FB0C4;
+    --ink-lo:     #788FA8;
+
+    --accent:     #49B4FF;
+    --accent-wash: rgba(73,180,255,0.14);
+    --accent-edge: rgba(73,180,255,0.42);
+
+    --overlay-bg: rgba(7,11,18,0.85);
+    --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+
+    --branch:     #B57CFF;
+    --branch-wash: rgba(181,124,255,0.12);
+    --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
+    --bg-spotlight: rgba(6, 10, 16, 0.55);
+
+    --ok:         #35C08A;
+    --ok-wash:    rgba(53,192,138,0.13);
+    --warn:       #E0A33E;
+    --warn-wash:  rgba(224,163,62,0.13);
+    --fail:       #F2564B;
+    --fail-wash:  rgba(242,86,75,0.13);
+    --synthetic:  #7D8EA3;
+    --synthetic-wash: rgba(125, 142, 163, 0.13);
+  }
 }
