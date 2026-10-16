@@ -82,6 +82,120 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
     return Math.max(30, Math.round(scaleBarKm * pxPerKm));
   }, [world.bbox]);
 
+  // Deterministic Label Collision Avoidance (R-4)
+  const labelPlacements = useMemo(() => {
+    interface Candidate {
+      id: string;
+      name: string;
+      priority: number;
+      isCritical: boolean;
+      pt: Point;
+    }
+
+    const list: Candidate[] = [];
+
+    // Facilities
+    for (const fac of world.facilities || []) {
+      const pt = facilityPoints[fac.id];
+      if (!pt || fac.excluded_from_metrics) continue;
+      list.push({
+        id: `fac_${fac.id}`,
+        name: fac.name,
+        priority: fac.is_critical ? 1 : 2,
+        isCritical: Boolean(fac.is_critical),
+        pt,
+      });
+    }
+
+    // Intersections
+    for (const int of world.intersections || []) {
+      const pt = intersectionPoints[int.id];
+      if (!pt) continue;
+      list.push({
+        id: `int_${int.id}`,
+        name: int.name,
+        priority: 3,
+        isCritical: false,
+        pt,
+      });
+    }
+
+    // Deterministic sort: priority ascending, tie-breaker alphabetical
+    list.sort((a, b) => {
+      if (a.priority !== b.priority) return a.priority - b.priority;
+      return a.id.localeCompare(b.id);
+    });
+
+    const placedBoxes: Array<{ x: number; y: number; w: number; h: number }> = [];
+    const placements: Record<string, { relX: number; relY: number; textAnchor: 'start' | 'end' | 'middle'; visible: boolean }> = {};
+
+    const overlaps = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) => {
+      const margin = 3;
+      return (
+        a.x < b.x + b.w + margin &&
+        a.x + a.w + margin > b.x &&
+        a.y < b.y + b.h + margin &&
+        a.y + a.h + margin > b.y
+      );
+    };
+
+    for (const item of list) {
+      const textWidth = Math.max(30, item.name.length * 6.5 + 4);
+      const textHeight = 12;
+      const offsetDist = 13;
+
+      // Offsets to try in fixed order: right, left, above, below
+      const offsets = [
+        {
+          box: { x: item.pt.x + offsetDist, y: item.pt.y - 6, w: textWidth, h: textHeight },
+          relX: offsetDist,
+          relY: 4,
+          textAnchor: 'start' as const,
+        },
+        {
+          box: { x: item.pt.x - offsetDist - textWidth, y: item.pt.y - 6, w: textWidth, h: textHeight },
+          relX: -offsetDist,
+          relY: 4,
+          textAnchor: 'end' as const,
+        },
+        {
+          box: { x: item.pt.x - textWidth / 2, y: item.pt.y - 12 - textHeight, w: textWidth, h: textHeight },
+          relX: 0,
+          relY: -12,
+          textAnchor: 'middle' as const,
+        },
+        {
+          box: { x: item.pt.x - textWidth / 2, y: item.pt.y + 12, w: textWidth, h: textHeight },
+          relX: 0,
+          relY: 12 + textHeight - 2,
+          textAnchor: 'middle' as const,
+        },
+      ];
+
+      let placed = false;
+      for (const opt of offsets) {
+        if (!placedBoxes.some((b) => overlaps(opt.box, b))) {
+          placedBoxes.push(opt.box);
+          placements[item.id] = { relX: opt.relX, relY: opt.relY, textAnchor: opt.textAnchor, visible: true };
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        if (item.isCritical) {
+          const fallback = offsets[0];
+          placedBoxes.push(fallback.box);
+          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: true };
+        } else {
+          placements[item.id] = { relX: 0, relY: 0, textAnchor: 'middle', visible: false };
+        }
+      }
+    }
+
+    return placements;
+  }, [world.facilities, world.intersections, facilityPoints, intersectionPoints]);
+
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -322,21 +436,29 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
                 rx="1"
               />
 
-              {/* Label halo */}
-              <text
-                x="0"
-                y="-8"
-                textAnchor="middle"
-                fill="var(--ink-lo)"
-                fontSize="var(--fs-micro)"
-                fontFamily="var(--font-sans)"
-                style={{
-                  textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
-                  pointerEvents: 'none',
-                }}
-              >
-                {intersection.name}
-              </text>
+              {/* Label with deterministic collision placement */}
+              {(() => {
+                const labelP = labelPlacements[`int_${intersection.id}`];
+                if (!labelP || !labelP.visible) return null;
+                return (
+                  <text
+                    x={labelP.relX}
+                    y={labelP.relY}
+                    textAnchor={labelP.textAnchor}
+                    fill="var(--ink-lo)"
+                    fontSize="var(--fs-micro)"
+                    fontFamily="var(--font-sans)"
+                    className="map-label-text"
+                    data-label-id={`int_${intersection.id}`}
+                    style={{
+                      textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {intersection.name}
+                  </text>
+                );
+              })()}
             </g>
           );
         })}
@@ -409,7 +531,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
                 </text>
               </g>
 
-              {/* Excluded chip or label */}
+              {/* Excluded chip or label with deterministic collision placement */}
               {isExcluded ? (
                 <g transform={`translate(${pt.x + 15}, ${pt.y - 5})`}>
                   <rect width="52" height="13" rx="2" fill="var(--bg-panel)" stroke="var(--ink-lo)" strokeWidth="0.8" />
@@ -417,21 +539,28 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
                     EXCLUDED
                   </text>
                 </g>
-              ) : (
-                <text
-                  x={pt.x + 16}
-                  y={pt.y + 4}
-                  fill="var(--ink-hi)"
-                  fontSize="var(--fs-micro)"
-                  fontWeight={isCritical ? '600' : '400'}
-                  style={{
-                    textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {fac.name}
-                </text>
-              )}
+              ) : (() => {
+                const labelP = labelPlacements[`fac_${fac.id}`];
+                if (!labelP || !labelP.visible) return null;
+                return (
+                  <text
+                    x={pt.x + labelP.relX}
+                    y={pt.y + labelP.relY}
+                    textAnchor={labelP.textAnchor}
+                    fill="var(--ink-hi)"
+                    fontSize="var(--fs-micro)"
+                    fontWeight={isCritical ? '600' : '400'}
+                    className="map-label-text"
+                    data-label-id={`fac_${fac.id}`}
+                    style={{
+                      textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {fac.name}
+                  </text>
+                );
+              })()}
             </g>
           );
         })}

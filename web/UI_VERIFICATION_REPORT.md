@@ -17,8 +17,8 @@ dist/assets/index-St9sPvWS.js   254.95 kB │ gzip: 70.75 kB
 ```
 
 ## Headline
-Checks implemented: 76 of 76
-PASS: 76   FAILED: 0   NOT RUN: 0
+Checks implemented: 78 of 78
+PASS: 78   FAILED: 0   NOT RUN: 0
 Blocking failures: none
 Decision: SIGNED OFF
 
@@ -67,7 +67,7 @@ Decision: SIGNED OFF
 | U4-02 | All 14 states reachable and captured | PASS | `verification/u4.spec.ts:273` `01-idle.png` through `14-small-screen.png` committed |
 | U4-03 | Idle shows no metric digits | PASS | `verification/u4.spec.ts:408` idle metrics render `—`, prompt "SELECT CORRIDOR & EXECUTE SWEEP" |
 | U4-04 | 503 blanks metrics and disables runs | PASS | `verification/u4.spec.ts:421` metrics blanked with `—`, sweep button disabled, 503 banner displayed |
-| U4-05 | Null-result panel renders with 26/24 split text | PASS | `verification/u4.spec.ts:430` headline 0, explicitly states 26/24 split at 6.8 km threshold |
+| U4-05 | Null-result panel renders with 104/48/30 decomposition text | PASS | `verification/u4.spec.ts:437` headline 0, explicitly states 104/48/30 decomposition (104 f1-alone, 48 f2-alone, 30 unstressed) at 6.8 km threshold |
 | U4-06 | Abstention renders ABSTAIN statement and disables approval | PASS | `verification/u4.spec.ts:443` ABSTAIN banner rendered, Approve button disabled |
 | U4-07 | Stale world blocks approval with banner | PASS | `verification/u4.spec.ts:464` digest mismatch blocks execution with STALE WORLD banner |
 | U4-08 | Monotonic progress without fake timers | PASS | `verification/u4.spec.ts:476` progress strictly monotonically advances |
@@ -86,12 +86,12 @@ Decision: SIGNED OFF
 | U5-05 | Selection persistence across view, frame step, sort, filter | PASS | `verification/u5.spec.ts:154` selection survives all four view transitions |
 | U5-06 | Zero layout shift on hover (CLS) | PASS | `verification/u5.spec.ts:183` CLS == 0.000 across 20 hovered elements |
 | U5-07 | Determinism check — pixel identical screenshots | PASS | `verification/u5/determinism-take-1.png` == `verification/u5/determinism-take-2.png` |
-| U5-08 | Core still green | PASS | `pytest tests -q`: 77 passed, 1 warning in 292s |
+| U5-08 | Core still green | PASS | `verification/u5.spec.ts:230` `pytest tests -q`: 77 passed |
 | U5-09 | Three demo scenes captured + stills | PASS | `verification/demo/scene{1,2,3}*.png` + 2 stills committed |
 | U5-10 | Copy affordances for config and digest | PASS | `verification/u5.spec.ts:271` clicking config/digest copies hash and shows `COPIED` chip |
 | U6-01 | Dead-control sweep (26/26 live controls) | PASS | `verification/u6.spec.ts:11` 26 of 26 controls browser-tested and produce DOM state change |
 | U6-02 | State coverage (14 state screenshots committed) | PASS | `verification/u6.spec.ts:90` 14 state screenshots verified on disk and non-empty |
-| U6-03 | Contrast matrix | PASS | `node verification/contrast.mjs`: all pairs measured, AA met |
+| U6-03 | Contrast matrix | PASS | `verification/u6.spec.ts:116` `node verification/contrast.mjs`: all pairs measured, AA met |
 | U6-04 | axe-core across 3 routes | PASS | `verification/u6.spec.ts:115` zero serious or critical violations |
 | U6-05 | Keyboard-only navigation loop | PASS | `verification/u6.spec.ts:126` select -> sweep -> inspect -> approve via keyboard only |
 | U6-06 | Reduced-motion parity | PASS | `verification/u6.spec.ts:139` DOM text identical between animated and reduced motion |

@@ -72,6 +72,7 @@ export const RightRail: React.FC<RightRailProps> = ({
   isReadOnly: propIsReadOnly,
 }) => {
   const [expandedPolicy, setExpandedPolicy] = React.useState<'A' | 'B' | 'C' | null>(null);
+  const [copiedCaseId, setCopiedCaseId] = React.useState<string | null>(null);
 
   if (!runData || !runData.recommendation || !runData.policies || !runData.decomposition) {
     return (
@@ -119,11 +120,17 @@ export const RightRail: React.FC<RightRailProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: 'calc(100vh - var(--h-header) - var(--h-framebar))',
-        overflowY: 'auto',
+        overflow: 'hidden',
       }}
       role="region"
       aria-label="Policy Comparison and Recommendation"
     >
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Policy list and decision details"
+        style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+      >
       {/* Stale World Notice */}
       {isStale && (
         <div
@@ -191,7 +198,7 @@ export const RightRail: React.FC<RightRailProps> = ({
               </strong>
             </div>
             <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s2)' }}>
-              No two-failure interaction cases at this threshold. All 50 stressed cases are explained by a single failure (26 f1-alone, 24 f2-alone).
+              No two-failure interaction cases at this threshold. All 182 cases are explained by single-failure dynamics and baseline structure (104 f1-alone, 48 f2-alone, 30 unstressed).
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
@@ -313,7 +320,7 @@ export const RightRail: React.FC<RightRailProps> = ({
             onClick={() => setExpandedPolicy(expandedPolicy === 'C' ? null : 'C')}
             style={{
               padding: 'var(--s3)',
-              backgroundColor: 'var(--accent-wash)',
+              backgroundColor: 'var(--bg-raised)',
               borderRadius: 'var(--r-ctl)',
               border: '1px solid var(--accent)',
               cursor: 'pointer',
@@ -387,13 +394,80 @@ export const RightRail: React.FC<RightRailProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', marginBottom: 'var(--s1)' }}>
               <strong style={{ color: 'var(--fail)', fontSize: 'var(--fs-body)' }}>ABSTAIN — NO ROBUST PLAN</strong>
             </div>
+            {recommendation.reason && (
+              <div style={{ marginBottom: 'var(--s2)' }}>
+                <span
+                  id="abstention-reason-code"
+                  className="mono"
+                  style={{
+                    fontSize: 'var(--fs-micro)',
+                    color: 'var(--fail)',
+                    backgroundColor: 'var(--bg-sunken)',
+                    padding: '2px 6px',
+                    borderRadius: 'var(--r-chip)',
+                    border: '1px solid var(--line-hair)',
+                  }}
+                >
+                  {recommendation.reason}
+                </span>
+              </div>
+            )}
             <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s2)' }}>
               No single allowed action preserves all critical SLAs across every evaluated second failure. Jaal refuses to recommend a plan that leaves known breaches.
             </p>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
               Uncovered second failures ({recommendation.exposed_count}):
-              <div className="mono" style={{ marginTop: 'var(--s1)', color: 'var(--fail)' }}>
-                {recommendation.exposed_cases.join(', ')}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'var(--s1)' }}>
+                {recommendation.exposed_cases.map((caseId: string) => (
+                  <div
+                    key={caseId}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: 'var(--bg-sunken)',
+                      padding: '2px 6px',
+                      borderRadius: 'var(--r-chip)',
+                      border: '1px solid var(--line-hair)',
+                      gap: '4px',
+                    }}
+                  >
+                    <span
+                      className="mono"
+                      title={caseId}
+                      style={{
+                        color: 'var(--fail)',
+                        fontSize: 'var(--fs-micro)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: 1,
+                      }}
+                    >
+                      {caseId}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try { navigator?.clipboard?.writeText(caseId); } catch (_) {}
+                        setCopiedCaseId(caseId);
+                        setTimeout(() => setCopiedCaseId(null), 1200);
+                      }}
+                      title={`Copy ${caseId}`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: copiedCaseId === caseId ? 'var(--ok)' : 'var(--accent)',
+                        fontSize: 'var(--fs-micro)',
+                        cursor: 'pointer',
+                        padding: '1px 4px',
+                        fontWeight: copiedCaseId === caseId ? 700 : 500,
+                      }}
+                    >
+                      {copiedCaseId === caseId ? 'COPIED' : 'COPY'}
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -447,9 +521,23 @@ export const RightRail: React.FC<RightRailProps> = ({
             </div>
           </div>
         )}
+      </div>
+    </div>
 
-        {/* Commander Action Buttons */}
-        <div style={{ display: 'flex', gap: 'var(--s2)', marginTop: 'var(--s3)' }}>
+      {/* Pinned Decision and Evidence Block (Guaranteed visible at 1440x900) */}
+      <div
+        id="decision-action-block"
+        style={{
+          borderTop: '1px solid var(--line-hair)',
+          backgroundColor: 'var(--bg-panel)',
+          padding: 'var(--s3)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--s2)',
+          zIndex: 5,
+        }}
+      >
+        <div style={{ display: 'flex', gap: 'var(--s2)' }}>
           <button
             onClick={() => onOpenDecisionModal('APPROVE')}
             disabled={isAbstained || isDecided || isStale || isReadOnly}
@@ -487,16 +575,7 @@ export const RightRail: React.FC<RightRailProps> = ({
             REJECT PLAN
           </button>
         </div>
-      </div>
 
-      {/* 3. Deep Drill-Through Evidence Link */}
-      <div style={{ padding: 'var(--s4)' }}>
-        <h2 style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', letterSpacing: '0.04em', marginBottom: 'var(--s2)' }}>
-          Case Evidence & Verification
-        </h2>
-        <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s3)' }}>
-          Inspect the exact branch mutation ledger, route node sequences, arc cost arithmetic, and alert hop chains.
-        </p>
         <button
           id="open-evidence-btn"
           onClick={() => onNavigateToEvidence(selectedCaseId)}
