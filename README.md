@@ -19,6 +19,20 @@ Jaal is not a predictive weather dashboard, nor does it claim to calculate real-
 
 ---
 
+## What it looks like
+
+| | |
+|---|---|
+| ![Three-band cross-layer view](web/verification/u2/schematic_view.png) | ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) |
+| **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. | **ABSTAIN with real reason code.** Honest refusal with real reason code when no candidate action prevents all SLA breaches across every second-failure contingency. |
+| ![The honest null finding](web/verification/demo/scene3_null_result.png) | |
+| **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. | |
+
+- **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:26) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
+- **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` (e.g., `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
+
+---
+
 ## 2. The Problem & The Hypothesis
 
 In urban floods (such as the historic July 2023 Yamuna River flood in Delhi), the first infrastructure failure ($f_1$) rarely causes total collapse by itself. Disaster responders react locally. However, when a **second failure ($f_2$)** occurs 30 minutes later, it interacts with $f_1$ to sever critical hospital access corridors or cut microwave backhaul alert relays covering emergency triage units.
@@ -161,6 +175,9 @@ All 182 scenario pairs ($14 \times 13$) are decomposed before policy evaluation:
 | Interaction-only | 0 | 0.0% |
 | Total evaluated | 182 | 100.0% |
 
+### Secondary Sensitivity Analysis (Allowance Sweep)
+The 8.0 km sweep is a **secondary sensitivity analysis** documented on `/method` (yielding 12 interaction cases at 8.0 km and 8 at 9–12 km); it is strictly secondary to the primary pre-registered 6.8 km benchmark.
+
 ---
 
 ## 7. Primary Policy Results
@@ -168,16 +185,7 @@ All 182 scenario pairs ($14 \times 13$) are decomposed before policy evaluation:
 > **Read this before the numbers.** Two findings here are negative and are reported
 > because they are true, not because they help.
 >
-> **1. Zero interaction-only cases at the frozen threshold.** Of 182 ordered `(f1,f2)`
-> cases, 104 are explained by the first failure alone, 48 by the second failure alone,
-> and 30 are unstressed. **None** require both failures together. Since the
-> interaction-only region is the only place where conditioning on a second failure can
-> change the decision, this fixture **does not demonstrate a pre-mortem advantage at the
-> frozen 6.8 km allowance**. The full sweep (section 3) shows interaction cases do exist
-> in this world at looser allowances (12 cases at 8.0 km, 8 at 9-12 km), so the method is
-> demonstrable here — just not at the preregistered threshold. Changing the threshold
-> after seeing that would be tuning, so the frozen value stands and this result is
-> published as-is.
+> **1. Zero interaction-only cases at the frozen threshold.** The threshold was fixed before any result existed; at that threshold the fixture shows no two-failure interaction, so no pre-mortem advantage is demonstrated; interaction cases do appear at 8.0 km (12) and 9-12 km (8); the threshold was deliberately not moved to reach them.
 >
 > **2. Policy C loses 12 cases to Policy B (Robust vs. Average Trade-Off).** C records 12 losses against B and a higher total breach count across all cases (487 vs 446). This is an explained, structural robust-versus-average trade-off arising directly from C's lexicographic objective:
 > - Tier 1: Minimize `exposed_cases_count` (the number of $f_2$ contingencies experiencing any breach).
@@ -296,16 +304,64 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 13. Rule 11 AI Disclosure Summary
+## 13. Development Timeline and Rule 8 Disclosure
+
+In compliance with Rule 8 and Rule 17 of the WeMakeDevs × FalkorDB Graph Hacks, this repository preserves its exact, un-rewritten git commit history. No commit has been squashed, rebased, amended, or re-dated.
+
+### Commit History (`git log --format='%h %ad %s' --date=iso`)
+
+```
+4cb2b74 2026-10-16 11:30:59 +0530 fix(pre-mortem): resolve errors E-1 through E-7 and verify full test battery
+c721cba 2026-10-15 15:56:34 +0530 feat(demo): presenter tour, transition choreography, and seeded demo harness
+ca24084 2026-10-15 03:01:36 +0530 fix(ui): remediate findings R-1..R-6 with live demo scenes, 78/78 checks, demo video, and 104/48/30 split
+d95bf38 2026-10-15 01:14:54 +0530 fix(ui): complete UI stages U4-U6, demo scenes, 76/76 verification battery and report
+3efa0a5 2026-10-14 23:39:40 +0530 feat(ui): complete Stage U3 motion system with 13/13 browser verification checks
+bd41fd1 2026-10-14 23:03:22 +0530 feat(ui): complete Stage U2 graph visualization engine with geographic/schematic views and dependency chain
+281be96 2026-10-14 21:57:36 +0530 fix(core): fixture enrichment, AB-02 abstention, Policy B tallies, graph-derived catalog, full sweep, procedure-doc corrections, GR tests, LICENSE, UI grep-test removal
+e7c5e8f 2026-10-14 20:12:35 +0530 feat(ui): Stage U1 complete - design tokens, typography, encodings, 19 SVG icons, and contrast verification
+a8e0c56 2026-10-14 01:35:25 +0530 chore: ignore vite timestamp files and web/dist
+a861751 2026-10-14 01:33:11 +0530 fix(test): use dynamic run_id in test_br_03 to guarantee test idempotency across reruns
+279b15a 2026-10-14 01:09:56 +0530 feat(ship): Phase 9 complete - submission README, demo scenarios DM-01..DM-03, clean-clone verification
+4b0963f 2026-10-14 01:07:21 +0530 feat(benchmark): Phase 8 complete - 182-case sweep, CSVs, and ablations AB-01..AB-03
+29c64a1 2026-10-14 01:03:44 +0530 feat(ui): Phase 7 complete - Command Deck, SVG topology, frame stepper, and evidence UI-01..UI-15, AX-01..AX-07
+3acc9b6 2026-10-14 00:56:05 +0530 feat(api): Phase 6 complete - FastAPI endpoints and typed tools AG-01..AG-09, ER-01..ER-04
+76b2f55 2026-10-14 00:52:52 +0530 feat(plan): Phase 5 complete - scenario planner, conditional N-1 and policies PL-01..PL-10
+fa2c5f8 2026-10-14 00:48:50 +0530 feat(eval): Phase 4 complete - shared evaluator for access and alert SLAs EV-01..EV-06
+f7e5ed5 2026-10-14 00:47:03 +0530 feat(branch): Phase 3 complete - branch isolation and staged cascade BR-01..BR-08
+02e397a 2026-10-14 00:44:19 +0530 feat(data): Phase 2 complete - world ingestion and validation DV-01..DV-07
+fae82ea 2026-10-14 00:39:10 +0530 feat(kickoff): Phase 1 complete - smoke battery SM-01..SM-10 verified with pinned FalkorDB digest
+```
+
+### Breakdown by Development Phase
+
+1. **Pre-Window Commits (Predating 15 Oct 2026 00:01 IST):**
+   - Commits `fae82ea` through `3efa0a5` (14 Oct 2026).
+   - **What they built:** The backend core: FalkorDB graph client and world loader (Phase 1–2), branch orchestrator (`GRAPH.COPY` isolation, Phase 3), shared evaluator for access and alert SLAs (Phase 4), scenario planner and conditional $N-1$ policies (Phase 5), FastAPI REST endpoints and typed tools (Phase 6), 182-case benchmark sweep and ablations (Phase 8), and initial UI engine stages (U1–U3).
+
+2. **In-Window Commits (On or After 15 Oct 2026 00:01 IST):**
+   - Commits `d95bf38` through `4cb2b74` (15–16 Oct 2026) and subsequent publication fixes.
+   - **What they built:** Fixture correction and re-benchmarking (resolving single-feeder saturation), full UI completion (stages U4–U6), deep-linkable presenter tour mode (`?tour=1&step=N`), transition choreography, seeded demo harness (`seed_demo.py`), Track 01 agent layer and MCP server integration (`mcp_server.py`), demo video recording and screenshot artifacts, and the full browser verification battery.
+
+3. **Pre-Window Planning Artifacts (`_planning_output/`):**
+   - In accordance with Rule 8 (which explicitly permits pre-hackathon notes, sketches, and planning documentation), conceptual planning documents were authored prior to the build window and preserved under `_planning_output/`:
+     - Graph schema and ontology sketches (`06_PRODUCT_ARCHITECTURE.md`, `07_UI_UX_MOTION_SPEC.md`).
+     - Dataset analysis, OSM corridor extraction notes, and prior art (`01_INVENTORY.md`, `05_DATA_AND_PRIOR_ART.md`).
+     - Benchmark methodology, mathematical formulation, and decision logs (`03_RESEARCH_AND_RULES.md`, `10_RISKS_AND_FINAL_DECISIONS.md`, `DECISION_LOG.md`).
+
+---
+
+## 14. Rule 11 AI-Assistant Disclosure Summary
 
 In compliance with Rule 11 of the WeMakeDevs × FalkorDB Graph Hacks:
-- Antigravity AI agentic pair programming was utilized during the official build window for test generation, code synthesis, and documentation formatting.
-- All graph schemas, Cypher traversals, and evaluation logic were autonomously developed, grounded in live FalkorDB tests with zero mock data.
+- **AI Coding Assistants Used:**
+  - **Google Antigravity IDE (Gemini 2.5 Flash / Pro):** Used as an agentic coding assistant during the official build window for test generation, code synthesis, refactoring, and documentation formatting.
+  - **Aider:** Used for command execution, running test suites, and git staging during development cycles.
+- **Human Oversight & Verification:** All graph schemas, Cypher traversals, multi-hop reachability rules, and evaluation algorithms were derived from the pre-authorized architectural specifications under human direction. Every metric cited in this repository was verified against live FalkorDB queries.
 - Detailed disclosure and verification protocols are documented in [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
 ---
 
-## 14. Track 01 Agent Architecture (Incident Copilot)
+## 15. Track 01 Agent Architecture (Incident Copilot)
 
 Jaal includes an operational Track 01 Incident Copilot Agent that acts on connected graph data through deterministic tools and strict grounding guarantees.
 
@@ -370,7 +426,7 @@ Jaal includes an operational Track 01 Incident Copilot Agent that acts on connec
 
 ---
 
-## 15. Submission Schedule, Team & Administrative Status
+## 16. Submission Schedule, Team & Administrative Status
 
 - **Submission Window:** Submissions **OPEN 17 Oct 2026 01:03 IST** and **CLOSE 18 Oct 2026 23:59 IST**.
 - **Team Immutability:** Hackathon rules dictate that the team composition cannot be changed after submitting.
