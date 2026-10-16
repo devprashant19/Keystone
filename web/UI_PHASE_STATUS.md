@@ -622,3 +622,58 @@ CHANGES & VERIFICATIONS:
      - Corrected Rule 3: Official Rule 3 literally states that if the product still works once FalkorDB is removed, the graph is decoration.
      - The earlier planning note categorizing that as a paraphrase was wrong; the build satisfies the stricter reading via the AB-02 abstention: removing FalkorDB terminates branch copying (`GRAPH.COPY`), cross-layer dependency walks, Dijkstra evaluations, and triggers an immediate 503 / AB-02 service halt.
 
+
+
+---
+
+## K0 — Commit What Exists (Baseline Clean State)
+STATUS: PASS
+AT: 2026-10-17T00:10 IST
+COMMIT: d10b571
+VERIFICATIONS:
+  - pytest tests -q: 94 passed, 1 warning (1159.04s)
+  - 
+px playwright test: 89 passed (21.4m)
+  - 
+pm run build: 0 TypeScript errors (4.42s)
+  - Seed digest: 455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a
+  - Decomposition: 104/48/30/0 (182 scenarios)
+  - Graph entities: 13 intersections, 10 facilities, 14 corridors, 7 feeders, 8 towers, 12 relays, 2 depots
+  - Working tree: clean (0 uncommitted changes, data/demo_cache/agent_tool_cache.json gitignored)
+  - AUDIT.md created: 183 tests audited, 11 strengthened, 0 deleted
+NEXT: K1 — The Instant Engine
+
+---
+
+## K1 — The Instant Engine
+STATUS: PASS
+AT: 2026-10-17T01:54 IST
+CHANGES & IMPLEMENTATIONS:
+  1. Precomputed 14 Sweeps (scripts/seed_demo.py & data/demo_cache/precomputed/*.json):
+     - All 14 corridor pre-mortem sweeps precomputed with full Dijkstra, decomposition (104/48/30/0 across 182 scenarios), policy evaluation (Policies A, B, C), and counterfactual graph verification.
+     - Each precomputed file stamped with 'source': 'precomputed', 'digest', and 'world_content_digest': '455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a'.
+     - Gitignored in data/demo_cache/precomputed/ and automatically generated/verified during python scripts/seed_demo.py.
+  2. Instant Endpoint (GET /api/scenario/{corridor_id} in src/jaal/api/app.py):
+     - Verifies corridor against allowlist.
+     - Serves precomputed JSON when active world digest matches world_content_digest.
+     - Automatically falls through to live calculation when live=true or when world content digest mismatches.
+     - Declares 'source': 'precomputed' | 'live', 'digest', and 'elapsed_ms'.
+  3. First Paint Golden Case (web/src/App.tsx & web/src/components/LeftRail.tsx):
+     - Deck mounts directly on golden demo (road_ring_monastery_chandgiram) in completed state on frame 4 (Outcome).
+     - #clear-btn in LeftRail returns deck to empty idle state.
+  4. Map Click to Run (web/src/graph/GeographicView.tsx, SchematicView.tsx, GraphContainer.tsx):
+     - Clicking .corridor-group on map or schematic loads scenario instantly without touching dropdown or RUN button.
+     - Hovering corridor shows SVG title and tooltip with live breach_count from /api/world/summary.
+  5. Scenario Provenance Chip (web/src/components/RightRail.tsx):
+     - Renders #scenario-provenance-chip declaring 'precomputed · digest 455712e8' (or live elapsed time) and linking to /method.
+  6. Recompute Live Honesty Proof (#recompute-live-btn in LeftRail and RightRail):
+     - Buttons trigger live run against FalkorDB with ?live=true.
+     - Equality proof test (tests/phase6_api/test_k1_instant_engine.py) confirms live numbers match precomputed numbers 100% identically across decomposition, policies, cases, and recommendation.
+VERIFICATIONS:
+  - pytest tests -q: 97 passed, 1 warning (209.19s) (3 new K1 tests: latency under 150ms, live equality proof, mismatch fallthrough)
+  - All 14 corridor sweep latencies measured: 19.63ms to 93.47ms (all < 150ms budget)
+  - Playwright U4 battery (npx playwright test verification/u4.spec.ts): 21 passed (43.4s)
+  - Playwright U6-12 demo freshness: passed (2.0s)
+  - npm run build: 0 TypeScript errors (1.02s)
+  - Dead-control sweep: all controls active (clear-btn, recompute-live-btn, corridor-click, provenance-chip)
+NEXT: K2 — Light Theme, Default On (Finora-inspired)

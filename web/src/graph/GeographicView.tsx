@@ -320,6 +320,8 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               onMouseEnter={() =>
                 onHoverEntity(corridor.id, {
                   type: 'Corridor',
+                  name: corridor.name,
+                  breach_count: corridor.breach_count ?? 0,
                   length_km: corridor.length_km,
                   travel_cost_min: corridor.travel_cost_min,
                   status: isSevered ? 'SEVERED' : isDegraded ? 'DEGRADED' : corridor.status,
@@ -331,6 +333,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               onMouseLeave={() => onHoverEntity(null)}
               style={{ cursor: 'pointer' }}
             >
+              <title>{`${corridor.name} (${corridor.id}) — ${corridor.breach_count ?? 0} breach cases (click to run sweep)`}</title>
               {/* Invisible 12px hit stroke for hit target rule */}
               <line
                 x1={p1.x}

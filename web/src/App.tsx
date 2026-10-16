@@ -142,12 +142,54 @@ export const App: React.FC = () => {
               setSelectedF1(data.f1_corridor_id);
               if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
               setCurrentFrame(4);
+              return;
             }
           }
+        } else if (runsData.runs && runsData.runs.length === 0) {
+          return;
         }
+        loadScenario('road_ring_monastery_chandgiram');
       })
-      .catch((err) => console.log('No prior runs:', err));
+      .catch(() => {
+        loadScenario('road_ring_monastery_chandgiram');
+      });
   }, []);
+
+  // K1: Instant Scenario Loader
+  const loadScenario = useCallback(async (corridorId: string, live: boolean = false) => {
+    if (!corridorId) return;
+    setIsLoading(true);
+    try {
+      const url = `/api/scenario/${corridorId}${live ? '?live=true' : ''}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setRunData(data);
+        setSelectedF1(corridorId);
+        if (data.cases?.length) {
+          setSelectedCaseId(data.cases[0].case_id);
+        }
+        setCurrentFrame(4);
+      }
+    } catch (e) {
+      console.error('Failed to load scenario', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setSelectedF1('');
+    setRunData(null);
+    setSelectedCaseId('');
+    setCurrentFrame(0);
+  }, []);
+
+  const handleRecomputeLive = useCallback(() => {
+    if (selectedF1) {
+      loadScenario(selectedF1, true);
+    }
+  }, [selectedF1, loadScenario]);
 
   const handleCloseTour = useCallback(() => {
     setIsTourOpen(false);
@@ -434,11 +476,17 @@ export const App: React.FC = () => {
           selectedF1={selectedF1}
           onSelectF1={(f1) => {
             setSelectedF1(f1);
-            setRunData(null);
-            setCurrentFrame(0);
+            if (f1) {
+              loadScenario(f1);
+            } else {
+              handleClear();
+            }
           }}
           onRunSweep={handleRunSweep}
           onCancelRun={handleCancelRun}
+          onClear={handleClear}
+          onRecomputeLive={handleRecomputeLive}
+          elapsedMs={runData?.elapsed_ms}
           runState={isLoading ? 'running' : runData?.cases?.length ? 'complete' : 'idle'}
           cases={runData?.cases || []}
           selectedCaseId={selectedCaseId}
@@ -455,9 +503,9 @@ export const App: React.FC = () => {
             f1Corridor={selectedF1}
             f2Corridor={f2Corridor}
             frameIndex={currentFrame}
-            onSelectEntity={(id) => {
-              if (id.startsWith('road_')) {
-                setSelectedCaseId(`${selectedF1}__${id}`);
+            onSelectEntity={(id, kind) => {
+              if (kind === 'Corridor' || id.startsWith('road_')) {
+                loadScenario(id);
               }
             }}
             highlightSynthetic={highlightSynthetic}
@@ -483,6 +531,7 @@ export const App: React.FC = () => {
           runData={runData}
           selectedCaseId={selectedCaseId}
           isStale={isStale}
+          onRecomputeLive={handleRecomputeLive}
           onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}
           onNavigateToEvidence={(caseId) => {
             if (caseId === 'method') {

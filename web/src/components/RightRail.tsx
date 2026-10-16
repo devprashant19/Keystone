@@ -19,6 +19,10 @@ interface PolicySummary {
 interface RunData {
   run_id: string;
   f1_corridor_id: string;
+  source?: 'precomputed' | 'live';
+  digest?: string;
+  world_content_digest?: string;
+  elapsed_ms?: number;
   decomposition: {
     f1_alone_cases: string[];
     f2_alone_cases: string[];
@@ -59,6 +63,7 @@ interface RightRailProps {
   selectedCaseId: string;
   onOpenDecisionModal: (verdict: 'APPROVE' | 'REJECT') => void;
   onNavigateToEvidence: (caseId: string) => void;
+  onRecomputeLive?: () => void;
   isStale?: boolean;
   isReadOnly?: boolean;
 }
@@ -68,6 +73,7 @@ export const RightRail: React.FC<RightRailProps> = ({
   selectedCaseId,
   onOpenDecisionModal,
   onNavigateToEvidence,
+  onRecomputeLive,
   isStale: propIsStale,
   isReadOnly: propIsReadOnly,
 }) => {
@@ -175,9 +181,63 @@ export const RightRail: React.FC<RightRailProps> = ({
 
       {/* 1. Policy Comparison Section */}
       <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
-        <h2 style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', letterSpacing: '0.04em', marginBottom: 'var(--s3)' }}>
-          Policy Comparison (182-Case Foundation)
-        </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)', flexWrap: 'wrap', gap: 'var(--s2)' }}>
+          <h2 style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', letterSpacing: '0.04em', margin: 0 }}>
+            Policy Comparison (182-Case Foundation)
+          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+            <a
+              id="scenario-provenance-chip"
+              href="/method"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToEvidence('method');
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--s1)',
+                padding: '2px 8px',
+                borderRadius: 'var(--r-chip)',
+                fontSize: 'var(--fs-micro)',
+                fontFamily: 'var(--font-mono)',
+                textDecoration: 'none',
+                border: '1px solid var(--line-hair)',
+                backgroundColor: 'var(--bg-sunken)',
+                color: 'var(--ink-hi)',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+              title="Provenance: link to /method methodology and frozen threshold"
+            >
+              <span style={{ color: runData.source === 'live' ? 'var(--warn)' : 'var(--accent)' }}>●</span>
+              <span>
+                {runData.source === 'live'
+                  ? `live (${runData.elapsed_ms || 0}ms) · digest ${(runData.world_content_digest || runData.digest || '455712e8').slice(0, 8)}`
+                  : `precomputed · digest ${(runData.world_content_digest || runData.digest || '455712e8').slice(0, 8)}`}
+              </span>
+            </a>
+            {onRecomputeLive && (
+              <button
+                id="recompute-live-btn-right"
+                onClick={onRecomputeLive}
+                style={{
+                  padding: '2px 8px',
+                  fontSize: 'var(--fs-micro)',
+                  borderRadius: 'var(--r-ctl)',
+                  border: '1px solid var(--line-hair)',
+                  backgroundColor: 'var(--bg-raised)',
+                  color: 'var(--ink-hi)',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+                title="Recompute this scenario live against FalkorDB"
+              >
+                Recompute live
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Dignified Null-Result / Main-Path Panel */}
         {decomposition.headline_interaction_only_count === 0 && (

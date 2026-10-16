@@ -664,10 +664,19 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
                   key={c.id}
                   className={`corridor-group ${isSevered ? 'severed' : ''}`}
                   onClick={() => onSelectEntity(c.id, 'Corridor')}
-                  onMouseEnter={() => onHoverEntity(c.id, { type: 'Corridor', status: isSevered ? 'SEVERED' : c.status })}
+                  onMouseEnter={() =>
+                    onHoverEntity(c.id, {
+                      type: 'Corridor',
+                      name: c.name,
+                      breach_count: c.breach_count ?? 0,
+                      length_km: c.length_km,
+                      status: isSevered ? 'SEVERED' : c.status,
+                    })
+                  }
                   onMouseLeave={() => onHoverEntity(null)}
                   style={{ cursor: 'pointer' }}
                 >
+                  <title>{`${c.name} (${c.id}) — ${c.breach_count ?? 0} breach cases (click to run sweep)`}</title>
                   <line
                     x1={p1.x}
                     y1={p1.y}

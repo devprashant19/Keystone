@@ -18,6 +18,7 @@ export interface CorridorEdge {
   carries_feeder_ids: string[];
   carries_alert_link_ids: string[];
   data_origin: string;
+  breach_count?: number;
 }
 
 export interface FacilityNode {

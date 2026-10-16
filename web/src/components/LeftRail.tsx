@@ -7,6 +7,7 @@ export interface Corridor {
   length_km: number;
   status: string;
   data_origin: string;
+  breach_count?: number;
 }
 
 export interface CaseSummary {
@@ -25,12 +26,15 @@ interface LeftRailProps {
   onSelectF1: (f1: string) => void;
   onRunSweep: () => void;
   onCancelRun?: () => void;
+  onClear?: () => void;
+  onRecomputeLive?: () => void;
   isLoading?: boolean;
   runState?: 'idle' | 'running' | 'complete';
   cases: CaseSummary[];
   selectedCaseId: string;
   onSelectCase: (caseId: string) => void;
   isDbDown: boolean;
+  elapsedMs?: number | null;
 }
 
 export const LeftRail: React.FC<LeftRailProps> = ({
@@ -39,12 +43,15 @@ export const LeftRail: React.FC<LeftRailProps> = ({
   onSelectF1,
   onRunSweep,
   onCancelRun,
+  onClear,
+  onRecomputeLive,
   isLoading: propIsLoading,
   runState: propRunState,
   cases,
   selectedCaseId,
   onSelectCase,
   isDbDown,
+  elapsedMs,
 }) => {
   const runState: 'idle' | 'running' | 'complete' =
     propRunState || (propIsLoading ? 'running' : cases.length > 0 ? 'complete' : 'idle');
@@ -95,20 +102,41 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       </div>
       {/* 1. Observed failure selector */}
       <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
-        <label
-          htmlFor="corridor-select"
-          style={{
-            display: 'block',
-            fontSize: 'var(--fs-micro)',
-            textTransform: 'uppercase',
-            color: 'var(--ink-lo)',
-            fontWeight: 600,
-            marginBottom: 'var(--s2)',
-            letterSpacing: '0.04em',
-          }}
-        >
-          Observed Failure (f1)
-        </label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s2)' }}>
+          <label
+            htmlFor="corridor-select"
+            style={{
+              display: 'block',
+              fontSize: 'var(--fs-micro)',
+              textTransform: 'uppercase',
+              color: 'var(--ink-lo)',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+            }}
+          >
+            Observed Failure (f1)
+          </label>
+          {Boolean(selectedF1) && onClear && (
+            <button
+              id="clear-btn"
+              onClick={onClear}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--ink-lo)',
+                fontSize: 'var(--fs-micro)',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: '0 4px',
+                fontWeight: 600,
+              }}
+              aria-label="Clear corridor selection"
+              title="Reset selection and return to empty idle state"
+            >
+              Clear
+            </button>
+          )}
+        </div>
         <select
           value={selectedF1}
           onChange={(e) => onSelectF1(e.target.value)}
@@ -129,7 +157,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
           <option value="">— Select an observed corridor failure —</option>
           {corridors.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name} ({c.length_km.toFixed(1)} km)
+              {c.name} ({c.length_km.toFixed(1)} km{c.breach_count !== undefined ? ` · ${c.breach_count} breaches` : ''})
             </option>
           ))}
         </select>
@@ -157,6 +185,29 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             ? 'RUN AGAIN'
             : 'RUN PRE-MORTEM SWEEP'}
         </button>
+
+        {onRecomputeLive && Boolean(selectedF1) && !isRunning && (
+          <button
+            id="recompute-live-btn"
+            onClick={onRecomputeLive}
+            style={{
+              width: '100%',
+              marginTop: 'var(--s2)',
+              backgroundColor: 'var(--bg-sunken)',
+              color: 'var(--ink-hi)',
+              border: '1px solid var(--line-hair)',
+              padding: 'var(--s1) var(--s2)',
+              borderRadius: 'var(--r-ctl)',
+              fontWeight: 600,
+              fontSize: 'var(--fs-micro)',
+              cursor: 'pointer',
+              letterSpacing: '0.02em',
+            }}
+            title="Recompute this scenario sweep live against FalkorDB"
+          >
+            {elapsedMs ? `RECOMPUTE LIVE (LAST: ${elapsedMs}ms)` : 'RECOMPUTE LIVE'}
+          </button>
+        )}
 
         {isRunning && (
           <button

@@ -9,7 +9,7 @@ interface CenterDeckProps {
   f1Corridor: string;
   f2Corridor: string;
   frameIndex: number;
-  onSelectEntity: (entityId: string) => void;
+  onSelectEntity: (entityId: string, kind?: string) => void;
   highlightSynthetic: boolean;
   onToggleSynthetic: () => void;
   highlightSevered: boolean;
@@ -105,9 +105,9 @@ export const CenterDeck: React.FC<CenterDeckProps> = ({
         viewMode={viewMode}
         onToggleViewMode={onToggleViewMode}
         selectedEntityId={selectedEntityId}
-        onSelectEntity={(id) => {
+        onSelectEntity={(id, kind) => {
           setSelectedEntityId(id);
-          onSelectEntity(id);
+          onSelectEntity(id, kind);
         }}
         branchId={activeBranchId}
         severedCorridorIds={severedCorridorIds}
