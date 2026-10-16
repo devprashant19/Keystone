@@ -103,6 +103,7 @@ test.describe('U1 — Design System Verification Battery', () => {
 
   test('U1-05: Tabular numerals width invariance 0 vs 8', async ({ page }) => {
     await page.goto('/method');
+    await page.evaluate(() => document.fonts.ready);
     const element = page.locator('#tabular-test-element');
     const toggleBtn = page.locator('#cycle-digit-btn');
 
