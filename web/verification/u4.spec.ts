@@ -278,6 +278,21 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     await page.waitForURL(/\/method/);
     await page.locator('text=Return to Incident Command Deck').click();
     await page.waitForURL('/');
+
+    // 31. Theme toggle (#theme-toggle)
+    const themeToggle = page.locator('#theme-toggle');
+    await expect(themeToggle).toBeVisible();
+    const initialThemeText = await themeToggle.textContent();
+    expect(initialThemeText).toContain('LIGHT');
+    await themeToggle.click();
+    const darkThemeText = await themeToggle.textContent();
+    expect(darkThemeText).toContain('DARK');
+    expect(await page.locator('html').getAttribute('data-theme')).toBe('dark');
+    await themeToggle.click();
+    const systemThemeText = await themeToggle.textContent();
+    expect(systemThemeText).toContain('SYSTEM');
+    await themeToggle.click();
+    expect(await page.locator('html').getAttribute('data-theme')).toBe('light');
   });
 
   test('U4-02: All 14 states reachable and captured', async ({ page }) => {

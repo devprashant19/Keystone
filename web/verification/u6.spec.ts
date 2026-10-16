@@ -86,6 +86,14 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     await motionToggle.click();
     expect(await motionToggle.innerText()).not.toBe(initText);
     await motionToggle.click();
+
+    // 27. Theme toggle
+    const themeToggle = page.locator('#theme-toggle');
+    const initTheme = await themeToggle.innerText();
+    expect(initTheme).toContain('LIGHT');
+    await themeToggle.click();
+    expect(await themeToggle.innerText()).toContain('DARK');
+    await themeToggle.click();
   });
 
   test('U6-02: State coverage (14 state screenshots committed and verified)', async () => {
