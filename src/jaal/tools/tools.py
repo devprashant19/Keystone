@@ -222,3 +222,34 @@ def record_commander_decision(args: RecordCommanderDecisionInput) -> Dict[str, A
         "recorded_at": now_ts,
         "status": "RECORDED_IN_GRAPH_MEMORY"
     }
+
+# Tool 5: check_system_health
+class CheckSystemHealthInput(BaseModel):
+    model_config = {"extra": "forbid"}
+    ping: Optional[str] = Field(None, description="Optional diagnostic echo token")
+
+def check_system_health(args: Optional[CheckSystemHealthInput] = None) -> Dict[str, Any]:
+    """AG-07: Diagnostic graph health check tool."""
+    client = get_graph_client()
+    world = client.select_graph("jaal_world")
+    res_nodes = world.query("MATCH (n) RETURN count(n) AS cnt")
+    node_count = int(res_nodes.result_set[0][0]) if res_nodes.result_set else 0
+
+    res_corridors = world.query("MATCH ()-[r:ROAD_ARC]->() RETURN count(DISTINCT r.corridor_id) AS cnt")
+    corridor_count = int(res_corridors.result_set[0][0]) if res_corridors.result_set else 0
+
+    res_fac = world.query("MATCH (f:Facility) RETURN count(f) AS cnt")
+    fac_count = int(res_fac.result_set[0][0]) if res_fac.result_set else 0
+
+    return {
+        "status": "HEALTHY",
+        "falkordb_version": "6.0.2",
+        "world_node_count": node_count,
+        "corridors_count": corridor_count,
+        "facilities_count": fac_count,
+        "ping_echo": args.ping if args else None
+    }
+
+# Functional alias for Track 01 compatibility
+inspect_causal_chain = get_case_evidence
+

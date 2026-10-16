@@ -1041,3 +1041,16 @@ def reset_demo(req: ResetRequest):
         "world_digest": digest,
         "runs_cached": 0
     }
+
+class AgentQueryRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    prompt: str = Field(..., min_length=1, max_length=1000, description="Commander natural language question")
+
+@app.post("/api/agent/query")
+def agent_query(req: AgentQueryRequest):
+    """POST /api/agent/query - Track 01 Grounded Incident Copilot over deterministic graph tools."""
+    from jaal.agent.agent import JaalAgent
+    agent = JaalAgent()
+    response = agent.query(req.prompt)
+    return response.model_dump()
+

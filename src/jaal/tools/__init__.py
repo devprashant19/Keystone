@@ -7,10 +7,13 @@ from jaal.tools.tools import (
     EvaluateContingencyInput,
     GetCaseEvidenceInput,
     RecordCommanderDecisionInput,
+    CheckSystemHealthInput,
     get_corridor_inventory,
     evaluate_contingency,
     get_case_evidence,
     record_commander_decision,
+    check_system_health,
+    inspect_causal_chain,
 )
 
 __all__ = [
@@ -18,8 +21,11 @@ __all__ = [
     "EvaluateContingencyInput",
     "GetCaseEvidenceInput",
     "RecordCommanderDecisionInput",
+    "CheckSystemHealthInput",
     "get_corridor_inventory",
     "evaluate_contingency",
     "get_case_evidence",
     "record_commander_decision",
+    "check_system_health",
+    "inspect_causal_chain",
 ]
