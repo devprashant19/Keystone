@@ -168,3 +168,59 @@ ELAPSED: 11.18s
 RECOVERY APPLIED: —
 NEXT: PHASE 10
 
+
+## FIX-ALL STEP 2 — API Contract Extension (U_PRE_API_CONTRACT)
+STATUS: PASS
+AT: 2026-10-14T22:20 IST
+RAN: pytest tests -q
+OUTPUT: 76 passed, 1 warning in 283.27s (0:04:43)
+ENDPOINTS VERIFIED:
+- GET /api/world/summary: 13 intersections, 14 corridors (source/target/travel_cost/carries), 10 facilities (lon/lat/excluded_from_metrics/reason), 6 hazard zones (Polygon coords), power_feeders, relays, alert_links, feeds_tower_links, computed bbox, provenance_mix.
+- GET /api/runs: returns newest-first runs with config_hash, world_digest, status, abstain, headline_interaction_only_count, decision.
+- GET /api/run/{run_id}/case/{case_id}: dependency_chain present with 5-step cross-layer chain (corridor -> feeder -> tower -> relay -> facility) and null reason_code on untracked entities.
+- 503 DATABASE_UNAVAILABLE: verified on connection error (no zeros, no empty arrays).
+NEXT: STEP 3 — INVESTIGATE POLICY C LOSING TO POLICY B (I-3)
+
+
+## FIX-ALL STEP 3 — Investigate Policy C Losses vs Policy B (I-3)
+STATUS: PASS
+AT: 2026-10-14T22:24 IST
+DETERMINATION: (a) Genuine robust-versus-average trade-off.
+FINDINGS:
+- All 12 losses occur on exactly 3 f1 corridors (road_barakhamba_cp_mandihouse, road_ring_monastery_chandgiram, road_vikas_marg_ito) under the exact same 4 f2 collapse corridors (road_delhigate_connector, road_ring_kashmere_redfort, road_ring_redfort_delhigate, road_sham_nath_sushruta_kashmere).
+- Policy B chooses act_prep_depot_central for all three, resulting in 13/13 exposed contingencies (100% failure rate across futures, 0 zero-breach scenarios).
+- Policy C lexicographically prioritizes robust feasibility (Tier 1: exposed_cases_count) and chooses mobile mesh relay actions that completely protect 6 contingencies (0 breaches), cutting exposed contingencies from 13 down to 7 (a 46% reduction).
+- In the remaining 4 unavoidable-collapse contingencies, B's depot pre-positioning dampens breaches more (1 vs 8), giving B lower aggregate breaches (446 vs 487) at the cost of failing across all futures.
+- Policy C correctly returns abstain=true on all three runs to warn the commander that no universally robust plan exists.
+- 12-case table documented in README.md Section 7.
+NEXT: STEP 4 — WORLD DIGEST STABILITY (I-8)
+
+
+## FIX-ALL STEP 4 — World Digest Stability (I-8)
+STATUS: PASS
+AT: 2026-10-14T22:28 IST
+RAN: pytest tests/phase2_data/test_digest_stability.py tests/phase3_branch/test_branch.py -v
+OUTPUT: 9 passed in 3.59s
+VERIFIED:
+- compute_content_digest added in jaal.graph.client, stripping volatile attributes (ingested_at, timestamps).
+- Reloaded world twice across distinct timestamps: mutation digest changed, content digest remained exactly identical (455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a).
+- BR-01 within-run immutability guard passes unbroken.
+- Both digests exposed on /api/health, /api/world/summary, and scripts/run_benchmark.py.
+NEXT: STEP 5 — SMOKE PROBE FIXTURE DRIFT (I-10)
+
+
+## FIX-ALL STEP 5 — Smoke Probe Fixture Drift (I-10)
+STATUS: PASS
+AT: 2026-10-14T22:34 IST
+RAN: python scripts/smoke.py
+OUTPUT: All 10 checks (SM-01..SM-10) PASSED
+VERIFIED:
+- scripts/smoke.py isolated from product world: runs on probe_world, not jaal_world.
+- All probe entities prefixed with probe_ (probe_depot_north, probe_tower_isbt, probe_pf_chandrawal, etc.).
+- Explanatory comment added stating it is an engine probe fixture, not the product fixture.
+- Zero entity collision with product fixture IDs.
+- jaal_world remains untouched (node_count=60, edge_count=100 verified).
+NEXT: STEP 6 — UI STAGES U2..U6 (I-6)
+
+
+

@@ -179,25 +179,39 @@ All 182 scenario pairs ($14 \times 13$) are decomposed before policy evaluation:
 > after seeing that would be tuning, so the frozen value stands and this result is
 > published as-is.
 >
-> **2. Policy C loses to Policy B in aggregate.** C records 12 losses against B and a
-> higher total breach count (487 vs 446). C optimises lexicographically for robustness
-> across *every* evaluated second failure, which can select a conservative action that is
-> worse on average than B's static degree-centrality choice. That is a genuine
-> robust-versus-average trade-off, not a rounding artifact, and it is unresolved.
+> **2. Policy C loses 12 cases to Policy B (Robust vs. Average Trade-Off).** C records 12 losses against B and a higher total breach count across all cases (487 vs 446). This is an explained, structural robust-versus-average trade-off arising directly from C's lexicographic objective:
+> - Tier 1: Minimize `exposed_cases_count` (the number of $f_2$ contingencies experiencing any breach).
+> - Tier 2: Minimize `total_breaches_sum` across all scenarios.
+> For the three primary failures with losses (`road_barakhamba_cp_mandihouse`, `road_ring_monastery_chandgiram`, and `road_vikas_marg_ito`), Policy B's static degree-centrality action (`act_prep_depot_central`) experiences breaches across **all 13** contingencies (exposed count = 13, 0 zero-breach scenarios). In contrast, Policy C's pre-mortem optimization selects a targeted mobile mesh relay action that completely protects 6 contingencies (0 breaches), cutting exposed contingencies from 13 down to 7 (a 46% reduction in failure exposure). However, in the 4 heavy-collapse contingencies (e.g. `road_delhigate_connector`, where baseline breaches = 9), Policy B's depot pre-positioning dampens road delays more than the mesh relay (1 vs 8 breaches). Policy C prioritizes robust contingency coverage over average-case breach dampening, and correctly flags abstention (`abstain = true`) to signal to the commander that no plan exists that preserves all critical SLAs across all contingencies.
 >
 > Policy C's 103 wins against the no-action baseline show only that acting beats not
 > acting — they are not evidence that the pre-mortem conditioning helped.
 
-
 All policies are evaluated using **one identical shared evaluator** (`SharedEvaluator`):
 
-| Policy | Description | Wins vs A | Ties vs A | Losses vs A | Wins vs B | Ties vs B | Losses vs B |
-|---|---|---|---|---|---|---|---|
-| **Policy A** | No action (baseline) | — | — | — | — | — | — |
-| **Policy B** | Static degree centrality | 50 | 132 | 0 | — | — | — |
-| **Policy C** | **Pre-Mortem Conditional N-1** | **50** | **132** | **0** | **50** | **132** | **0** |
+| Policy | Description | Wins vs A | Ties vs A | Losses vs A | Wins vs B | Ties vs B | Losses vs B | Total Breaches |
+|---|---|---|---|---|---|---|---|---|
+| **Policy A** | No action (baseline) | — | — | — | — | — | — | 682 |
+| **Policy B** | Static degree centrality | 60 | 122 | 0 | — | — | — | 446 |
+| **Policy C** | **Pre-Mortem Conditional N-1** | **103** | **79** | **0** | **43** | **127** | **12** | **487** |
 
-Policy C achieves **zero losses** across all 182 cases.
+### Per-Case Evidence of the 12 Policy C Losses to Policy B
+
+| # | $f_1$ (Primary Failure) | $f_2$ (Second Contingency) | Policy C Action | Policy B Action | Breaches (A) | Breaches (B) | Breaches (C) | Outcome vs B |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `road_barakhamba_cp_mandihouse` | `road_delhigate_connector` | `act_relay_relay_dfs` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 2 | `road_barakhamba_cp_mandihouse` | `road_ring_kashmere_redfort` | `act_relay_relay_dfs` (mobile relay) | `act_prep_depot_central` (depot central) | 11 | 3 | 10 | LOSS (10 vs 3) |
+| 3 | `road_barakhamba_cp_mandihouse` | `road_ring_redfort_delhigate` | `act_relay_relay_dfs` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 4 | `road_barakhamba_cp_mandihouse` | `road_sham_nath_sushruta_kashmere` | `act_relay_relay_dfs` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 5 | `road_ring_monastery_chandgiram` | `road_delhigate_connector` | `act_relay_relay_chandrawal` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 6 | `road_ring_monastery_chandgiram` | `road_ring_kashmere_redfort` | `act_relay_relay_chandrawal` (mobile relay) | `act_prep_depot_central` (depot central) | 11 | 3 | 10 | LOSS (10 vs 3) |
+| 7 | `road_ring_monastery_chandgiram` | `road_ring_redfort_delhigate` | `act_relay_relay_chandrawal` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 8 | `road_ring_monastery_chandgiram` | `road_sham_nath_sushruta_kashmere` | `act_relay_relay_chandrawal` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 9 | `road_vikas_marg_ito` | `road_delhigate_connector` | `act_relay_relay_drain12` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 10 | `road_vikas_marg_ito` | `road_ring_kashmere_redfort` | `act_relay_relay_drain12` (mobile relay) | `act_prep_depot_central` (depot central) | 11 | 3 | 10 | LOSS (10 vs 3) |
+| 11 | `road_vikas_marg_ito` | `road_ring_redfort_delhigate` | `act_relay_relay_drain12` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+| 12 | `road_vikas_marg_ito` | `road_sham_nath_sushruta_kashmere` | `act_relay_relay_drain12` (mobile relay) | `act_prep_depot_central` (depot central) | 9 | 1 | 8 | LOSS (8 vs 1) |
+
 
 ---
 
