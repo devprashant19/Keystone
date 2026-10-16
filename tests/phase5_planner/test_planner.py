@@ -105,10 +105,30 @@ def test_pl_06_action_actually_attempted_f07_regression(planner_env):
     _, planner, _ = planner_env
     f1 = "road_ring_kashmere_monastery"
     actions = planner.get_default_action_catalog()
-    assert len(actions) == 4
+
+    # The catalog is DERIVED FROM THE GRAPH (one PREPOSITION_DEPOT per :Depot, one
+    # DEPLOY_MOBILE_RELAY per required-target :RelayContact), so assert that
+    # correspondence rather than a magic count that silently rots when the fixture
+    # changes. A stale hard-coded catalog is how a policy becomes a no-op unnoticed.
+    world = planner.client.select_graph(planner.base_graph_name)
+    depot_ids = {r[0] for r in world.query("MATCH (d:Depot) RETURN d.id").result_set}
+    relay_ids = {
+        r[0] for r in world.query(
+            "MATCH (r:RelayContact {is_required_target: true}) RETURN r.id"
+        ).result_set
+    }
+    assert depot_ids, "fixture must define at least one depot"
+    assert relay_ids, "fixture must define at least one required relay target"
+
+    prep_targets = {a.target_id for a in actions if a.action_kind == "PREPOSITION_DEPOT"}
+    relay_targets = {a.target_id for a in actions if a.action_kind == "DEPLOY_MOBILE_RELAY"}
+    assert prep_targets == depot_ids
+    assert relay_targets == relay_ids
+    assert len(actions) == len(depot_ids) + len(relay_ids)
 
     sweep = planner.run_f1_sweep(f1, allowed_actions=actions, run_id="pl06")
-    # Policy C evaluates all 4 actions across all 13 f2 cases -> 52 branch evaluations
+    # Every allowed action is evaluated against every f2 case; a case may only be
+    # called unfixable after all of them were tried (the F-07 regression).
     summary_c = sweep["POLICY_C"]
     assert summary_c.total_cases_evaluated == 13
 

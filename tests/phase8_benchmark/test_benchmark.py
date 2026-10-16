@@ -91,9 +91,16 @@ def test_ab_02_relation_context_removed():
         flat_graph.query("CREATE (d:Depot {id: 'dep_1', name: 'Depot 1', dispatch_delay_min: 3.0})")
         res = evaluator.evaluate_graph(flat_graph, "flat_case")
 
-        # Without ROAD_ARC or ACCESS_VIA relations, facility is unreachable -> breach
-        assert res.is_breached is True
-        assert len(res.access_breaches) > 0
+        # AB-02: with relation context removed the evaluator must ABSTAIN, not emit a
+        # verdict. "Cannot evaluate" is the honest answer; claiming every facility is
+        # breached would assert a conclusion with no supporting evidence, and would
+        # make this ablation worthless as Rule 3 evidence.
+        assert res.abstained is True, "evaluator must abstain without relation context"
+        assert res.abstain_reason == "NO_RELATION_CONTEXT_CANNOT_EVALUATE_ACCESS"
+        assert res.access_breaches == [], "abstention must not emit breach verdicts"
+        assert res.alert_breaches == []
+        assert res.total_breaches == 0
+        assert res.is_breached is False
     finally:
         flat_graph.delete()
 
