@@ -162,10 +162,15 @@ def seed_demo():
 
     # Create demo cache directory
     DEMO_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    precomputed_dir = DEMO_CACHE_DIR / "precomputed"
+    precomputed_dir.mkdir(parents=True, exist_ok=True)
 
     # Golden Case: road_ring_monastery_chandgiram
     golden_run_id = "run_golden_demo"
     golden_payload = build_run_payload(planner, "road_ring_monastery_chandgiram", golden_run_id, initial_digest)
+    golden_payload["source"] = "precomputed"
+    golden_payload["world_content_digest"] = content_digest
+    golden_payload["digest"] = content_digest
     golden_cache_file = DEMO_CACHE_DIR / f"{golden_run_id}.json"
     with open(golden_cache_file, "w", encoding="utf-8") as f:
         json.dump(golden_payload, f, indent=2)
@@ -173,9 +178,39 @@ def seed_demo():
     # Abstention Case: road_ring_kashmere_monastery
     abstain_run_id = "run_abstain_demo"
     abstain_payload = build_run_payload(planner, "road_ring_kashmere_monastery", abstain_run_id, initial_digest)
+    abstain_payload["source"] = "precomputed"
+    abstain_payload["world_content_digest"] = content_digest
+    abstain_payload["digest"] = content_digest
     abstain_cache_file = DEMO_CACHE_DIR / f"{abstain_run_id}.json"
     with open(abstain_cache_file, "w", encoding="utf-8") as f:
         json.dump(abstain_payload, f, indent=2)
+
+    # Precompute and persist all 14 corridor sweeps (K1)
+    all_corridors = planner.get_all_corridors()
+    for cid in all_corridors:
+        out_file = precomputed_dir / f"{cid}.json"
+        if cid == "road_ring_monastery_chandgiram":
+            with open(out_file, "w", encoding="utf-8") as f:
+                json.dump(golden_payload, f, indent=2)
+            continue
+        if cid == "road_ring_kashmere_monastery":
+            with open(out_file, "w", encoding="utf-8") as f:
+                json.dump(abstain_payload, f, indent=2)
+            continue
+        if out_file.exists():
+            try:
+                with open(out_file, "r", encoding="utf-8") as f:
+                    p = json.load(f)
+                if p.get("world_content_digest") == content_digest:
+                    continue
+            except Exception:
+                pass
+        p_payload = build_run_payload(planner, cid, f"pre_{cid}", initial_digest)
+        p_payload["source"] = "precomputed"
+        p_payload["world_content_digest"] = content_digest
+        p_payload["digest"] = content_digest
+        with open(out_file, "w", encoding="utf-8") as f:
+            json.dump(p_payload, f, indent=2)
 
     # Write by_corridor index
     by_corridor = {
