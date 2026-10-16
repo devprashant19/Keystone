@@ -29,6 +29,7 @@
   --branch:     #B57CFF;
   --branch-wash: rgba(181,124,255,0.12);
   --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
+  --bg-spotlight: rgba(6, 10, 16, 0.55);
 
   /* Status — reserved, semantic, never decorative */
   --ok:         #35C08A;

@@ -412,12 +412,32 @@ export const RightRail: React.FC<RightRailProps> = ({
                 </span>
               </div>
             )}
-            <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s2)' }}>
+            <p
+              id="abstention-body-text"
+              style={{
+                fontSize: 'var(--fs-cap)',
+                color: 'var(--ink-hi)',
+                lineHeight: 'var(--lh-data)',
+                marginBottom: 'var(--s2)',
+                wordBreak: 'normal',
+                whiteSpace: 'normal',
+              }}
+            >
               No single allowed action preserves all critical SLAs across every evaluated second failure. Jaal refuses to recommend a plan that leaves known breaches.
             </p>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
               Uncovered second failures ({recommendation.exposed_count}):
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'var(--s1)' }}>
+              <div
+                id="abstention-exposed-cases"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  marginTop: 'var(--s1)',
+                  maxHeight: '130px',
+                  overflowY: 'auto',
+                }}
+              >
                 {recommendation.exposed_cases.map((caseId: string) => (
                   <div
                     key={caseId}

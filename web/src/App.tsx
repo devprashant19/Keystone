@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { LeftRail, Corridor } from './components/LeftRail';
 import { CenterDeck } from './components/CenterDeck';
@@ -7,6 +7,7 @@ import { FrameBar } from './components/FrameBar';
 import { DecisionModal } from './components/DecisionModal';
 import { HistoryModal } from './components/HistoryModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
+import { PresenterTour } from './components/PresenterTour';
 import { EvidenceView } from './routes/EvidenceView';
 import { MethodView } from './routes/MethodView';
 import { WorldSummary } from './graph/types';
@@ -71,6 +72,37 @@ export const App: React.FC = () => {
   const [isSubmittingDecision, setIsSubmittingDecision] = useState<boolean>(false);
   const [pastRuns, setPastRuns] = useState<any[]>([]);
 
+  // Presenter Tour Walkthrough state (Step D-2)
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('tour') === '1';
+    }
+    return false;
+  });
+  const [tourStep, setTourStep] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const s = parseInt(params.get('step') || '1', 10);
+      return isNaN(s) ? 1 : Math.max(1, Math.min(s, 7));
+    }
+    return 1;
+  });
+
+  // Keep query params synced with tour state (?tour=1&step=X)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (isTourOpen) {
+      url.searchParams.set('tour', '1');
+      url.searchParams.set('step', String(tourStep));
+    } else {
+      url.searchParams.delete('tour');
+      url.searchParams.delete('step');
+    }
+    window.history.replaceState(null, '', url.toString());
+  }, [isTourOpen, tourStep]);
+
   // 1. Initial World and Health load
   useEffect(() => {
     fetch('/api/health')
@@ -107,6 +139,7 @@ export const App: React.FC = () => {
               setRunData(data);
               setSelectedF1(data.f1_corridor_id);
               if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+              setCurrentFrame(4);
             }
           }
         }
@@ -120,18 +153,65 @@ export const App: React.FC = () => {
       if (e.key === '?') {
         setIsShortcutsOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
+        setIsTourOpen(false);
         setIsShortcutsOpen(false);
         setIsHistoryOpen(false);
         setDecisionModal({ isOpen: false, verdict: 'APPROVE' });
-      } else if (e.key === 'ArrowLeft') {
+      } else if (!isTourOpen && e.key === 'ArrowLeft') {
         setCurrentFrame((f) => Math.max(f - 1, 0));
-      } else if (e.key === 'ArrowRight') {
+      } else if (!isTourOpen && e.key === 'ArrowRight') {
         setCurrentFrame((f) => Math.min(f + 1, 4));
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isTourOpen]);
+
+  // Presenter mode state transitions across all 7 beats (Step D-2)
+  const applyTourStepState = useCallback(async (stepIndex: number) => {
+    if (stepIndex === 1) {
+      setSelectedF1('road_ring_monastery_chandgiram');
+      setViewMode('map');
+      setCurrentFrame(0);
+      setHighlightSevered(false);
+    } else if (stepIndex === 2) {
+      setViewMode('topology');
+    } else if (stepIndex === 3) {
+      setViewMode('map');
+      setSelectedF1('road_ring_monastery_chandgiram');
+      setHighlightSevered(true);
+      try {
+        const res = await fetch('/api/run/run_golden_demo');
+        if (res.ok) {
+          const data = await res.json();
+          setRunData(data);
+          if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+          setCurrentFrame(4);
+        }
+      } catch (_) {}
+    } else if (stepIndex === 4) {
+      setViewMode('map');
+      setCurrentFrame(4);
+      if (runData?.cases?.length) {
+        setSelectedCaseId('road_ring_monastery_chandgiram__road_ring_kashmere_monastery');
+      }
+    } else if (stepIndex === 5) {
+      setCurrentFrame(4);
+    } else if (stepIndex === 6) {
+      setCurrentFrame(4);
+    } else if (stepIndex === 7) {
+      try {
+        const res = await fetch('/api/run/run_abstain_demo');
+        if (res.ok) {
+          const data = await res.json();
+          setRunData(data);
+          setSelectedF1('road_ring_kashmere_monastery');
+          if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+          setCurrentFrame(4);
+        }
+      } catch (_) {}
+    }
+  }, [runData]);
 
   // History modal handler: loads past runs from /api/runs
   const handleOpenHistory = async () => {
@@ -176,7 +256,7 @@ export const App: React.FC = () => {
       if (data.cases && data.cases.length > 0) {
         setSelectedCaseId(data.cases[0].case_id);
       }
-      setCurrentFrame(1); // Advance to frame 1 (observed f1)
+      setCurrentFrame(4); // Advance to frame 4 (Outcome)
       setPastRuns((prev) => [
         {
           run_id: data.run_id,
@@ -291,6 +371,11 @@ export const App: React.FC = () => {
         onNavigate={setCurrentRoute}
         currentRoute={currentRoute}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onStartTour={() => {
+          setIsTourOpen(true);
+          setTourStep(1);
+        }}
+        isTourActive={isTourOpen}
       />
 
       {/* 503 DB Unavailable Banner */}
@@ -336,11 +421,12 @@ export const App: React.FC = () => {
           selectedF1={selectedF1}
           onSelectF1={(f1) => {
             setSelectedF1(f1);
+            setRunData(null);
             setCurrentFrame(0);
           }}
           onRunSweep={handleRunSweep}
           onCancelRun={handleCancelRun}
-          isLoading={isLoading}
+          runState={isLoading ? 'running' : runData?.cases?.length ? 'complete' : 'idle'}
           cases={runData?.cases || []}
           selectedCaseId={selectedCaseId}
           onSelectCase={setSelectedCaseId}
@@ -416,6 +502,7 @@ export const App: React.FC = () => {
             setRunData({ ...data, isReadOnly: true });
             setSelectedF1(data.f1_corridor_id);
             if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+            setCurrentFrame(4);
           } catch (e) {
             console.error('Failed to open past run', e);
           }
@@ -423,6 +510,15 @@ export const App: React.FC = () => {
       />
 
       <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+
+      {/* Presenter Mode Walkthrough (Step D-2) */}
+      <PresenterTour
+        isOpen={isTourOpen}
+        currentStep={tourStep}
+        onStepChange={setTourStep}
+        onClose={() => setIsTourOpen(false)}
+        onApplyStepState={applyTourStepState}
+      />
     </div>
   );
 };

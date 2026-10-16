@@ -25,7 +25,8 @@ interface LeftRailProps {
   onSelectF1: (f1: string) => void;
   onRunSweep: () => void;
   onCancelRun?: () => void;
-  isLoading: boolean;
+  isLoading?: boolean;
+  runState?: 'idle' | 'running' | 'complete';
   cases: CaseSummary[];
   selectedCaseId: string;
   onSelectCase: (caseId: string) => void;
@@ -38,12 +39,17 @@ export const LeftRail: React.FC<LeftRailProps> = ({
   onSelectF1,
   onRunSweep,
   onCancelRun,
-  isLoading,
+  isLoading: propIsLoading,
+  runState: propRunState,
   cases,
   selectedCaseId,
   onSelectCase,
   isDbDown,
 }) => {
+  const runState: 'idle' | 'running' | 'complete' =
+    propRunState || (propIsLoading ? 'running' : cases.length > 0 ? 'complete' : 'idle');
+  const isRunning = runState === 'running';
+  const isComplete = runState === 'complete';
   const [filter, setFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'f2' | 'verdict'>('verdict');
 
@@ -85,7 +91,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       aria-label="Observed Failure and Scenario Sweep"
     >
       <div id="sweep-live-announcer" aria-live="polite" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
-        {isLoading ? 'Evaluating 13 scenario branches' : cases.length > 0 ? `${cases.length} cases evaluated` : 'Ready to evaluate'}
+        {isRunning ? 'Evaluating 13 scenario branches' : isComplete ? `${cases.length} cases evaluated` : 'Ready to evaluate'}
       </div>
       {/* 1. Observed failure selector */}
       <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
@@ -106,7 +112,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
         <select
           value={selectedF1}
           onChange={(e) => onSelectF1(e.target.value)}
-          disabled={isLoading || isDbDown}
+          disabled={isRunning || isDbDown}
           style={{
             width: '100%',
             backgroundColor: 'var(--bg-sunken)',
@@ -130,25 +136,29 @@ export const LeftRail: React.FC<LeftRailProps> = ({
 
         <button
           onClick={onRunSweep}
-          disabled={!selectedF1 || isLoading || isDbDown}
+          disabled={!selectedF1 || isRunning || isDbDown}
           style={{
             width: '100%',
-            backgroundColor: isLoading ? 'var(--line-hair)' : 'var(--accent)',
-            color: isLoading ? 'var(--ink-lo)' : 'var(--bg-void)',
+            backgroundColor: isRunning ? 'var(--line-hair)' : 'var(--accent)',
+            color: isRunning ? 'var(--ink-lo)' : 'var(--bg-void)',
             border: 'none',
             padding: 'var(--s2) var(--s3)',
             borderRadius: 'var(--r-ctl)',
             fontWeight: 700,
             fontSize: 'var(--fs-body)',
-            cursor: !selectedF1 || isLoading || isDbDown ? 'not-allowed' : 'pointer',
+            cursor: !selectedF1 || isRunning || isDbDown ? 'not-allowed' : 'pointer',
             letterSpacing: '0.04em',
           }}
           id="run-sweep-btn"
         >
-          {isLoading ? 'EVALUATING 13 SCENARIO BRANCHES…' : 'RUN PRE-MORTEM SWEEP'}
+          {isRunning
+            ? 'EVALUATING 13 SCENARIO BRANCHES…'
+            : isComplete
+            ? 'RUN AGAIN'
+            : 'RUN PRE-MORTEM SWEEP'}
         </button>
 
-        {isLoading && (
+        {isRunning && (
           <button
             id="cancel-run-btn"
             onClick={onCancelRun}
@@ -171,8 +181,9 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       </div>
 
       {/* 2. Headline counters */}
-      {cases.length > 0 && (
+      {isComplete && cases.length > 0 && (
         <div
+          id="sweep-complete-summary"
           style={{
             padding: 'var(--s3) var(--s4)',
             borderBottom: '1px solid var(--line-hair)',
@@ -182,7 +193,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s2)' }}>
             <span style={{ fontSize: 'var(--fs-cap)', fontWeight: 600, color: 'var(--ink-hi)' }}>CASES: 13 / 13 ✓</span>
-            <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>100% COMPLETE</span>
+            <span id="sweep-complete-badge" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>100% COMPLETE</span>
           </div>
 
           <div style={{ display: 'flex', gap: 'var(--s2)', flexWrap: 'wrap' }}>
@@ -225,7 +236,12 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       )}
 
       {/* 4. Cases list */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Scenario Cases List"
+        style={{ flex: 1, overflowY: 'auto' }}
+      >
         {cases.length === 0 ? (
           <div style={{ padding: 'var(--s5) var(--s4)', color: 'var(--ink-lo)', textAlign: 'center', fontSize: 'var(--fs-cap)' }}>
             Select an observed corridor failure to begin.

@@ -9,6 +9,8 @@ interface HeaderProps {
   onNavigate: (route: string) => void;
   currentRoute: string;
   onOpenShortcuts?: () => void;
+  onStartTour?: () => void;
+  isTourActive?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   currentRoute,
   onOpenShortcuts,
+  onStartTour,
+  isTourActive,
 }) => {
   const [reducedMotion, setReducedMotion] = React.useState<boolean>(() => {
     return typeof document !== 'undefined' && document.documentElement.getAttribute('data-reduced-motion') === 'true';
@@ -210,6 +214,26 @@ export const Header: React.FC<HeaderProps> = ({
         >
           {reducedMotion ? '⊘ MOTION' : '◎ MOTION'}
         </button>
+
+        {onStartTour && (
+          <button
+            id="start-tour-btn"
+            onClick={onStartTour}
+            style={{
+              background: isTourActive ? 'var(--accent)' : 'var(--bg-raised)',
+              border: '1px solid var(--accent)',
+              color: isTourActive ? 'var(--bg-void)' : 'var(--accent)',
+              padding: 'var(--s1) var(--s3)',
+              borderRadius: 'var(--r-ctl)',
+              cursor: 'pointer',
+              fontSize: 'var(--fs-cap)',
+              fontWeight: 700,
+            }}
+            title="Guided Tour Walkthrough (?tour=1)"
+          >
+            Guided tour
+          </button>
+        )}
 
         <button
           id="open-history-btn"

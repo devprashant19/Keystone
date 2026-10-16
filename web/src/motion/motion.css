@@ -77,3 +77,37 @@
   transition-duration: var(--dur-state);
   transition-timing-function: var(--ease-emph);
 }
+
+/* M7 — Step Transition (Presenter Tour Spotlight & Narration Card) */
+.tour-spotlight-rect {
+  transition-property: x, y, width, height;
+  transition-duration: var(--dur-reveal);
+  transition-timing-function: var(--ease-emph);
+}
+
+.tour-card {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-state);
+  transition-timing-function: var(--ease-in-out);
+}
+
+.tour-card.incoming {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tour-card.outgoing {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-spotlight-rect,
+  .tour-card,
+  .tour-card.incoming,
+  .tour-card.outgoing {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+

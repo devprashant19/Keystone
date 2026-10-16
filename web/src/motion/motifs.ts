@@ -97,3 +97,20 @@ export const M6_VerdictSettle: MotifConfig = {
   reducedMotionFallback: 'Value and badge change instantly',
   perfFallback: 'Instant value update',
 };
+
+/**
+ * M7 — Step Transition (Presenter Walkthrough)
+ * Trigger: Presenter walkthrough steps between scenes.
+ * Outgoing card fades and drops 6px (--dur-state, --ease-in-out)
+ * while spotlight travels to next target along a straight path (--dur-reveal, --ease-emph)
+ * and incoming card rises 6px into place. Total duration under --chain-max.
+ */
+export const M7_StepTransition: MotifConfig = {
+  name: 'M7_StepTransition',
+  durationToken: 'var(--dur-reveal)',
+  easingToken: 'var(--ease-emph)',
+  meaning: 'Continuous spatial spotlight travel and card fade/rise during presenter walkthrough steps',
+  reducedMotionFallback: 'Instant spotlight snap and instant card opacity with zero spatial travel',
+  perfFallback: 'Instant spotlight snap without intermediate interpolation',
+};
+

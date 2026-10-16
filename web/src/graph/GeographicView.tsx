@@ -130,7 +130,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
     const placements: Record<string, { relX: number; relY: number; textAnchor: 'start' | 'end' | 'middle'; visible: boolean }> = {};
 
     const overlaps = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) => {
-      const margin = 3;
+      const margin = 2;
       return (
         a.x < b.x + b.w + margin &&
         a.x + a.w + margin > b.x &&
@@ -139,38 +139,42 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       );
     };
 
+    const computeBox = (
+      pt: Point,
+      relX: number,
+      relY: number,
+      textAnchor: 'start' | 'end' | 'middle',
+      w: number,
+      h: number
+    ) => {
+      let x = pt.x + relX;
+      if (textAnchor === 'end') x -= w;
+      else if (textAnchor === 'middle') x -= w / 2;
+      const y = pt.y + relY - h + 2; // SVG baseline to top
+      return { x, y, w, h };
+    };
+
     for (const item of list) {
-      const textWidth = Math.max(30, item.name.length * 6.5 + 4);
-      const textHeight = 12;
+      const textWidth = Math.max(34, item.name.length * 7.5 + 8);
+      const textHeight = 13;
       const offsetDist = 13;
 
-      // Offsets to try in fixed order: right, left, above, below
-      const offsets = [
-        {
-          box: { x: item.pt.x + offsetDist, y: item.pt.y - 6, w: textWidth, h: textHeight },
-          relX: offsetDist,
-          relY: 4,
-          textAnchor: 'start' as const,
-        },
-        {
-          box: { x: item.pt.x - offsetDist - textWidth, y: item.pt.y - 6, w: textWidth, h: textHeight },
-          relX: -offsetDist,
-          relY: 4,
-          textAnchor: 'end' as const,
-        },
-        {
-          box: { x: item.pt.x - textWidth / 2, y: item.pt.y - 12 - textHeight, w: textWidth, h: textHeight },
-          relX: 0,
-          relY: -12,
-          textAnchor: 'middle' as const,
-        },
-        {
-          box: { x: item.pt.x - textWidth / 2, y: item.pt.y + 12, w: textWidth, h: textHeight },
-          relX: 0,
-          relY: 12 + textHeight - 2,
-          textAnchor: 'middle' as const,
-        },
+      // 8 candidate offsets in fixed deterministic order
+      const candidates = [
+        { relX: offsetDist, relY: 4, textAnchor: 'start' as const }, // East
+        { relX: -offsetDist, relY: 4, textAnchor: 'end' as const }, // West
+        { relX: 0, relY: -15, textAnchor: 'middle' as const }, // North
+        { relX: 0, relY: 18, textAnchor: 'middle' as const }, // South
+        { relX: offsetDist, relY: -10, textAnchor: 'start' as const }, // North-East
+        { relX: offsetDist, relY: 15, textAnchor: 'start' as const }, // South-East
+        { relX: -offsetDist, relY: -10, textAnchor: 'end' as const }, // North-West
+        { relX: -offsetDist, relY: 15, textAnchor: 'end' as const }, // South-West
       ];
+
+      const offsets = candidates.map((c) => ({
+        ...c,
+        box: computeBox(item.pt, c.relX, c.relY, c.textAnchor, textWidth, textHeight),
+      }));
 
       let placed = false;
       for (const opt of offsets) {
@@ -188,7 +192,9 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
           placedBoxes.push(fallback.box);
           placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: true };
         } else {
-          placements[item.id] = { relX: 0, relY: 0, textAnchor: 'middle', visible: false };
+          // Suppressed from default view; visible on hover
+          const fallback = offsets[0];
+          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: false };
         }
       }
     }
@@ -439,7 +445,8 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               {/* Label with deterministic collision placement */}
               {(() => {
                 const labelP = labelPlacements[`int_${intersection.id}`];
-                if (!labelP || !labelP.visible) return null;
+                const isVisible = labelP && (labelP.visible || isHovered);
+                if (!labelP || !isVisible) return null;
                 return (
                   <text
                     x={labelP.relX}
@@ -541,7 +548,9 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
                 </g>
               ) : (() => {
                 const labelP = labelPlacements[`fac_${fac.id}`];
-                if (!labelP || !labelP.visible) return null;
+                const isHovered = hoveredEntityId === fac.id;
+                const isVisible = labelP && (labelP.visible || isHovered);
+                if (!labelP || !isVisible) return null;
                 return (
                   <text
                     x={pt.x + labelP.relX}

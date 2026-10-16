@@ -146,6 +146,106 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
               <strong style={{ color: 'var(--accent)' }}>Interaction-only cases (The Headline Denominator):</strong> Breaches that occur only when both f1 and f2 occur jointly. This is the only region where conditioning on f1 changes the optimal action!
             </li>
           </ul>
+
+          <h3 style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-hi)', marginTop: 'var(--s4)', marginBottom: 'var(--s2)' }}>
+            Empirical Allowance Sweep (results/deadline_sweep.csv)
+          </h3>
+          <table id="deadline-sweep-table" style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse', marginTop: 'var(--s2)' }}>
+            <thead>
+              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>Allowance (km)</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>Deadline (min)</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>Total</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>Interaction Only</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>f1 Alone</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>f2 Alone</th>
+                <th style={{ padding: 'var(--s2) var(--s1)' }}>Neither</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>4.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>13.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>5.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>15.5 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>148</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>18</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>6.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>18.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)', backgroundColor: 'var(--bg-sunken)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--accent)', fontWeight: 700 }}>6.8 km (Frozen)</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>20.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-hi)', fontWeight: 700 }}>0</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>7.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>20.5 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)', backgroundColor: 'var(--bg-sunken)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--accent)', fontWeight: 700 }}>8.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>23.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ok)', fontWeight: 700 }}>12</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>60</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>9.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>25.5 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>10.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>28.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>12.0 km</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>33.0 min</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
+                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
         {/* 3. Provenance & Attribution */}

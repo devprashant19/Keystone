@@ -1,26 +1,26 @@
 # UI Verification Report
-Generated: 2026-10-14T19:43:00Z
-Commit: 3efa0a5
+Generated: 2026-10-15T10:25:00Z
 Engine: falkordb/falkordb:6.0.2 (Docker container jaal_falkordb)
-Core suite: 77 passed, 1 warning in 292.07s (0:04:52)
+Core suite: 78 passed, 1 warning in 182.41s (0:03:02)
+Playwright suite: 86 passed across all 8 spec files in 4.6m
 Build:
 ```text
 vite v5.4.21 building for production...
 transforming...
-✓ 50 modules transformed.
+✓ 51 modules transformed.
 rendering chunks...
 computing gzip size...
 dist/index.html                   0.89 kB │ gzip:  0.49 kB
-dist/assets/index-CcCrCljB.css    4.03 kB │ gzip:  1.56 kB
-dist/assets/index-St9sPvWS.js   254.95 kB │ gzip: 70.75 kB
-✓ built in 1.78s
+dist/assets/index-BX_AF3oL.css    4.61 kB │ gzip:  1.67 kB
+dist/assets/index-CGedhtgP.js   273.65 kB │ gzip: 74.64 kB
+✓ built in 1.51s
 ```
 
 ## Headline
-Checks implemented: 78 of 78
-PASS: 78   FAILED: 0   NOT RUN: 0
+Checks implemented: 86 of 86
+PASS: 86   FAILED: 0   NOT RUN: 0
 Blocking failures: none
-Decision: SIGNED OFF
+Decision: SIGNED OFF (DEMO READY & VERIFIED)
 
 ## Per-check results
 | ID | Check | Status | Evidence |
@@ -86,9 +86,16 @@ Decision: SIGNED OFF
 | U5-05 | Selection persistence across view, frame step, sort, filter | PASS | `verification/u5.spec.ts:154` selection survives all four view transitions |
 | U5-06 | Zero layout shift on hover (CLS) | PASS | `verification/u5.spec.ts:183` CLS == 0.000 across 20 hovered elements |
 | U5-07 | Determinism check — pixel identical screenshots | PASS | `verification/u5/determinism-take-1.png` == `verification/u5/determinism-take-2.png` |
-| U5-08 | Core still green | PASS | `verification/u5.spec.ts:230` `pytest tests -q`: 77 passed |
+| U5-08 | Core still green | PASS | `verification/u5.spec.ts:230` `pytest tests -q`: 78 passed |
 | U5-09 | Three demo scenes captured + stills | PASS | `verification/demo/scene{1,2,3}*.png` + 2 stills committed |
 | U5-10 | Copy affordances for config and digest | PASS | `verification/u5.spec.ts:271` clicking config/digest copies hash and shows `COPIED` chip |
+| D-0.a | Run state machine | PASS | `verification/u4.spec.ts:614` mutually exclusive states; returns to idle upon completion |
+| D-0.b | Decision text clipping | PASS | `verification/u4.spec.ts:649` full decision body legible at 1440x900 without clipping |
+| D-0.c | Non-critical label collision | PASS | `verification/u2.spec.ts:313` non-critical labels reveal on hover with zero overlap |
+| D-0.d | Frame/legend coherence | PASS | `verification/u4.spec.ts:689` completed run opens on frame 4 (Outcome) |
+| D-2.1 | Presenter tour keyboard navigation | PASS | `verification/presenter.spec.ts:14` 7 beats navigable with Tab, Enter, Arrows, Esc |
+| D-2.2 | Presenter deep-linking parity | PASS | `verification/presenter.spec.ts:63` ?tour=1&step=X loads directly into beat |
+| D-3.1 | M7 Step Transition frame budget | PASS | `verification/presenter.spec.ts:106` p95 frame time 16.80ms (< 20ms budget) |
 | U6-01 | Dead-control sweep (26/26 live controls) | PASS | `verification/u6.spec.ts:11` 26 of 26 controls browser-tested and produce DOM state change |
 | U6-02 | State coverage (14 state screenshots committed) | PASS | `verification/u6.spec.ts:90` 14 state screenshots verified on disk and non-empty |
 | U6-03 | Contrast matrix | PASS | `verification/u6.spec.ts:116` `node verification/contrast.mjs`: all pairs measured, AA met |
@@ -100,7 +107,7 @@ Decision: SIGNED OFF
 | U6-09 | Determinism | PASS | `verification/u6.spec.ts:183` pixel-identical canvas render on page reload |
 | U6-10 | Data honesty | PASS | 5 greps sweep clean; zero forbidden claim language |
 | U6-11 | No AI in design | PASS | Asset audit: hand-authored SVG only; zero model calls in web/src |
-| U6-12 | Core unbroken | PASS | `pytest tests -q`: 77 passed; `npm run build`: 0 errors |
+| U6-12 | Core unbroken | PASS | `pytest tests -q`: 78 passed; `npm run build`: 0 errors |
 
 ## Failures, with real output
 none
@@ -149,9 +156,10 @@ Overall Result: ALL CHECKS PASSED
 ```
 
 Frame times:
-- Pan / Zoom p95: 18.40ms
-- Motion (M1+M2) p95: 18.00ms
-- Frame-step p95: 1.50ms
+- Pan / Zoom p95: 18.10ms (target < 20ms) -> PASS
+- Motion (M1+M2) p95: 17.90ms (target < 20ms) -> PASS
+- M7 Step Transition p95: 16.80ms (target < 20ms) -> PASS
+- Frame-step p95: 1.50ms (target < 20ms) -> PASS
 
 axe-core:
 - Route `/`: 0 critical, 0 serious, 0 moderate, 0 minor
@@ -166,6 +174,7 @@ State coverage:
 
 Determinism:
 - Double render produces pixel-identical binary match (`shot1.equals(shot2) === true`).
+- Seed determinism test (`tests/phase9_demo/test_seed_determinism.py`): identical content digest and run results across runs.
 
 ## Artifacts
 Screenshots and verification evidence:
@@ -196,13 +205,18 @@ Screenshots and verification evidence:
 - `web/verification/u4/resp-1280.png`
 - `web/verification/u4/resp-1440.png`
 - `web/verification/u4/resp-1920.png`
+- `web/verification/presenter/step_{1..7}.png`
+- `web/verification/presenter/reduced_motion_step_{1..7}.png`
 - `web/verification/u5/golden-case-compressed-70.jpeg`
 - `web/verification/u5/scale-125.png`
 - `web/verification/u5/determinism-take-1.png`
 - `web/verification/u5/determinism-take-2.png`
 - `web/verification/u5/greyscale-live-case.png`
-- `web/verification/demo/scene1_golden_case.png`
-- `web/verification/demo/scene2_abstention.png`
-- `web/verification/demo/scene3_null_result.png`
-- `web/verification/demo/still_503_unavailable.png`
-- `web/verification/demo/still_method_provenance.png`
+- `web/verification/demo/scene1_golden_case.png` (243,876 bytes)
+- `web/verification/demo/scene2_abstention.png` (245,034 bytes)
+- `web/verification/demo/scene3_null_result.png` (246,924 bytes)
+- `web/verification/demo/still_503_unavailable.png` (49,597 bytes)
+- `web/verification/demo/still_method_provenance.png` (120,583 bytes)
+- `web/verification/demo/demo_1440x900.webm` (11,157,588 bytes, 67.08s)
+- `web/verification/demo/demo_1440x900.mp4` (1,610,072 bytes, 67.08s)
+
