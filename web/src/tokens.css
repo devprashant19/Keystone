@@ -57,13 +57,17 @@
   --lh-prose:  1.5;   /* explanatory text */
 
   /* Motion */
+  --dur-instant:  1ms;
   --dur-feedback: 120ms;
   --dur-state:    200ms;
   --dur-reveal:   300ms;
   --dur-causal:   420ms;
+  --dur-breath:   2400ms;
   --ease-out:     cubic-bezier(.22,1,.36,1);
   --ease-in-out:  cubic-bezier(.65,0,.35,1);
   --ease-emph:    cubic-bezier(.16,1,.30,1);
+  --stagger:      40ms;
+  --chain-max:    1200ms;
 
   /* Space — 4px base */
   --s1: 4px;

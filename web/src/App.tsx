@@ -9,6 +9,7 @@ import { HistoryModal } from './components/HistoryModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
 import { EvidenceView } from './routes/EvidenceView';
 import { MethodView } from './routes/MethodView';
+import { WorldSummary } from './graph/types';
 
 export const App: React.FC = () => {
   // Navigation & route state
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
   const [worldDigest, setWorldDigest] = useState<string>('');
   const [configHash, setConfigHash] = useState<string>('');
   const [isDbHealthy, setIsDbHealthy] = useState<boolean>(true);
+  const [worldSummary, setWorldSummary] = useState<WorldSummary | null>(null);
   const [corridors, setCorridors] = useState<Corridor[]>([]);
 
   // Sweep & Run state
@@ -85,12 +87,31 @@ export const App: React.FC = () => {
 
     fetch('/api/world/summary')
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: WorldSummary) => {
+        setWorldSummary(data);
         if (data.corridors) {
           setCorridors(data.corridors);
         }
       })
       .catch((err) => console.error('Failed to load world summary', err));
+
+    fetch('/api/runs?limit=1')
+      .then((res) => res.json())
+      .then(async (runsData) => {
+        if (runsData.runs && runsData.runs.length > 0) {
+          const rId = runsData.runs[0].run_id;
+          const runRes = await fetch(`/api/run/${rId}`);
+          if (runRes.ok) {
+            const data = await runRes.json();
+            if (data && data.recommendation && data.policies) {
+              setRunData(data);
+              setSelectedF1(data.f1_corridor_id);
+              if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+            }
+          }
+        }
+      })
+      .catch((err) => console.log('No prior runs:', err));
   }, []);
 
   // 2. Global Keyboard Shortcuts (?, Esc, Left, Right)
@@ -261,6 +282,8 @@ export const App: React.FC = () => {
           onToggleSynthetic={() => setHighlightSynthetic(!highlightSynthetic)}
           highlightSevered={highlightSevered}
           onToggleSevered={() => setHighlightSevered(!highlightSevered)}
+          worldSummary={worldSummary}
+          branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
         />
 
         {/* Right Rail (380px) */}

@@ -89,7 +89,6 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
         overflow: 'hidden',
         border: isCounterfactual ? '1px solid var(--branch)' : 'none',
         boxShadow: isCounterfactual ? 'var(--branch-glow)' : 'none',
-        transition: 'border var(--dur-feedback), box-shadow var(--dur-feedback)',
       }}
       role="region"
       aria-label="Interactive Graph Canvas"
@@ -240,7 +239,6 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
             height: '100%',
             transform: viewMode === 'map' ? `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)` : 'none',
             transformOrigin: 'center center',
-            transition: isPanning ? 'none' : 'transform var(--dur-feedback) var(--ease-out)',
           }}
         >
           {viewMode === 'map' ? (
@@ -297,7 +295,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
           </div>
         )}
 
-        {/* Hover Tooltip (appears after 400ms) */}
+        {/* Hover Tooltip */}
         {tooltipMeta && (
           <div
             className="graph-tooltip"

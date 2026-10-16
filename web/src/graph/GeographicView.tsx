@@ -119,7 +119,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               stroke="var(--fail)"
               strokeWidth={isSelected ? '2' : '1'}
               strokeDasharray="4 3"
-              style={{ cursor: 'pointer', transition: 'stroke-width var(--dur-feedback) var(--ease-out)' }}
+              style={{ cursor: 'pointer' }}
               onClick={() => onSelectEntity(zone.id, 'HazardZone')}
               onMouseEnter={() =>
                 onHoverEntity(zone.id, {

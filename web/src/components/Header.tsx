@@ -94,6 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
         <span style={{ color: 'var(--line-hair)' }}>•</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
           <span
+            className={`health-dot ${isDbHealthy ? 'alive' : 'down'}`}
             style={{
               width: '8px',
               height: '8px',

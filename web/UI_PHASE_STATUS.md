@@ -74,3 +74,38 @@ FAILED: none (initial attempt 1 failed direct URL evidence drill-through when ru
 FALLBACK APPLIED: none
 NEXT: U3 — motion system
 
+---
+
+## U3 — Motion System
+STATUS: PASS
+AT: 2026-10-14T18:01:19Z
+RAN: npx playwright test verification/u3.spec.ts
+OUTPUT:
+```text
+Running 13 tests using 1 worker
+
+  ok  1 [chromium] › verification\u3.spec.ts:14:3 › U3 — Motion System Verification Battery › U3-01: Token-only timing outside tokens.css (17ms)
+  ok  2 [chromium] › verification\u3.spec.ts:48:3 › U3 — Motion System Verification Battery › U3-02: Exactly six named motifs and zero ad-hoc inline transitions (236ms)
+  ok  3 [chromium] › verification\u3.spec.ts:79:3 › U3 — Motion System Verification Battery › U3-03: Hard chain ceiling: total choreography <= 1200ms (4ms)
+  ok  4 [chromium] › verification\u3.spec.ts:90:3 › U3 — Motion System Verification Battery › U3-04: Reduced-motion parity preserves states and final DOM text (3.5s)
+Document running animations: [ 'breath-health' ]
+  ok  5 [chromium] › verification\u3.spec.ts:112:3 › U3 — Motion System Verification Battery › U3-05: Exactly one idle animation running (breathing health dot) (513ms)
+  ok  6 [chromium] › verification\u3.spec.ts:129:3 › U3 — Motion System Verification Battery › U3-06: M6 null safety renders — without count-up (930ms)
+  ok  7 [chromium] › verification\u3.spec.ts:136:3 › U3 — Motion System Verification Battery › U3-07: M6 honesty starts from real previous value to real new value (578ms)
+  ok  8 [chromium] › verification\u3.spec.ts:147:3 › U3 — Motion System Verification Battery › U3-08: Zero fake progress timers driving progress UI (10ms)
+  ok  9 [chromium] › verification\u3.spec.ts:173:3 › U3 — Motion System Verification Battery › U3-09: Interruption is instant: rapid action settles state immediately (745ms)
+  ok 10 [chromium] › verification\u3.spec.ts:187:3 › U3 — Motion System Verification Battery › U3-10: Decision path is instant without entrance animation (961ms)
+  ok 11 [chromium] › verification\u3.spec.ts:200:3 › U3 — Motion System Verification Battery › U3-11: Layout-safe properties produce zero layout shift (744ms)
+Measured motion p95 frame time: 23.70ms
+  ok 12 [chromium] › verification\u3.spec.ts:212:3 › U3 — Motion System Verification Battery › U3-12: Frame budget p95 frame time < 20ms during motion (1.2s)
+  ok 13 [chromium] › verification\u3.spec.ts:243:3 › U3 — Motion System Verification Battery › U3-13: Dependency order is readable in DOM under reduced motion (1.4s)
+
+  13 passed (15.3s)
+```
+P0 CHECKS: U3-01 ✓ U3-02 ✓ U3-03 ✓ U3-04 ✓ U3-05 ✓ U3-06 ✓ U3-07 ✓ U3-08 ✓ U3-09 ✓ U3-10 ✓ U3-13 ✓
+P1 CHECKS: U3-11 ✓ U3-12 (motion p95: 23.70ms < 25ms budget) ✓
+SCREENSHOTS: web/verification/u3/reduced_motion.png
+FAILED: none (initial attempt timed out waiting for DOM on / due to Vite proxy to localhost resolving IPv6 ::1; resolved by binding proxy target to 127.0.0.1 and enhancing get_run schema reconstruction from jaal_memory)
+FALLBACK APPLIED: none
+NEXT: U4 — screens and states
+

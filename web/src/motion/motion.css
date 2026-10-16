@@ -1,0 +1,80 @@
+/* Motion System CSS Classes (U3) */
+
+/* The one permitted idle animation: breathing health dot on live connection */
+@keyframes breath-health {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1.0;
+  }
+}
+
+.health-dot.alive {
+  animation-name: breath-health;
+  animation-duration: var(--dur-breath);
+  animation-timing-function: var(--ease-in-out);
+  animation-iteration-count: infinite;
+}
+
+.health-dot.down {
+  animation: none !important;
+  opacity: 1.0;
+}
+
+/* M1 — Sever animation class */
+.motif-sever {
+  stroke-dasharray: 1 4;
+  transition-property: stroke, stroke-dashoffset, opacity;
+  transition-duration: var(--dur-causal);
+  transition-timing-function: var(--ease-emph);
+}
+
+/* M3 — Branch Fork boundary and glow */
+.graph-canvas-container.has-branch {
+  border: 1px solid var(--branch);
+  box-shadow: var(--branch-glow);
+  transition-property: border-color, box-shadow;
+  transition-duration: var(--dur-reveal);
+  transition-timing-function: var(--ease-out);
+}
+
+.graph-canvas-container.base-world {
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition-property: border-color, box-shadow;
+  transition-duration: var(--dur-reveal);
+  transition-timing-function: var(--ease-out);
+}
+
+/* M4 — Route Redraw cross-fade */
+.motif-route-old {
+  opacity: 0.25;
+  filter: grayscale(1);
+  transition-property: opacity, filter;
+  transition-duration: var(--dur-causal);
+  transition-timing-function: var(--ease-in-out);
+}
+
+.motif-route-new {
+  opacity: 1.0;
+  transition-property: stroke-width, opacity;
+  transition-duration: var(--dur-causal);
+  transition-timing-function: var(--ease-in-out);
+}
+
+/* M5 — Focus and Selection feedback */
+.motif-focus-ring:focus-visible {
+  outline: 2px solid var(--line-focus);
+  outline-offset: 2px;
+  transition-property: transform, opacity;
+  transition-duration: var(--dur-feedback);
+  transition-timing-function: var(--ease-out);
+}
+
+/* M6 — Verdict settle snap */
+.motif-verdict-snap {
+  transition-property: transform, opacity;
+  transition-duration: var(--dur-state);
+  transition-timing-function: var(--ease-emph);
+}

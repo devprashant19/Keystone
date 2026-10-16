@@ -67,9 +67,10 @@ export const RightRail: React.FC<RightRailProps> = ({
   onOpenDecisionModal,
   onNavigateToEvidence,
 }) => {
-  if (!runData) {
+  if (!runData || !runData.recommendation || !runData.policies || !runData.decomposition) {
     return (
       <aside
+        className="right-rail"
         style={{
           width: 'var(--w-rail-r)',
           backgroundColor: 'var(--bg-panel)',
@@ -102,6 +103,7 @@ export const RightRail: React.FC<RightRailProps> = ({
 
   return (
     <aside
+      className="right-rail"
       style={{
         width: 'var(--w-rail-r)',
         backgroundColor: 'var(--bg-panel)',
