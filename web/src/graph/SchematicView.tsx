@@ -188,6 +188,54 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
       showBadge: boolean;
     }> = [];
 
+    // Collect all node bounding boxes in schematic view to ensure zero overlap
+    const nodeBoxes: Array<{ x: number; y: number; w: number; h: number }> = [];
+
+    // Feeder labels (labels like "Chandrawal Grid Feeder" are ~130px wide)
+    for (const pt of Object.values(feederPositions)) {
+      nodeBoxes.push({ x: pt.x - 70, y: pt.y + 18 - 10, w: 140, h: 20 });
+    }
+    // Intersection labels
+    for (const [id, pt] of Object.entries(roadPositions)) {
+      const offset = roadLabelOffsets[id] ?? -10;
+      const labelY = offset < 0 ? pt.y - 10 : pt.y + 18;
+      nodeBoxes.push({ x: pt.x - 70, y: labelY - 10, w: 140, h: 20 });
+    }
+    // Tower & Relay labels
+    for (const pt of Object.values(alertPositions)) {
+      const labelY = pt.y + (pt.labelOffset ?? 15);
+      nodeBoxes.push({ x: pt.x - 70, y: labelY - 10, w: 140, h: 20 });
+    }
+
+    const collidesWithNode = (bx: number, by: number) => {
+      const bw = 42, bh = 16;
+      const x1 = bx - bw / 2, y1 = by - bh / 2, x2 = x1 + bw, y2 = y1 + bh;
+      return nodeBoxes.some((nb) => {
+        const nx2 = nb.x + nb.w, ny2 = nb.y + nb.h;
+        return x1 < nx2 && x2 > nb.x && y1 < ny2 && y2 > nb.y;
+      });
+    };
+
+    const findClearBadgePt = (p1: Point, length: number, dx: number, dy: number): Point | null => {
+      if (length < 40) return null;
+      const nx = -dy / length;
+      const ny = dx / length;
+
+      // Try candidates along connector: fractions and perpendicular offsets
+      for (const t of [0.5, 0.35, 0.65, 0.25, 0.75]) {
+        const cx = p1.x + t * dx;
+        const cy = p1.y + t * dy;
+        for (const dist of [18, -18, 25, -25, 32, -32]) {
+          const candX = cx + nx * dist;
+          const candY = cy + ny * dist;
+          if (!collidesWithNode(candX, candY)) {
+            return { x: candX, y: candY };
+          }
+        }
+      }
+      return null;
+    };
+
     (world.corridors || []).forEach((c) => {
       const p1 = roadPositions[c.source];
       const p2 = roadPositions[c.target];
@@ -198,12 +246,12 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
       (c.carries_feeder_ids || []).forEach((fid) => {
         const pF = feederPositions[fid];
         if (pF) {
-          const length = Math.hypot(pF.x - pRoad.x, pRoad.y - pF.y);
+          const dx = pF.x - pRoad.x;
+          const dy = pF.y - pRoad.y;
+          const length = Math.hypot(dx, dy);
           const isVertical = Math.abs(pF.x - pRoad.x) <= 25;
-          const badgePt = {
-            x: isVertical ? pF.x : (pRoad.x + pF.x) / 2,
-            y: (pRoad.y + pF.y) / 2,
-          };
+          const clearPt = findClearBadgePt(pRoad, length, dx, dy);
+
           rawLinks.push({
             corridorId: c.id,
             targetId: fid,
@@ -212,8 +260,8 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
             pTarget: pF,
             length,
             isVertical,
-            badgePt,
-            showBadge: length >= 40,
+            badgePt: clearPt || { x: pRoad.x, y: pRoad.y },
+            showBadge: clearPt !== null,
           });
         }
       });
@@ -224,12 +272,12 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
         if (alertLink) {
           const pT = alertPositions[alertLink.to] || alertPositions[alertLink.from];
           if (pT) {
-            const length = Math.hypot(pT.x - pRoad.x, pRoad.y - pT.y);
+            const dx = pT.x - pRoad.x;
+            const dy = pT.y - pRoad.y;
+            const length = Math.hypot(dx, dy);
             const isVertical = Math.abs(pT.x - pRoad.x) <= 25;
-            const badgePt = {
-              x: (pRoad.x + pT.x) / 2,
-              y: (pRoad.y + pT.y) / 2,
-            };
+            const clearPt = findClearBadgePt(pRoad, length, dx, dy);
+
             rawLinks.push({
               corridorId: c.id,
               targetId: alid,
@@ -238,20 +286,20 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
               pTarget: pT,
               length,
               isVertical,
-              badgePt,
-              showBadge: length >= 40,
+              badgePt: clearPt || { x: pRoad.x, y: pRoad.y },
+              showBadge: clearPt !== null,
             });
           }
         }
       });
     });
 
-    // Deduplicate badges within 35px
+    // Deduplicate badges within 38px
     const placedBadges: Point[] = [];
     return rawLinks.map((link) => {
       if (!link.showBadge) return link;
       const tooClose = placedBadges.some(
-        (b) => Math.hypot(b.x - link.badgePt.x, b.y - link.badgePt.y) < 35
+        (b) => Math.hypot(b.x - link.badgePt.x, b.y - link.badgePt.y) < 38
       );
       if (tooClose) {
         return { ...link, showBadge: false };
@@ -259,7 +307,7 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
       placedBadges.push(link.badgePt);
       return link;
     });
-  }, [world.corridors, world.alert_links, roadPositions, feederPositions, alertPositions]);
+  }, [world.corridors, world.alert_links, roadPositions, feederPositions, alertPositions, roadLabelOffsets]);
 
   return (
     <svg
@@ -727,6 +775,8 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
                     fill="var(--synthetic)"
                     fontSize="var(--fs-micro)"
                     fontWeight="700"
+                    className="edge-label-text"
+                    data-label-id={`edge-${link.corridorId}-${link.targetId}`}
                     style={{ pointerEvents: 'none' }}
                   >
                     carries

@@ -148,8 +148,11 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
           </ul>
 
           <h3 style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-hi)', marginTop: 'var(--s4)', marginBottom: 'var(--s2)' }}>
-            Empirical Allowance Sweep (results/deadline_sweep.csv)
+            Secondary Sensitivity Analysis: Empirical Allowance Sweep (results/deadline_sweep.csv)
           </h3>
+          <p style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s2)' }}>
+            Secondary sensitivity analysis demonstrating interaction-only cases at looser allowances (12 cases at 8.0 km, 8 at 9–12 km). The primary benchmark uses the pre-registered 6.8 km frozen threshold.
+          </p>
           <table id="deadline-sweep-table" style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse', marginTop: 'var(--s2)' }}>
             <thead>
               <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
