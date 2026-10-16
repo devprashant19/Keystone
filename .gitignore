@@ -9,3 +9,8 @@ results/raw/
 *.timestamp-*.mjs
 web/dist/
 web/test-results/
+
+# Agent tool cache: derived from whatever world was last seeded, keyed without a
+# world digest. Never commit it -- a stale cache would serve outdated numbers that
+# still pass the grounding check. scripts/seed_demo.py regenerates it.
+data/demo_cache/agent_tool_cache.json
