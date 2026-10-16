@@ -406,6 +406,25 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
     if run_id in RUN_CACHE:
         return RUN_CACHE[run_id]
 
+    # Pre-seeded demo cache for instant walkthrough response (Step D-1)
+    demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
+    if demo_cache_dir.exists():
+        by_corridor_file = demo_cache_dir / "by_corridor.json"
+        if by_corridor_file.exists():
+            try:
+                with open(by_corridor_file, "r", encoding="utf-8") as f:
+                    corridor_map = json.load(f)
+                cached_rid = req.run_id
+                if cached_rid:
+                    cache_file = demo_cache_dir / f"{cached_rid}.json"
+                    if cache_file.exists():
+                        with open(cache_file, "r", encoding="utf-8") as cf:
+                            cached_payload = json.load(cf)
+                        RUN_CACHE[cached_rid] = cached_payload
+                        return cached_payload
+            except Exception:
+                pass
+
     try:
         client = get_graph_client()
         planner = PreMortemPlanner(client)
@@ -621,6 +640,17 @@ def get_run(run_id: str):
     """Retrieves existing run by ID."""
     if run_id in RUN_CACHE:
         return RUN_CACHE[run_id]
+
+    demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
+    cache_file = demo_cache_dir / f"{run_id}.json"
+    if cache_file.exists():
+        try:
+            with open(cache_file, "r", encoding="utf-8") as cf:
+                data = json.load(cf)
+            RUN_CACHE[run_id] = data
+            return data
+        except Exception:
+            pass
     try:
         client = get_graph_client()
         mem = client.select_graph("jaal_memory")
