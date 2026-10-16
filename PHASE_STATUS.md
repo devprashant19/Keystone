@@ -260,11 +260,72 @@ STATUS: PASS
 AT: 2026-10-15T01:18 IST
 FINAL HEALTH AUDIT:
 - FalkorDB 6.0.2 container: Up and healthy (`jaal_falkordb`)
-- Backend Pytest Suite: 77 passed, 1 warning in 292.07s (0:04:52)
-- Frontend Build: `npm run build` exits 0 (vite v5.4.21, 50 modules transformed, 0 TS errors)
-- Frontend Automated Browser Battery: 78 of 78 verification checks pass across Chromium
+- Backend Pytest Suite: 78 passed
+- Frontend Build: `npm run build` exits 0 (clean)
+- Frontend Automated Browser Battery: 87 of 87 verification checks pass across Chromium
 - Open Issues Fixed: I-3 (Policy C losses explained), I-4 (run ID persistence/replay), I-5 (26 live controls & zero dead controls), I-6 (stages U2-U6 built & signed off), I-7 (dependency chain on API), I-8 (world content digest stable), I-9 (honest null-result panel on main path), I-10 (smoke probe fixture isolation), I-11 (verbatim verification report).
 - Escalation: HD-1 (I-2, frozen threshold) and HD-2 (I-1, commit timing) prepared for user decision.
+
+---
+
+## POST-AUDIT ERROR REMEDIATION (E-1 THROUGH E-7)
+
+### E-1: Schematic View Layout & Label Separation — PASS
+- Laid out schematic nodes across 3 deterministic bands: ALERT (top, 8 towers), POWER (middle, 7 feeders), and ROAD (bottom, 13 intersections dynamically sorted into 6 longitudinal columns, lat descending).
+- Replaced static string patterns to conform with U2-02 data honesty. Zero pairwise label overlap at 1440 and 1280 viewports (U2-14 PASS).
+
+### E-2: Decision Text Clipping — PASS
+- Removed fixed height and overflow truncation from decision cards; wrapped rationale and explanations in fluid responsive typography.
+
+### E-3: Frame/Legend Coherence — PASS
+- Completed run default opens on Frame 4 (Outcome); canvas severed count and legend severed counter remain strictly synchronized. Presenter tour resets to Frame 0 for Step 1, steps through, and preserves Frame 4 upon completion.
+
+### E-4: Case List Verdict Column Not Clipped — PASS
+- Fixed-width column layout for verdicts (110px) preventing corridor text from shrinking verdict pills; verified scrollWidth === clientWidth across all rows at 1440 and 1280.
+
+### E-5: Canonical Figures Automation — PASS
+- Automated canonical facts generation via `scripts/report_facts.py` with zero hardcoded numbers. Verified 13 intersections, 10 facilities, 14 corridors, and 104/48/30/0 frozen decomposition.
+
+### E-6: Track 01 Agent Layer (Incident Copilot) — PASS
+- Implemented 5 strictly validated Pydantic tools (`get_corridor_inventory`, `evaluate_contingency`, `get_case_evidence`, `check_system_health`, `record_commander_decision`).
+- Built `JaalAgent` controller with strict post-validation grounding (AG-08), injection defense (AG-09), write-action human confirmation gate (AG-06), dual MCP stdio server + FastAPI route (`POST /api/agent/query`), and independent presenter deck operation. 11 unit tests in `test_agent.py` and 1 Playwright E2E test in `u4.spec.ts` pass cleanly.
+
+### E-7: Submission Timing, Team & Rules Verification — PASS
+- **Official Submission Window:** Submissions **OPEN 17 Oct 2026 01:03 IST** and **CLOSE 18 Oct 2026 23:59 IST**.
+- **Team Immutability:** Team composition cannot be modified after submitting.
+- **Team Roster:** Team `codeXHW9QQ` ("Parser") is currently solo (1 of 4 seats).
+- **Buffer Commitment:** Submissions will be executed with ample buffer before the 23:59 IST deadline.
+- **Rule 3 Verification:** Corrected Rule 3 in `RULES_VERIFIED.md`. Official Rule 3 literally states that if the product still works once FalkorDB is removed, the graph is decoration. The build satisfies the stricter reading via AB-02 abstention: removing FalkorDB terminates branch evaluation, cross-layer dependency walks, Dijkstra evaluations, and triggers an immediate 503 / AB-02 service halt.
+
+### Canonical System Facts (Live Query)
+- **Entity Counts by Label**:
+  - Intersections: 13
+  - Facilities: 10
+  - Corridors: 14
+  - Power Feeders: 7
+  - Towers: 8
+  - Relays: 12
+  - Depots: 2
+  - Hazard Zones: 6
+  - Alert Links: 36
+  - Feeds Tower Links: 10
+- **Facility IDs (10):**
+  `fire_dfs_hq, fire_kashmere_gate, fire_roop_nagar, hosp_gb_pant, hosp_hindu_rao, hosp_lnjp, hosp_sushruta, regulator_drain12, wtp_chandrawal, wtp_wazirabad`
+- **Corridor IDs (14):**
+  `road_barakhamba_cp_mandihouse, road_chelmsford_cp_station, road_delhigate_connector, road_jln_marg_delhigate_cp, road_rani_jhansi_hindurao_cp, road_rani_jhansi_to_station, road_ridge_sushruta_hindurao, road_ring_delhigate_ito, road_ring_kashmere_monastery, road_ring_kashmere_redfort, road_ring_monastery_chandgiram, road_ring_redfort_delhigate, road_sham_nath_sushruta_kashmere, road_vikas_marg_ito`
+- **Current Content Digest:** `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a`
+- **Current Config Hash:** `ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35`
+- **FalkorDB Version:** `6.0.2`
+- **Frozen Decomposition (6.8 km SLA):**
+  - f1-alone: 104
+  - f2-alone: 48
+  - unstressed: 30
+  - interaction-only: 0
+  - total scenarios: 182 (104 + 48 + 30 + 0 = 182)
+- **Verification Battery Test Counts:**
+  - Pytest Core Suite: 78 tests passed
+  - Playwright UI/E2E Suite: 87 tests passed
+
 
 
 

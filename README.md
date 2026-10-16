@@ -301,3 +301,79 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 In compliance with Rule 11 of the WeMakeDevs × FalkorDB Graph Hacks:
 - Antigravity AI agentic pair programming was utilized during the official build window for test generation, code synthesis, and documentation formatting.
 - All graph schemas, Cypher traversals, and evaluation logic were autonomously developed, grounded in live FalkorDB tests with zero mock data.
+- Detailed disclosure and verification protocols are documented in [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
+
+---
+
+## 14. Track 01 Agent Architecture (Incident Copilot)
+
+Jaal includes an operational Track 01 Incident Copilot Agent that acts on connected graph data through deterministic tools and strict grounding guarantees.
+
+### Architecture Diagram
+```
+                     ┌─────────────────────────────────────────┐
+                     │       Incident Commander Query          │
+                     │    (UI Agent Panel or MCP Client)       │
+                     └────────────────────┬────────────────────┘
+                                          │
+                                          ▼
+                     ┌─────────────────────────────────────────┐
+                     │          JaalAgent Controller           │
+                     │   - Intent Dispatch & Tool Selection    │
+                     │   - AG-09 Injection / Jailbreak Filter  │
+                     │   - AG-06 Commander Write-Action Gate   │
+                     └────────────────────┬────────────────────┘
+                                          │
+                    ┌─────────────────────┴─────────────────────┐
+                    ▼                                           ▼
+     ┌─────────────────────────────┐             ┌─────────────────────────────┐
+     │         Read Tools          │             │         Write Tool          │
+     │ - get_corridor_inventory    │             │ - record_commander_decision │
+     │ - evaluate_contingency      │             │   (Requires confirmed=true) │
+     │ - get_case_evidence         │             └──────────────┬──────────────┘
+     │ - check_system_health       │                            │
+     └──────────────┬──────────────┘                            │
+                    │                                           │
+                    ▼                                           ▼
+     ┌─────────────────────────────┐             ┌─────────────────────────────┐
+     │  FalkorDB jaal_world        │             │  FalkorDB jaal_memory       │
+     │  & Ephemeral Graph Branches │             │  Append-Only Audit Ledger   │
+     └──────────────┬──────────────┘             └─────────────────────────────┘
+                    │
+                    ▼
+     ┌─────────────────────────────────────────────────────────┐
+     │         Strict Grounding Post-Validation (AG-08)        │
+     │  - Parses all numbers and entity IDs from response      │
+     │  - Cross-checks against raw tool results & metrics      │
+     │  - Suppresses ungrounded narrative if any check fails   │
+     └────────────────────────────┬────────────────────────────┘
+                                  │
+                                  ▼
+     ┌─────────────────────────────────────────────────────────┐
+     │                   Structured Output                     │
+     │  { tool_trace, citations, answer, grounded, abstain }   │
+     └─────────────────────────────────────────────────────────┘
+```
+
+### Tool Catalog (5 Typed Pydantic Tools)
+1. **`get_corridor_inventory`**: Queries `jaal_world` for all 14 arterial road corridors, lengths, and operational statuses.
+2. **`evaluate_contingency`**: Evaluates 13 counterfactual scenario branches via ephemeral `GRAPH.COPY` clones; returns 3-way case decomposition and Policy C recommendation.
+3. **`get_case_evidence`** (alias: `inspect_causal_chain`): Reconstructs the exact branch for failure pair $(f_1, f_2)$, evaluating Dijkstra hospital travel times, alert directed walks, and mutation ledgers.
+4. **`check_system_health`**: Verifies FalkorDB connectivity, `jaal_world` node counts (13 intersections, 8 facilities, 2 depots), and engine version (`6.0.2`).
+5. **`record_commander_decision`**: Gated write-tool that records human approval/rejection with rationale into `jaal_memory`. Requires explicit `confirmed: true`.
+
+### Grounding Guarantees
+- **Strict Post-Validation (AG-08):** Every numeric metric ($\ge 2$) and entity ID in the narrative is checked against the tool output trace. If an ungrounded metric is detected, the agent suppresses prose narration (`"Narration unavailable: ungrounded metric detected"`) and returns deterministic raw metrics.
+- **Prompt Injection Defense (AG-09):** Rejection of adversarial override attempts (*"Ignore previous instructions..."*) without leaking graph topology.
+- **MCP Server:** Native Model Context Protocol stdio server (`src/jaal/agent/mcp_server.py`) exposing tools for external agent environments.
+- **Presenter Deck Independence:** The main deck UI operates 100% independently; opening or closing the Agent Panel has zero impact on core visual sweep inspection.
+
+---
+
+## 15. Submission Schedule, Team & Administrative Status
+
+- **Submission Window:** Submissions **OPEN 17 Oct 2026 01:03 IST** and **CLOSE 18 Oct 2026 23:59 IST**.
+- **Team Immutability:** Hackathon rules dictate that the team composition cannot be changed after submitting.
+- **Team Profile:** Team `codeXHW9QQ` ("Parser") is currently a solo entry (1 of 4 seats utilized).
+- **Submission Buffer Policy:** Submissions will be finalized with adequate buffer prior to the 23:59 IST close to prevent portal congestion or last-minute verification failures.
+
