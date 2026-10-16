@@ -133,15 +133,42 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // History modal handler: loads past runs from /api/runs
+  const handleOpenHistory = async () => {
+    setIsHistoryOpen(true);
+    try {
+      const res = await fetch('/api/runs?limit=25');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.runs) {
+          setPastRuns(
+            data.runs.map((r: any) => ({
+              run_id: r.run_id,
+              f1_corridor_id: r.f1_corridor_id,
+              created_at: r.created_at,
+              verdict: r.abstain ? 'ABSTAIN' : 'FEASIBLE',
+            }))
+          );
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load past runs', e);
+    }
+  };
+
   // 3. Trigger Pre-Mortem Run Sweep
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
   const handleRunSweep = async () => {
     if (!selectedF1) return;
     setIsLoading(true);
+    abortControllerRef.current = new AbortController();
     try {
       const res = await fetch('/api/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ f1_corridor_id: selectedF1 }),
+        signal: abortControllerRef.current.signal,
       });
       if (!res.ok) throw new Error(`Run failed: ${res.statusText}`);
       const data = await res.json();
@@ -159,12 +186,22 @@ export const App: React.FC = () => {
         },
         ...prev.filter((r) => r.run_id !== data.run_id),
       ]);
-    } catch (err) {
-      console.error(err);
-      alert('Error triggering scenario sweep. Check FalkorDB connection.');
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error(err);
+        alert('Error triggering scenario sweep. Check FalkorDB connection.');
+      }
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
     }
+  };
+
+  const handleCancelRun = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setIsLoading(false);
   };
 
   // 4. Submit Commander Decision
@@ -201,6 +238,9 @@ export const App: React.FC = () => {
   // Extract selected f2 from selectedCaseId
   const f2Corridor = selectedCaseId.includes('__') ? selectedCaseId.split('__')[1] : '';
 
+  // Stale world detection
+  const isStale = Boolean(runData?.world_digest && worldDigest && runData.world_digest !== worldDigest);
+
   // Render secondary routes
   if (currentRoute === '/method') {
     return (
@@ -209,9 +249,10 @@ export const App: React.FC = () => {
           worldDigest={worldDigest}
           configHash={configHash}
           isDbHealthy={isDbHealthy}
-          onOpenHistory={() => setIsHistoryOpen(true)}
+          onOpenHistory={handleOpenHistory}
           onNavigate={setCurrentRoute}
           currentRoute={currentRoute}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
         />
         <MethodView onBack={() => setCurrentRoute('/')} configHash={configHash} worldDigest={worldDigest} />
       </>
@@ -225,9 +266,10 @@ export const App: React.FC = () => {
           worldDigest={worldDigest}
           configHash={configHash}
           isDbHealthy={isDbHealthy}
-          onOpenHistory={() => setIsHistoryOpen(true)}
+          onOpenHistory={handleOpenHistory}
           onNavigate={setCurrentRoute}
           currentRoute={currentRoute}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
         />
         <EvidenceView
           caseId={evidenceCaseId || selectedCaseId}
@@ -245,10 +287,46 @@ export const App: React.FC = () => {
         worldDigest={worldDigest}
         configHash={configHash}
         isDbHealthy={isDbHealthy}
-        onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenHistory={handleOpenHistory}
         onNavigate={setCurrentRoute}
         currentRoute={currentRoute}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
+
+      {/* 503 DB Unavailable Banner */}
+      {!isDbHealthy && (
+        <div
+          id="db-unavailable-banner"
+          style={{
+            backgroundColor: 'var(--fail-wash)',
+            color: 'var(--fail)',
+            borderBottom: '1px solid var(--fail)',
+            padding: 'var(--s2) var(--s4)',
+            fontSize: 'var(--fs-micro)',
+            fontWeight: 700,
+            textAlign: 'center',
+            letterSpacing: '0.04em',
+          }}
+        >
+          FALKORDB ENGINE UNAVAILABLE — GRAPH OFFLINE · ALL METRICS — · SWEEPS DISABLED
+        </div>
+      )}
+
+      {/* Small Screen Notice (<900px) */}
+      <div
+        id="small-screen-notice"
+        className="small-screen-notice"
+        style={{
+          backgroundColor: 'var(--bg-sunken)',
+          color: 'var(--ink-mid)',
+          borderBottom: '1px solid var(--line-hair)',
+          padding: 'var(--s2) var(--s4)',
+          fontSize: 'var(--fs-micro)',
+          textAlign: 'center',
+        }}
+      >
+        Dense command deck — use a wider screen for full 3-column analysis.
+      </div>
 
       {/* 2. Main 3-Column Deck */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -256,8 +334,12 @@ export const App: React.FC = () => {
         <LeftRail
           corridors={corridors}
           selectedF1={selectedF1}
-          onSelectF1={setSelectedF1}
+          onSelectF1={(f1) => {
+            setSelectedF1(f1);
+            setCurrentFrame(0);
+          }}
           onRunSweep={handleRunSweep}
+          onCancelRun={handleCancelRun}
           isLoading={isLoading}
           cases={runData?.cases || []}
           selectedCaseId={selectedCaseId}
@@ -284,16 +366,25 @@ export const App: React.FC = () => {
           onToggleSevered={() => setHighlightSevered(!highlightSevered)}
           worldSummary={worldSummary}
           branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
+          onOpenEvidence={(caseId) => {
+            setEvidenceCaseId(caseId);
+            setCurrentRoute(`/evidence/${caseId}`);
+          }}
         />
 
         {/* Right Rail (380px) */}
         <RightRail
           runData={runData}
           selectedCaseId={selectedCaseId}
+          isStale={isStale}
           onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}
           onNavigateToEvidence={(caseId) => {
-            setEvidenceCaseId(caseId);
-            setCurrentRoute(`/evidence/${caseId}`);
+            if (caseId === 'method') {
+              setCurrentRoute('/method');
+            } else {
+              setEvidenceCaseId(caseId);
+              setCurrentRoute(`/evidence/${caseId}`);
+            }
           }}
         />
       </div>
@@ -322,7 +413,7 @@ export const App: React.FC = () => {
           try {
             const res = await fetch(`/api/run/${rId}`);
             const data = await res.json();
-            setRunData(data);
+            setRunData({ ...data, isReadOnly: true });
             setSelectedF1(data.f1_corridor_id);
             if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
           } catch (e) {

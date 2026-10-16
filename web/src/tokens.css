@@ -14,7 +14,7 @@
   /* Ink */
   --ink-hi:     #E9EEF6;   /* primary text, numerals */
   --ink-mid:    #9FB0C4;   /* labels, secondary */
-  --ink-lo:     #6B7F96;   /* units, captions, disabled text */
+  --ink-lo:     #788FA8;   /* units, captions, disabled text (>=4.5:1 contrast) */
 
   /* Interaction */
   --accent:     #49B4FF;

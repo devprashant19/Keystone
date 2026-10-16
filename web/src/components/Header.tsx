@@ -8,6 +8,7 @@ interface HeaderProps {
   onOpenHistory: () => void;
   onNavigate: (route: string) => void;
   currentRoute: string;
+  onOpenShortcuts?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,7 +18,21 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenHistory,
   onNavigate,
   currentRoute,
+  onOpenShortcuts,
 }) => {
+  const [reducedMotion, setReducedMotion] = React.useState<boolean>(() => {
+    return typeof document !== 'undefined' && document.documentElement.getAttribute('data-reduced-motion') === 'true';
+  });
+  const [copiedTarget, setCopiedTarget] = React.useState<'config' | 'digest' | null>(null);
+
+  const toggleMotion = () => {
+    const nextVal = !reducedMotion;
+    setReducedMotion(nextVal);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-reduced-motion', nextVal ? 'true' : 'false');
+    }
+  };
+
   return (
     <header
       style={{
@@ -29,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
         justifyContent: 'space-between',
         padding: '0 var(--s4)',
         userSelect: 'none',
-        boxShadow: 'var(--elevation-sticky)'
+        boxShadow: 'var(--elevation-sticky)',
       }}
       role="banner"
     >
@@ -65,6 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <span
+          id="provenance-badge"
           title="Contains both real-world OSM Delhi roads and synthetic power/alert layers"
           style={{ cursor: 'pointer' }}
           onClick={() => onNavigate('/method')}
@@ -84,15 +100,82 @@ export const Header: React.FC<HeaderProps> = ({
         }}
         className="mono"
       >
-        <span>
-          CONFIG: <strong style={{ color: 'var(--ink-hi)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong>
-        </span>
+        <button
+          id="copy-config-btn"
+          onClick={() => {
+            if (configHash) {
+              try { navigator?.clipboard?.writeText(configHash); } catch (_) {}
+              setCopiedTarget('config');
+              setTimeout(() => setCopiedTarget(null), 1200);
+            }
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'inherit',
+            font: 'inherit',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--s1)',
+          }}
+          title="Click to copy full Config SHA-256"
+        >
+          <span>CONFIG: <strong style={{ color: 'var(--ink-hi)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong></span>
+          {copiedTarget === 'config' && (
+            <span style={{ backgroundColor: 'var(--ok)', color: 'var(--bg-void)', padding: '1px 4px', borderRadius: 'var(--r-chip)', fontSize: 'var(--fs-micro)', fontWeight: 700 }}>
+              COPIED
+            </span>
+          )}
+        </button>
         <span style={{ color: 'var(--line-hair)' }}>•</span>
-        <span>
-          DIGEST: <strong style={{ color: 'var(--ink-hi)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong>
-        </span>
+        <button
+          id="copy-digest-btn"
+          onClick={() => {
+            if (worldDigest) {
+              try { navigator?.clipboard?.writeText(worldDigest); } catch (_) {}
+              setCopiedTarget('digest');
+              setTimeout(() => setCopiedTarget(null), 1200);
+            }
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'inherit',
+            font: 'inherit',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--s1)',
+          }}
+          title="Click to copy full World Content Digest"
+        >
+          <span>DIGEST: <strong style={{ color: 'var(--ink-hi)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong></span>
+          {copiedTarget === 'digest' && (
+            <span style={{ backgroundColor: 'var(--ok)', color: 'var(--bg-void)', padding: '1px 4px', borderRadius: 'var(--r-chip)', fontSize: 'var(--fs-micro)', fontWeight: 700 }}>
+              COPIED
+            </span>
+          )}
+        </button>
         <span style={{ color: 'var(--line-hair)' }}>•</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
+        <button
+          id="health-dot"
+          onClick={() => onNavigate('/method')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'inherit',
+            font: 'inherit',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--s1)',
+            padding: 0,
+          }}
+          title={isDbHealthy ? 'FalkorDB 6.0.2 Live — Click for Methodology' : 'FalkorDB Unavailable'}
+        >
           <span
             className={`health-dot ${isDbHealthy ? 'alive' : 'down'}`}
             style={{
@@ -102,15 +185,34 @@ export const Header: React.FC<HeaderProps> = ({
               backgroundColor: isDbHealthy ? 'var(--ok)' : 'var(--fail)',
               display: 'inline-block',
             }}
-            title={isDbHealthy ? 'FalkorDB 6.0.2 Live' : 'FalkorDB Unavailable'}
           />
           FalkorDB 6.0.2
-        </span>
+        </button>
       </div>
 
       {/* Right controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
         <button
+          id="reduced-motion-toggle"
+          onClick={toggleMotion}
+          style={{
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--line-hair)',
+            color: reducedMotion ? 'var(--accent)' : 'var(--ink-lo)',
+            padding: 'var(--s1) var(--s2)',
+            borderRadius: 'var(--r-ctl)',
+            cursor: 'pointer',
+            fontSize: 'var(--fs-micro)',
+            fontWeight: 600,
+          }}
+          title="Toggle Reduced Motion"
+          aria-label="Toggle Reduced Motion"
+        >
+          {reducedMotion ? '⊘ MOTION' : '◎ MOTION'}
+        </button>
+
+        <button
+          id="open-history-btn"
           onClick={onOpenHistory}
           style={{
             background: 'var(--bg-raised)',
@@ -125,6 +227,31 @@ export const Header: React.FC<HeaderProps> = ({
         >
           Run History
         </button>
+
+        {onOpenShortcuts && (
+          <button
+            id="shortcuts-help-btn"
+            onClick={onOpenShortcuts}
+            style={{
+              background: 'var(--bg-raised)',
+              border: '1px solid var(--line-hair)',
+              color: 'var(--ink-lo)',
+              width: '28px',
+              height: '28px',
+              borderRadius: 'var(--r-ctl)',
+              cursor: 'pointer',
+              fontSize: 'var(--fs-cap)',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Keyboard Shortcuts (?)"
+            aria-label="Keyboard Shortcuts"
+          >
+            ?
+          </button>
+        )}
 
         <button
           onClick={() => onNavigate(currentRoute === '/method' ? '/' : '/method')}

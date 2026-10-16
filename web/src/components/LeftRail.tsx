@@ -24,6 +24,7 @@ interface LeftRailProps {
   selectedF1: string;
   onSelectF1: (f1: string) => void;
   onRunSweep: () => void;
+  onCancelRun?: () => void;
   isLoading: boolean;
   cases: CaseSummary[];
   selectedCaseId: string;
@@ -36,6 +37,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
   selectedF1,
   onSelectF1,
   onRunSweep,
+  onCancelRun,
   isLoading,
   cases,
   selectedCaseId,
@@ -82,9 +84,13 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       role="region"
       aria-label="Observed Failure and Scenario Sweep"
     >
+      <div id="sweep-live-announcer" aria-live="polite" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+        {isLoading ? 'Evaluating 13 scenario branches' : cases.length > 0 ? `${cases.length} cases evaluated` : 'Ready to evaluate'}
+      </div>
       {/* 1. Observed failure selector */}
       <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
         <label
+          htmlFor="corridor-select"
           style={{
             display: 'block',
             fontSize: 'var(--fs-micro)',
@@ -92,7 +98,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             color: 'var(--ink-lo)',
             fontWeight: 600,
             marginBottom: 'var(--s2)',
-            letterSpacing: '0.04em'
+            letterSpacing: '0.04em',
           }}
         >
           Observed Failure (f1)
@@ -112,7 +118,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             marginBottom: 'var(--s3)',
           }}
           className="mono"
-          id="f1-select"
+          id="corridor-select"
         >
           <option value="">— Select an observed corridor failure —</option>
           {corridors.map((c) => (
@@ -141,6 +147,27 @@ export const LeftRail: React.FC<LeftRailProps> = ({
         >
           {isLoading ? 'EVALUATING 13 SCENARIO BRANCHES…' : 'RUN PRE-MORTEM SWEEP'}
         </button>
+
+        {isLoading && (
+          <button
+            id="cancel-run-btn"
+            onClick={onCancelRun}
+            style={{
+              width: '100%',
+              marginTop: 'var(--s2)',
+              backgroundColor: 'var(--fail-wash)',
+              color: 'var(--fail)',
+              border: '1px solid var(--fail)',
+              padding: 'var(--s1) var(--s2)',
+              borderRadius: 'var(--r-ctl)',
+              fontWeight: 600,
+              fontSize: 'var(--fs-micro)',
+              cursor: 'pointer',
+            }}
+          >
+            CANCEL RUN (ABORT &amp; CLEAN)
+          </button>
+        )}
       </div>
 
       {/* 2. Headline counters */}
@@ -151,6 +178,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             borderBottom: '1px solid var(--line-hair)',
             backgroundColor: 'var(--bg-raised)',
           }}
+          aria-live="polite"
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--s2)' }}>
             <span style={{ fontSize: 'var(--fs-cap)', fontWeight: 600, color: 'var(--ink-hi)' }}>CASES: 13 / 13 ✓</span>
@@ -160,9 +188,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
           <div style={{ display: 'flex', gap: 'var(--s2)', flexWrap: 'wrap' }}>
             <StatusBadge status="BREACH" label={`BREACH ${breachCount}`} />
             <StatusBadge status="DEGRADED" label={`DEGRADED ${degradedCount}`} />
-            <span
-              title="Headline denominator: cases where neither corridor breaches alone"
-            >
+            <span title="Headline denominator: cases where neither corridor breaches alone">
               <StatusBadge status="SYNTHETIC" label={`INTERACTION ${interactionCount}`} />
             </span>
           </div>
@@ -186,13 +212,14 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             { id: 'degraded', label: 'Degraded', count: degradedCount },
             { id: 'interaction', label: 'Interaction', count: interactionCount },
           ].map((item) => (
-            <Chip
-              key={item.id}
-              label={item.label}
-              active={filter === item.id}
-              count={item.count}
-              onClick={() => setFilter(item.id)}
-            />
+            <div key={item.id} id={`filter-${item.id}`}>
+              <Chip
+                label={item.label}
+                active={filter === item.id}
+                count={item.count}
+                onClick={() => setFilter(item.id)}
+              />
+            </div>
           ))}
         </div>
       )}
@@ -201,7 +228,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {cases.length === 0 ? (
           <div style={{ padding: 'var(--s5) var(--s4)', color: 'var(--ink-lo)', textAlign: 'center', fontSize: 'var(--fs-cap)' }}>
-            Select an observed failure corridor and click Run Sweep to evaluate all 13 counterfactual second-failures.
+            Select an observed corridor failure to begin.
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--fs-cap)' }}>
@@ -212,10 +239,12 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                   color: 'var(--ink-lo)',
                   textAlign: 'left',
                   fontSize: 'var(--fs-micro)',
-                  backgroundColor: 'var(--bg-header)'
+                  backgroundColor: 'var(--bg-header)',
                 }}
               >
                 <th
+                  id="sort-f2-btn"
+                  aria-sort={sortBy === 'f2' ? 'ascending' : 'none'}
                   style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer' }}
                   onClick={() => setSortBy('f2')}
                   title="Sort by secondary corridor ID"
@@ -223,6 +252,8 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                   f2 CORRIDOR
                 </th>
                 <th
+                  id="sort-verdict-btn"
+                  aria-sort={sortBy === 'verdict' ? 'descending' : 'none'}
                   style={{ padding: 'var(--s2) var(--s3)', cursor: 'pointer', textAlign: 'right' }}
                   onClick={() => setSortBy('verdict')}
                   title="Sort by verdict severity"
@@ -237,13 +268,16 @@ export const LeftRail: React.FC<LeftRailProps> = ({
                 return (
                   <tr
                     key={c.case_id}
+                    className="case-row"
+                    data-caseid={c.case_id}
+                    id={`case-row-${c.case_id}`}
                     onClick={() => onSelectCase(c.case_id)}
                     style={{
                       cursor: 'pointer',
                       backgroundColor: isSelected ? 'var(--bg-raised)' : 'transparent',
                       borderLeft: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
                       borderBottom: '1px solid var(--line-hair)',
-                      height: '28px'
+                      height: '28px',
                     }}
                   >
                     <td style={{ padding: 'var(--s2) var(--s3)' }}>

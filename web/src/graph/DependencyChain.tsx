@@ -87,7 +87,7 @@ export const DependencyChain: React.FC<DependencyChainProps> = ({
               >
                 <div
                   style={{
-                    fontSize: '8px',
+                    fontSize: 'var(--fs-micro)',
                     textTransform: 'uppercase',
                     color: 'var(--ink-lo)',
                     fontWeight: 700,
@@ -116,7 +116,7 @@ export const DependencyChain: React.FC<DependencyChainProps> = ({
                 <div
                   className="mono reason-code-text"
                   style={{
-                    fontSize: '9px',
+                    fontSize: 'var(--fs-micro)',
                     color: step.reason_code ? 'var(--fail)' : 'var(--ink-lo)',
                     marginTop: '2px',
                   }}
@@ -138,7 +138,7 @@ export const DependencyChain: React.FC<DependencyChainProps> = ({
                 >
                   <span
                     style={{
-                      fontSize: '8px',
+                      fontSize: 'var(--fs-micro)',
                       color: 'var(--synthetic)',
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 600,
@@ -168,7 +168,7 @@ export const DependencyChain: React.FC<DependencyChainProps> = ({
             gap: 'var(--s1)',
           }}
         >
-          <div style={{ fontSize: '8px', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700 }}>
+          <div style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700 }}>
             Response Time Equation (Verification U2-07)
           </div>
           <div

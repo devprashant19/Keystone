@@ -18,6 +18,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
 
   return (
     <div
+      id="shortcuts-modal"
       style={{
         position: 'fixed',
         inset: 0,
@@ -46,6 +47,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
             Keyboard Shortcuts
           </h2>
           <button
+            id="close-shortcuts-btn"
             onClick={onClose}
             style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer', fontSize: 'var(--fs-ui)' }}
             aria-label="Close shortcuts sheet"

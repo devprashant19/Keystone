@@ -23,6 +23,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
 
   return (
     <div
+      id="history-modal"
       style={{
         position: 'fixed',
         inset: 0,
@@ -54,6 +55,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             Run History (Auditable Graph Memory)
           </h2>
           <button
+            id="close-history-btn"
             onClick={onClose}
             style={{ background: 'none', border: 'none', color: 'var(--ink-lo)', cursor: 'pointer', fontSize: 'var(--fs-ui)' }}
             aria-label="Close history modal"
@@ -91,6 +93,8 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                     </td>
                     <td style={{ padding: 'var(--s2) var(--s3)', textAlign: 'right' }}>
                       <button
+                        className="history-open-btn"
+                        id={`history-open-${r.run_id}`}
                         onClick={() => { onSelectRun(r.run_id); onClose(); }}
                         style={{
                           padding: '2px var(--s2)',

@@ -448,7 +448,7 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
       </g>
 
       {/* CROSS-BAND CARRIER LINKS: Visible even when bands are collapsed */}
-      <g className="carrier-connectors" aria-label="Carrier Connectors">
+      <g role="group" className="carrier-connectors" aria-label="Carrier Connectors">
         {carrierLinks.map((link, idx) => {
           // Orthogonal routing with rounded corner from road up to target
           const cornerY = link.pTarget.y + 12;
@@ -467,7 +467,7 @@ export const SchematicView: React.FC<SchematicViewProps> = ({
               {/* Badge Label 'carries' */}
               <g transform={`translate(${link.pRoad.x - 18}, ${(link.pRoad.y + link.pTarget.y) / 2 - 8})`}>
                 <rect width="36" height="12" rx="2" fill="var(--bg-panel)" stroke="var(--synthetic)" strokeWidth="0.8" />
-                <text x="18" y="9" textAnchor="middle" fill="var(--synthetic)" fontSize="8px" fontWeight="700">
+                <text x="18" y="9" textAnchor="middle" fill="var(--synthetic)" fontSize="var(--fs-micro)" fontWeight="700">
                   carries
                 </text>
               </g>

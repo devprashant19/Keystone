@@ -109,3 +109,94 @@ FAILED: none (initial attempt timed out waiting for DOM on / due to Vite proxy t
 FALLBACK APPLIED: none
 NEXT: U4 — screens and states
 
+---
+
+## U4 — Screens, States and Control Wiring
+STATUS: PASS
+AT: 2026-10-14T19:01:05Z
+RAN: npx playwright test verification/u4.spec.ts
+OUTPUT:
+```text
+Running 16 tests using 1 worker
+
+  ok  1 [chromium] › verification\u4.spec.ts:91:3 › U4 — Screens, States and Control Wiring Battery › U4-01: All 26 controls live and produce observed DOM changes (4.1s)
+  ok  2 [chromium] › verification\u4.spec.ts:273:3 › U4 — Screens, States and Control Wiring Battery › U4-02: All 14 states reachable and captured (5.4s)
+  ok  3 [chromium] › verification\u4.spec.ts:408:3 › U4 — Screens, States and Control Wiring Battery › U4-03: Idle shows no metric digits (1.6s)
+  ok  4 [chromium] › verification\u4.spec.ts:421:3 › U4 — Screens, States and Control Wiring Battery › U4-04: 503 blanks metrics and disables runs (960ms)
+  ok  5 [chromium] › verification\u4.spec.ts:430:3 › U4 — Screens, States and Control Wiring Battery › U4-05: Null-result panel renders with 26/24 split text (1.7s)
+  ok  6 [chromium] › verification\u4.spec.ts:443:3 › U4 — Screens, States and Control Wiring Battery › U4-06: Abstention renders ABSTAIN statement and disables approval (1.7s)
+  ok  7 [chromium] › verification\u4.spec.ts:464:3 › U4 — Screens, States and Control Wiring Battery › U4-07: Stale world blocks approval with banner (2.2s)
+  ok  8 [chromium] › verification\u4.spec.ts:476:3 › U4 — Screens, States and Control Wiring Battery › U4-08: Monotonic progress without fake timers (1.7s)
+  ok  9 [chromium] › verification\u4.spec.ts:484:3 › U4 — Screens, States and Control Wiring Battery › U4-09: Metric drill-through reaches evidence route (1.2s)
+  ok 10 [chromium] › verification\u4.spec.ts:495:3 › U4 — Screens, States and Control Wiring Battery › U4-10: Component arithmetic sums to total (2.1s)
+  ok 11 [chromium] › verification\u4.spec.ts:508:3 › U4 — Screens, States and Control Wiring Battery › U4-11: Full keyboard navigation loop (2.0s)
+  ok 12 [chromium] › verification\u4.spec.ts:522:3 › U4 — Screens, States and Control Wiring Battery › U4-12: axe-core clean on all three routes (5.9s)
+  ok 13 [chromium] › verification\u4.spec.ts:545:3 › U4 — Screens, States and Control Wiring Battery › U4-13: Focus restoration on modal close (1.0s)
+  ok 14 [chromium] › verification\u4.spec.ts:557:3 › U4 — Screens, States and Control Wiring Battery › U4-14: Live regions announce progress (920ms)
+  ok 15 [chromium] › verification\u4.spec.ts:564:3 › U4 — Screens, States and Control Wiring Battery › U4-15: Responsive screenshots at 1920, 1440, 1280, 880 (2.0s)
+  ok 16 [chromium] › verification\u4.spec.ts:584:3 › U4 — Screens, States and Control Wiring Battery › U4-16: No client-side computation of metrics (6ms)
+
+  16 passed (39.2s)
+```
+P0 CHECKS: U4-01 ✓ U4-02 ✓ U4-03 ✓ U4-04 ✓ U4-05 ✓ U4-06 ✓ U4-07 ✓ U4-08 ✓ U4-09 ✓ U4-10 ✓ U4-11 ✓ U4-12 ✓ U4-16 ✓
+P1 CHECKS: U4-13 ✓ U4-14 ✓ U4-15 ✓
+SCREENSHOTS: web/verification/u4/ (14 state screenshots: 01-idle through 14-small-screen, plus 4 responsive screenshots resp-{880,1280,1440,1920}.png)
+FAILED: none (initial contrast flags on ink-lo resolved by token tuning to #788FA8; SVG g tag aria-label prohibited attributes resolved by adding role="group"; typo REJECTD resolved to REJECTED)
+FALLBACK APPLIED: none
+NEXT: U5 — polish and demo craft
+
+---
+
+## U5 — Polish and Demo Craft
+STATUS: PASS
+AT: 2026-10-14T19:20:10Z
+RAN: npx playwright test verification/u5.spec.ts
+OUTPUT:
+```text
+Running 9 tests using 1 worker
+
+  ok 1 [chromium] › verification\u5.spec.ts:80:3 › U5 — Polish and Demo Craft Battery › U5-01: Data-honesty sweep via source scanning (10ms)
+  ok 2 [chromium] › verification\u5.spec.ts:114:3 › U5 — Polish and Demo Craft Battery › U5-02: Asset audit — hand-crafted SVG only (2ms)
+  ok 3 [chromium] › verification\u5.spec.ts:130:3 › U5 — Polish and Demo Craft Battery › U5-03: Compression legibility with 70% JPEG quality (1.1s)
+  ok 4 [chromium] › verification\u5.spec.ts:141:3 › U5 — Polish and Demo Craft Battery › U5-04: 125% OS scaling screenshot (1.1s)
+  ok 5 [chromium] › verification\u5.spec.ts:154:3 › U5 — Polish and Demo Craft Battery › U5-05: Selection persistence across view, frame step, sort, filter (1.8s)
+  ok 6 [chromium] › verification\u5.spec.ts:183:3 › U5 — Polish and Demo Craft Battery › U5-06: Zero layout shift on hover (CLS) (1.7s)
+  ok 7 [chromium] › verification\u5.spec.ts:199:3 › U5 — Polish and Demo Craft Battery › U5-07: Determinism check — pixel identical screenshots (1.4s)
+  ok 8 [chromium] › verification\u5.spec.ts:222:3 › U5 — Polish and Demo Craft Battery › U5-09: Three demo scenes captured + stills (2.8s)
+  ok 9 [chromium] › verification\u5.spec.ts:271:3 › U5 — Polish and Demo Craft Battery › U5-10: Copy affordances for config and digest (796ms)
+
+  9 passed (18.8s)
+```
+P0 CHECKS: U5-01 ✓ U5-02 ✓ U5-03 ✓ U5-05 ✓ U5-07 ✓ U5-08 (pytest: 77 passed) ✓ U5-09 ✓
+P1 CHECKS: U5-04 ✓ U5-06 ✓ U5-10 ✓
+SCREENSHOTS: web/verification/u5/{golden-case-compressed-70.jpeg, scale-125.png, determinism-take-1.png, determinism-take-2.png, greyscale-live-case.png}, web/verification/demo/{scene1_golden_case.png, scene2_abstention.png, scene3_null_result.png, still_503_unavailable.png, still_method_provenance.png}
+FAILED: none
+FALLBACK APPLIED: none
+NEXT: U6 — verification battery and signoff
+
+---
+
+## U6 — Verification Battery and Sign-off
+STATUS: PASS (SIGNED OFF)
+AT: 2026-10-14T19:43:00Z
+RAN: npx playwright test verification/ && node verification/contrast.mjs && npm run build && pytest tests -q
+OUTPUT:
+```text
+Playwright Verification Suite:
+  73 passed in 1.5m across verification/ (u1, u2, u3, u4, u5, u6)
+  3 passed in 14.1s in verification/a11y.spec.ts
+
+Contrast Matrix (contrast.mjs):
+  ALL CHECKS PASSED (12 ink, 2 accent, 8 status, 2 focus pairs met AA targets)
+
+TypeScript & Vite Build:
+  0 errors, 50 modules transformed, build in 1.78s
+
+Backend Core Pytest Suite:
+  77 passed, 1 warning in 292.07s
+```
+P0 CHECKS: U6-01 ✓ U6-02 ✓ U6-03 ✓ U6-04 ✓ U6-05 ✓ U6-06 ✓ U6-07 ✓ U6-08 ✓ U6-09 ✓ U6-10 ✓ U6-11 ✓ U6-12 ✓
+DECISION: SIGNED OFF (76 of 76 checks passed, zero dead controls, 14/14 states screenshotted, 0 serious/critical axe violations, core unbroken)
+FINAL REPORT: web/UI_VERIFICATION_REPORT.md
+
+

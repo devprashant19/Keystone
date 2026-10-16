@@ -109,6 +109,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
         {/* View Mode Toggle: Map vs Schematic */}
         <div style={{ display: 'flex', gap: 'var(--s1)' }} className="view-mode-toggles">
           <button
+            id="tab-geographic"
             onClick={() => onToggleViewMode('map')}
             className={`tab-geographic ${viewMode === 'map' ? 'active' : ''}`}
             style={{
@@ -125,6 +126,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
             Geographic Map
           </button>
           <button
+            id="tab-schematic"
             onClick={() => onToggleViewMode('topology')}
             className={`tab-schematic ${viewMode === 'topology' ? 'active' : ''}`}
             style={{
@@ -146,6 +148,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
           {onToggleSynthetic && (
             <button
+              id="toggle-synthetic"
               onClick={onToggleSynthetic}
               className={`legend-synthetic ${showSyntheticOverlay ? 'active' : ''}`}
               style={{
@@ -165,6 +168,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
 
           {onToggleSevered && (
             <button
+              id="toggle-severed"
               onClick={onToggleSevered}
               className={`legend-severed ${highlightSevered ? 'active' : ''}`}
               style={{
@@ -183,6 +187,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
           )}
 
           <button
+            id="entity-registry-toggle"
             onClick={() => setShowEntityList(!showEntityList)}
             style={{
               fontSize: 'var(--fs-micro)',
@@ -200,20 +205,26 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
           {/* Zoom controls */}
           <div style={{ display: 'flex', gap: '2px', marginLeft: 'var(--s2)' }}>
             <button
+              id="zoom-in-btn"
               onClick={() => setZoom((z) => Math.min(z + 0.2, 2.0))}
               style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
+              title="Zoom In"
             >
               +
             </button>
             <button
+              id="zoom-out-btn"
               onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
               style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
+              title="Zoom Out"
             >
               −
             </button>
             <button
+              id="zoom-fit-btn"
               onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
               style={{ padding: '2px var(--s2)', background: 'var(--bg-raised)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)', cursor: 'pointer', borderRadius: 'var(--r-chip)' }}
+              title="Reset View / Fit"
             >
               0
             </button>
@@ -309,7 +320,6 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
               padding: 'var(--s3)',
               maxWidth: '300px',
               fontSize: 'var(--fs-micro)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
               zIndex: 20,
               pointerEvents: 'none',
             }}

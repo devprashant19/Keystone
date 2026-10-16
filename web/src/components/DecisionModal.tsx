@@ -18,11 +18,15 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
   const [rationale, setRationale] = useState<string>('');
   const [actor, setActor] = useState<string>('Commander Inc-01');
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
+      triggerRef.current = (document.activeElement as HTMLElement) || null;
       setRationale('');
       setTimeout(() => inputRef.current?.focus(), 50);
+    } else if (triggerRef.current) {
+      triggerRef.current.focus();
     }
   }, [isOpen]);
 
@@ -32,6 +36,7 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
 
   return (
     <div
+      id="decision-modal"
       style={{
         position: 'fixed',
         inset: 0,
@@ -88,6 +93,7 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
             Operational Justification & Rationale (Minimum 10 Characters) *
           </label>
           <textarea
+            id="rationale-input"
             ref={inputRef}
             rows={4}
             value={rationale}
@@ -114,6 +120,7 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--s2)' }}>
           <button
+            id="decision-cancel-btn"
             onClick={onClose}
             disabled={isSubmitting}
             style={{

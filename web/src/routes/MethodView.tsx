@@ -404,6 +404,7 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
               </div>
             </div>
             <button
+              id="reset-demo-btn"
               onClick={handleResetDemo}
               disabled={resetting}
               style={{

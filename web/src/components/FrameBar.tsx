@@ -36,8 +36,26 @@ export const FrameBar: React.FC<FrameBarProps> = ({
       aria-label="Counterfactual Frame Stepper"
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+        <button
+          id="frame-prev-btn"
+          onClick={() => onSelectFrame(Math.max(0, currentFrame - 1))}
+          disabled={currentFrame <= 0}
+          style={{
+            padding: 'var(--s1) var(--s2)',
+            borderRadius: 'var(--r-ctl)',
+            border: '1px solid var(--line-hair)',
+            backgroundColor: 'var(--bg-raised)',
+            color: currentFrame <= 0 ? 'var(--ink-lo)' : 'var(--ink-hi)',
+            cursor: currentFrame <= 0 ? 'not-allowed' : 'pointer',
+            fontSize: 'var(--fs-micro)',
+          }}
+          title="Previous Frame (ArrowLeft)"
+          aria-label="Previous Frame"
+        >
+          ◀
+        </button>
         <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 600 }}>
-          FRAMES (◀ / ▶):
+          FRAMES:
         </span>
         <div style={{ display: 'flex', gap: 'var(--s1)' }}>
           {FRAMES.map((f) => {
@@ -45,6 +63,8 @@ export const FrameBar: React.FC<FrameBarProps> = ({
             return (
               <button
                 key={f.index}
+                id={`frame-step-${f.index}`}
+                className={`frame-step ${isActive ? 'active' : ''}`}
                 onClick={() => onSelectFrame(f.index)}
                 style={{
                   padding: 'var(--s2) var(--s3)',
@@ -68,6 +88,24 @@ export const FrameBar: React.FC<FrameBarProps> = ({
             );
           })}
         </div>
+        <button
+          id="frame-next-btn"
+          onClick={() => onSelectFrame(Math.min(4, currentFrame + 1))}
+          disabled={currentFrame >= 4}
+          style={{
+            padding: 'var(--s1) var(--s2)',
+            borderRadius: 'var(--r-ctl)',
+            border: '1px solid var(--line-hair)',
+            backgroundColor: 'var(--bg-raised)',
+            color: currentFrame >= 4 ? 'var(--ink-lo)' : 'var(--ink-hi)',
+            cursor: currentFrame >= 4 ? 'not-allowed' : 'pointer',
+            fontSize: 'var(--fs-micro)',
+          }}
+          title="Next Frame (ArrowRight)"
+          aria-label="Next Frame"
+        >
+          ▶
+        </button>
       </div>
 
       {/* Display active branch graph ID */}

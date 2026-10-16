@@ -34,15 +34,14 @@
 .graph-canvas-container.has-branch {
   border: 1px solid var(--branch);
   box-shadow: var(--branch-glow);
-  transition-property: border-color, box-shadow;
+  transition-property: border-color;
   transition-duration: var(--dur-reveal);
   transition-timing-function: var(--ease-out);
 }
 
 .graph-canvas-container.base-world {
   border: 1px solid transparent;
-  box-shadow: none;
-  transition-property: border-color, box-shadow;
+  transition-property: border-color;
   transition-duration: var(--dur-reveal);
   transition-timing-function: var(--ease-out);
 }

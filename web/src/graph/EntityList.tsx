@@ -142,7 +142,7 @@ export const EntityList: React.FC<EntityListProps> = ({
         <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, color: 'var(--ink-hi)' }}>
           KEYBOARD ENTITY REGISTRY ({entities.length} items)
         </span>
-        <span style={{ fontSize: '9px', color: 'var(--ink-lo)' }}>
+        <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
           Use Tab to focus, ↑/↓ to move, Enter for evidence
         </span>
       </div>

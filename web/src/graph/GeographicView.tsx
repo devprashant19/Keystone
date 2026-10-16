@@ -98,14 +98,14 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       <defs>
         {/* 32px Survey Grid */}
         <pattern id="geo-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-          <path d="M 32 0 L 0 0 0 32" fill="none" stroke="rgba(255, 255, 255, 0.025)" strokeWidth="1" />
+          <path d="M 32 0 L 0 0 0 32" fill="none" stroke="var(--line-hair)" strokeOpacity="0.3" strokeWidth="1" />
         </pattern>
       </defs>
 
       <rect width={width} height={height} fill="url(#geo-grid)" style={{ pointerEvents: 'none' }} />
 
       {/* Layer 1: Hazard Polygons */}
-      <g className="hazard-zones" aria-label="Hazard Zones">
+      <g role="group" className="hazard-zones" aria-label="Hazard Zones">
         {projectedHazards.map((zone) => {
           const pathData = zone.projectedRings
             .map((ring) => ring.map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`).join(' ') + ' Z')
@@ -138,7 +138,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       </g>
 
       {/* Layer 2: Corridor Ribbons */}
-      <g className="corridors" aria-label="Corridors">
+      <g role="group" className="corridors" aria-label="Corridors">
         {(world.corridors || []).map((corridor) => {
           const p1 = intersectionPoints[corridor.source];
           const p2 = intersectionPoints[corridor.target];
@@ -282,7 +282,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       </g>
 
       {/* Layer 3: Intersection Nodes */}
-      <g className="intersections" aria-label="Intersections">
+      <g role="group" className="intersections" aria-label="Intersections">
         {(world.intersections || []).map((intersection) => {
           const pt = intersectionPoints[intersection.id];
           if (!pt) return null;
@@ -343,7 +343,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       </g>
 
       {/* Layer 4: Facilities & Leader Lines */}
-      <g className="facilities" aria-label="Facilities">
+      <g role="group" className="facilities" aria-label="Facilities">
         {(world.facilities || []).map((fac) => {
           const pt = facilityPoints[fac.id];
           const accPt = fac.access_intersection ? intersectionPoints[fac.access_intersection] : null;
@@ -413,7 +413,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               {isExcluded ? (
                 <g transform={`translate(${pt.x + 15}, ${pt.y - 5})`}>
                   <rect width="52" height="13" rx="2" fill="var(--bg-panel)" stroke="var(--ink-lo)" strokeWidth="0.8" />
-                  <text x="26" y="9.5" textAnchor="middle" fill="var(--ink-lo)" fontSize="8px" fontWeight="600">
+                  <text x="26" y="9.5" textAnchor="middle" fill="var(--ink-lo)" fontSize="var(--fs-micro)" fontWeight="600">
                     EXCLUDED
                   </text>
                 </g>
@@ -438,7 +438,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       </g>
 
       {/* Layer 5: Depots & Responders */}
-      <g className="depots" aria-label="Depots">
+      <g role="group" className="depots" aria-label="Depots">
         {(world.depots || []).map((depot) => {
           const accPt = depot.intersection ? intersectionPoints[depot.intersection] : null;
           if (!accPt) return null;

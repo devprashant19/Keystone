@@ -56,3 +56,15 @@ code, pre, .mono, [data-mono], .tabular {
     scroll-behavior: auto !important;
   }
 }
+
+/* Responsive: small-screen (<900px) */
+.small-screen-notice {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .small-screen-notice {
+    display: block !important;
+  }
+}
+
