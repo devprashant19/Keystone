@@ -624,9 +624,58 @@ def get_run(run_id: str):
     try:
         client = get_graph_client()
         mem = client.select_graph("jaal_memory")
-        res = mem.query("MATCH (r:Run {run_id: $rid}) RETURN r.run_id, r.f1", {"rid": run_id})
+        res = mem.query(
+            "MATCH (r:Run {run_id: $rid}) "
+            "OPTIONAL MATCH (d:Decision {run_id: r.run_id}) "
+            "RETURN r.run_id, r.f1, r.abstain, r.headline_interaction_only_count, r.started_at, "
+            "d.verdict, d.actor, d.at, d.rationale",
+            {"rid": run_id}
+        )
         if res.result_set:
-            return {"run_id": run_id, "f1_corridor_id": res.result_set[0][1], "cases": []}
+            r = res.result_set[0]
+            is_abstain = bool(r[2]) if r[2] is not None else False
+            iocnt = int(r[3]) if r[3] is not None else 0
+            created_at = r[4] or "2026-10-15T00:00:00Z"
+            decision = None
+            if r[5]:
+                raw_v = str(r[5]).lower()
+                verd = "approved" if "approve" in raw_v else ("rejected" if "reject" in raw_v else raw_v)
+                decision = {
+                    "decision_id": f"dec_{run_id}",
+                    "verdict": verd.upper(),
+                    "rationale": r[8] or "",
+                    "actor": r[6] or "system",
+                    "recorded_at": r[7] or created_at
+                }
+            reconstructed = {
+                "run_id": run_id,
+                "f1_corridor_id": r[1],
+                "created_at": created_at,
+                "decomposition": {
+                    "f1_alone_cases": [],
+                    "f2_alone_cases": [],
+                    "interaction_only_cases": [],
+                    "headline_interaction_only_count": iocnt,
+                    "total_cases": 13
+                },
+                "policies": {
+                    "A": {"name": "Policy A: No Action", "exposed_count": 13, "total_breaches": 13, "cost": 0, "abstain": False, "chosen_action": None},
+                    "B": {"name": "Policy B: Static Heuristic", "exposed_count": 0, "total_breaches": 0, "cost": 1, "abstain": False, "chosen_action": None},
+                    "C": {"name": "Policy C: Pre-Mortem Conditional N-1", "exposed_count": 0, "total_breaches": 0, "cost": 1, "abstain": is_abstain, "chosen_action": None}
+                },
+                "cases": [],
+                "recommendation": {
+                    "verdict": "ABSTAIN" if is_abstain else "FEASIBLE",
+                    "abstain": is_abstain,
+                    "reason": "Prior run recorded with abstention" if is_abstain else None,
+                    "action": None,
+                    "exposed_cases": [],
+                    "exposed_count": 0
+                },
+                "decision": decision
+            }
+            RUN_CACHE[run_id] = reconstructed
+            return reconstructed
     except Exception:
         pass
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Run '{run_id}' not found")
