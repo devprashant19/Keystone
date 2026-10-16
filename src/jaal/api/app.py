@@ -155,9 +155,23 @@ def get_world_summary():
             "RETURN r.corridor_id, r.name, r.length_km, r.travel_cost_min, r.status, a.id, b.id, r.data_origin "
             "ORDER BY r.corridor_id"
         )
-        corridors = [
-            {
-                "id": r[0],
+        demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
+        precomputed_dir = demo_cache_dir / "precomputed"
+
+        corridors = []
+        for r in corridors_res.result_set:
+            cid = r[0]
+            b_cnt = 0
+            p_file = precomputed_dir / f"{cid}.json"
+            if p_file.exists():
+                try:
+                    with open(p_file, "r", encoding="utf-8") as pf:
+                        pdata = json.load(pf)
+                    b_cnt = sum(1 for item in pdata.get("cases", []) if item.get("verdict") == "BREACH")
+                except Exception:
+                    pass
+            corridors.append({
+                "id": cid,
                 "name": r[1],
                 "source": r[5],
                 "target": r[6],
@@ -165,12 +179,11 @@ def get_world_summary():
                 "travel_cost_min": float(r[3]),
                 "status": r[4],
                 "historical_status_peak": r[4],
-                "carries_feeder_ids": sorted(feeder_map.get(r[0], [])),
-                "carries_alert_link_ids": sorted(alert_map.get(r[0], [])),
-                "data_origin": r[7]
-            }
-            for r in corridors_res.result_set
-        ]
+                "carries_feeder_ids": sorted(feeder_map.get(cid, [])),
+                "carries_alert_link_ids": sorted(alert_map.get(cid, [])),
+                "data_origin": r[7],
+                "breach_count": b_cnt
+            })
 
         # 3. Intersections
         intersections_res = world.query(
@@ -547,6 +560,151 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
         )
 
         return response_payload
+    except Exception as e:
+        err_msg = str(e)
+        if "Connection" in err_msg or "Redis" in err_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={"error": "DATABASE_UNAVAILABLE", "message": err_msg}
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": "EXECUTION_ERROR", "message": err_msg}
+        )
+
+@app.get("/api/scenario/{corridor_id}")
+def get_corridor_scenario(corridor_id: str, live: bool = False):
+    """
+    K1: Returns precomputed scenario sweep for corridor_id if digest matches;
+    otherwise computes live. Always returns 'source': 'precomputed' | 'live' and the digest.
+    """
+    if corridor_id not in ALLOWED_CORRIDORS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Corridor '{corridor_id}' is not in the allowed corridor allowlist"
+        )
+
+    try:
+        client = get_graph_client()
+        world = client.select_graph("jaal_world")
+        live_content_digest, _, _ = compute_content_digest(world)
+
+        demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
+        precomputed_file = demo_cache_dir / "precomputed" / f"{corridor_id}.json"
+
+        if not live and precomputed_file.exists():
+            try:
+                with open(precomputed_file, "r", encoding="utf-8") as f:
+                    payload = json.load(f)
+                if payload.get("world_content_digest") == live_content_digest:
+                    payload["source"] = "precomputed"
+                    payload["digest"] = live_content_digest
+                    return payload
+            except Exception:
+                pass
+
+        # Compute live
+        import time
+        t0 = time.perf_counter()
+        planner = PreMortemPlanner(client)
+        initial_digest, _, _ = compute_graph_digest(world)
+
+        run_id = f"live_{corridor_id}_{uuid.uuid4().hex[:6]}"
+        decomp = planner.compute_three_way_decomposition(corridor_id, run_id=f"{run_id}_decomp")
+        sweep = planner.run_f1_sweep(corridor_id, run_id=run_id)
+        planner.orchestrator.assert_immutability(initial_digest)
+        elapsed_ms = round((time.perf_counter() - t0) * 1000, 1)
+
+        pol_a = sweep["POLICY_A"]
+        pol_b = sweep["POLICY_B"]
+        pol_c = sweep["POLICY_C"]
+
+        cases_list = []
+        for f2, out_a in pol_a.case_outcomes.items():
+            out_c = pol_c.case_outcomes.get(f2)
+            is_interaction = f2 in decomp.interaction_only_cases
+            verdict = "BREACH" if (out_c and out_c.is_breach) else ("DEGRADED" if out_a.is_breach and not (out_c and out_c.is_breach) else "OK")
+            cases_list.append({
+                "case_id": f"{corridor_id}__{f2}",
+                "f1": corridor_id,
+                "f2": f2,
+                "verdict": verdict,
+                "interaction_only": is_interaction,
+                "breaches_a": out_a.total_breaches,
+                "breaches_c": out_c.total_breaches if out_c else 0
+            })
+
+        if pol_c.abstain:
+            recommendation = {
+                "verdict": "ABSTAIN — NO ROBUST PLAN",
+                "abstain": True,
+                "reason": pol_c.abstain_reason,
+                "action": None,
+                "exposed_cases": pol_c.exposed_cases,
+                "exposed_count": pol_c.exposed_cases_count
+            }
+        else:
+            act = pol_c.chosen_action
+            recommendation = {
+                "verdict": "RECOMMENDED",
+                "abstain": False,
+                "action": {
+                    "id": act.action_id if act else None,
+                    "kind": act.action_kind if act else None,
+                    "target": act.target_id if act else None,
+                    "cost": act.cost if act else 0.0,
+                    "description": act.description if act else ""
+                },
+                "exposed_cases": [],
+                "exposed_count": 0
+            }
+
+        return {
+            "source": "live",
+            "run_id": run_id,
+            "f1_corridor_id": corridor_id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "world_digest": initial_digest,
+            "world_content_digest": live_content_digest,
+            "digest": live_content_digest,
+            "elapsed_ms": elapsed_ms,
+            "config_hash": planner.evaluator.config_hash,
+            "decomposition": {
+                "f1_alone_breach": decomp.f1_alone_breach,
+                "f1_alone_cases": decomp.f1_alone_cases,
+                "f2_alone_cases": decomp.f2_alone_cases,
+                "interaction_only_cases": decomp.interaction_only_cases,
+                "neither_stressed_cases": decomp.neither_stressed_cases,
+                "headline_interaction_only_count": len(decomp.interaction_only_cases),
+                "total_cases": decomp.total_cases
+            },
+            "policies": {
+                "A": {
+                    "name": pol_a.policy_name,
+                    "exposed_count": pol_a.exposed_cases_count,
+                    "total_breaches": pol_a.total_breaches_sum,
+                    "cost": pol_a.action_cost
+                },
+                "B": {
+                    "name": pol_b.policy_name,
+                    "chosen_action": pol_b.chosen_action.__dict__ if pol_b.chosen_action else None,
+                    "exposed_count": pol_b.exposed_cases_count,
+                    "total_breaches": pol_b.total_breaches_sum,
+                    "cost": pol_b.action_cost
+                },
+                "C": {
+                    "name": pol_c.policy_name,
+                    "chosen_action": pol_c.chosen_action.__dict__ if pol_c.chosen_action else None,
+                    "abstain": pol_c.abstain,
+                    "exposed_count": pol_c.exposed_cases_count,
+                    "total_breaches": pol_c.total_breaches_sum,
+                    "cost": pol_c.action_cost
+                }
+            },
+            "cases": cases_list,
+            "recommendation": recommendation,
+            "decision": None
+        }
     except Exception as e:
         err_msg = str(e)
         if "Connection" in err_msg or "Redis" in err_msg:
