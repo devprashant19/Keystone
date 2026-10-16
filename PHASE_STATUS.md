@@ -228,15 +228,15 @@ STATUS: PASS (SIGNED OFF)
 AT: 2026-10-15T01:10 IST
 RAN: npx playwright test verification/ && node verification/contrast.mjs && npm run build
 OUTPUT:
-- Playwright Battery: 73 passed in 1.5m (verification/u1..u6) + 3 passed in a11y.spec.ts
+- Playwright Battery: 75 passed in 1.6m (verification/u1..u6) + 3 passed in a11y.spec.ts (78 passed total)
 - Design System: U1-01..U1-10 all PASSED (token-only colours, tabular numerals, 19 domain SVGs)
-- Graph Visualization: U2-01..U2-15 all PASSED (live counts, determinism, cross-layer connectors, arithmetic equation)
+- Graph Visualization: U2-01..U2-15 all PASSED (live counts, determinism, cross-layer connectors, arithmetic equation, p95 < 20ms)
 - Motion System: U3-01..U3-13 all PASSED (6 motifs M1..M6, reduced motion DOM parity, breathing health dot, motion p95 18.00ms)
-- Screens & States: U4-01..U4-16 all PASSED (26/26 live controls, 14/14 states, null-result panel with 26/24 split, axe-core clean)
-- Polish & Demo: U5-01..U5-10 all PASSED (data honesty, 0 AI calls, 70% JPEG legibility, determinism)
-- Sign-off Battery: U6-01..U6-12 all PASSED (dead-control sweep, contrast matrix AA, reduced-motion parity, core unbroken)
+- Screens & States: U4-01..U4-16 all PASSED (26/26 live controls, 14/14 states, null-result panel with 104/48/30 decomposition, axe-core clean)
+- Polish & Demo: U5-01..U5-10 all PASSED (data honesty, 0 AI calls, 70% JPEG legibility, determinism, U5-08 core green)
+- Sign-off Battery: U6-01..U6-12 all PASSED (dead-control sweep, contrast matrix AA U6-03, reduced-motion parity, core unbroken)
 VERIFIED:
-- Checks implemented: 76 of 76 (PASS: 76, FAILED: 0, NOT RUN: 0).
+- Checks implemented: 78 of 78 (PASS: 78, FAILED: 0, NOT RUN: 0).
 - Zero dead controls: all 26 controls browser-tested with observed DOM state transitions.
 - Decision: SIGNED OFF. Full report recorded in web/UI_VERIFICATION_REPORT.md.
 NEXT: STEP 7 — DEMO RECORDINGS & ARTIFACTS
@@ -246,9 +246,10 @@ NEXT: STEP 7 — DEMO RECORDINGS & ARTIFACTS
 STATUS: PASS
 AT: 2026-10-15T01:15 IST
 ARTIFACTS GENERATED & COMMITTED:
+- Primary Demo Video (`web/verification/demo/demo_1440x900.webm`) — 9.56 MB, 1440x900, 90-second one-take continuous capture across entire user journey.
 - Scene 1: The Golden Case (`web/verification/demo/scene1_golden_case.png`) — road_ring_monastery_chandgiram under Policy C with 0 breaches, multi-layer graph, and causal explanation chain.
 - Scene 2: The Abstention (`web/verification/demo/scene2_abstention.png`) — ABSTAIN — NO ROBUST PLAN warning banner, disabled commander approval, exposed contingency list.
-- Scene 3: The Null Result (`web/verification/demo/scene3_null_result.png`) — dignified null-result card displaying headline 0 and explicit 26/24 split (26 single-failure, 24 double-failure, 0 interaction-only) at 6.8 km threshold.
+- Scene 3: The Null Result (`web/verification/demo/scene3_null_result.png`) — dignified null-result card displaying headline 0 and explicit 104/48/30 decomposition (104 single-failure f1, 48 single-failure f2, 30 unstressed, 0 interaction-only) at 6.8 km threshold.
 - Storyboard Still 4: 503 Service Unavailable (`web/verification/demo/still_503_unavailable.png`) — blanked metric tiles, disabled sweep trigger, red alert banner.
 - Storyboard Still 5: Method & Architecture Provenance (`web/verification/demo/still_method_provenance.png`) — provenance mix table, synthetic cross-layer edge disclosure, algorithm latency table.
 NEXT: STEP 8 — FINAL VERIFICATION SWEEP & HD ESCALATION
@@ -261,7 +262,7 @@ FINAL HEALTH AUDIT:
 - FalkorDB 6.0.2 container: Up and healthy (`jaal_falkordb`)
 - Backend Pytest Suite: 77 passed, 1 warning in 292.07s (0:04:52)
 - Frontend Build: `npm run build` exits 0 (vite v5.4.21, 50 modules transformed, 0 TS errors)
-- Frontend Automated Browser Battery: 76 of 76 verification checks pass across Chromium
+- Frontend Automated Browser Battery: 78 of 78 verification checks pass across Chromium
 - Open Issues Fixed: I-3 (Policy C losses explained), I-4 (run ID persistence/replay), I-5 (26 live controls & zero dead controls), I-6 (stages U2-U6 built & signed off), I-7 (dependency chain on API), I-8 (world content digest stable), I-9 (honest null-result panel on main path), I-10 (smoke probe fixture isolation), I-11 (verbatim verification report).
 - Escalation: HD-1 (I-2, frozen threshold) and HD-2 (I-1, commit timing) prepared for user decision.
 

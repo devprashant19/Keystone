@@ -153,13 +153,13 @@ RETURN DISTINCT r.id
 ### The Three-Way Case Decomposition
 All 182 scenario pairs ($14 \times 13$) are decomposed before policy evaluation:
 
-| Category | Cases | Definition |
+| Outcome | Cases | Fraction |
 |---|---|---|
-| **Interaction-Only (HEADLINE)** | **0** | Joint failure breaches SLA, but neither corridor breaches alone. |
-| **f1-alone** | **26** | Initial corridor failure breaches SLA on its own. |
-| **f2-alone** | **24** | Secondary failure breaches SLA regardless of $f_1$. |
-| **Neither Stressed** | **132** | System remains resilient under both failures without intervention. |
-| **Total Evaluated** | **182** | Exhaustive ordered pair space. |
+| Stressed by f1 alone | 104 | 57.1% |
+| Stressed by f2 alone | 48 | 26.4% |
+| Unstressed | 30 | 16.5% |
+| Interaction-only | 0 | 0.0% |
+| Total evaluated | 182 | 100.0% |
 
 ---
 
