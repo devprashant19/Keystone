@@ -2,64 +2,64 @@
 // Calculates WCAG contrast ratios for Jaal / Keystone design tokens across BOTH light and dark themes
 
 const lightColors = {
-  name: 'LIGHT THEME (DEFAULT ON)',
-  bgVoid: '#f5f2eb',
-  bgPanel: '#fffdf9',
+  name: 'LIGHT THEME (PUKAAR PALETTE · DEFAULT ON)',
+  bgVoid: '#f2f8fc',
+  bgPanel: '#ffffff',
   bgRaised: '#ffffff',
-  bgSunken: '#f0ece3',
+  bgSunken: '#e3f0f8',
   bgHeader: '#ffffff',
 
-  lineHair: '#000000',
-  lineFirm: '#000000',
-  lineFocus: '#0369a1',
+  lineHair: '#d6e6f1',
+  lineFirm: '#b9d3e5',
+  lineFocus: '#1d7fc4',
 
-  inkHi: '#000000',
-  inkMid: '#3f3f46',
-  inkLo: '#52525b',
+  inkHi: '#0b1f33',
+  inkMid: '#284560',
+  inkLo: '#557089',
 
-  accent: '#0369a1',
-  branch: '#7c3aed',
-  ok: '#15803d',
-  warn: '#a16207',
-  fail: '#b91c1c',
-  synthetic: '#475569',
+  accent: '#11679e',
+  branch: '#6b21a8',
+  ok: '#0f6443',
+  warn: '#6b5000',
+  fail: '#9c0d2f',
+  synthetic: '#557089',
 
-  accentWash: '#e0f2fe',
-  branchWash: '#ede9fe',
-  okWash: '#dcfce7',
-  warnWash: '#fef9c3',
-  failWash: '#fee2e2'
+  accentWash: '#e2f1fb',
+  branchWash: '#f3e8ff',
+  okWash: '#def5ea',
+  warnWash: '#fff4c7',
+  failWash: '#ffdfe6'
 };
 
 const darkColors = {
-  name: 'DARK THEME',
-  bgVoid: '#070B12',
-  bgPanel: '#0B1119',
-  bgRaised: '#111A25',
-  bgSunken: '#060A10',
-  bgHeader: '#17222F',
+  name: 'DARK THEME (PUKAAR NIGHT)',
+  bgVoid: '#06111f',
+  bgPanel: '#0c2136',
+  bgRaised: '#102a42',
+  bgSunken: '#081828',
+  bgHeader: '#15334f',
 
-  lineHair: '#1E2A38',
-  lineFirm: '#2A3A4C',
-  lineFocus: '#49B4FF',
+  lineHair: '#1a3854',
+  lineFirm: '#24496b',
+  lineFocus: '#8ad0ff',
 
-  inkHi: '#E9EEF6',
-  inkMid: '#9FB0C4',
-  inkLo: '#6B7F96',
+  inkHi: '#eaf4fb',
+  inkMid: '#c3dbee',
+  inkLo: '#8fb0cb',
 
-  accent: '#49B4FF',
-  branch: '#B57CFF',
-  ok: '#35C08A',
-  warn: '#E0A33E',
-  fail: '#F2564B',
-  synthetic: '#7D8EA3',
+  accent: '#4fb3ff',
+  branch: '#c084fc',
+  ok: '#5fd6a4',
+  warn: '#f6d95c',
+  fail: '#ff8098',
+  synthetic: '#8fb0cb',
 
-  // Washes with alphas blended on bgPanel (#0B1119)
-  accentWash: { r: 73, g: 180, b: 255, a: 0.14 },
-  branchWash: { r: 181, g: 124, b: 255, a: 0.12 },
-  okWash: { r: 53, g: 192, b: 138, a: 0.13 },
-  warnWash: { r: 224, g: 163, b: 62, a: 0.13 },
-  failWash: { r: 242, g: 86, b: 75, a: 0.13 }
+  // Washes with alphas blended on bgPanel (#0c2136)
+  accentWash: { r: 79, g: 179, b: 255, a: 0.14 },
+  branchWash: { r: 192, g: 132, b: 252, a: 0.14 },
+  okWash: { r: 60, g: 198, b: 143, a: 0.14 },
+  warnWash: { r: 242, g: 204, b: 53, a: 0.14 },
+  failWash: { r: 255, g: 77, b: 109, a: 0.16 }
 };
 
 function hexToRgb(hex) {

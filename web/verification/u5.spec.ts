@@ -124,10 +124,19 @@ test.describe('U5 — Polish and Demo Craft Battery', () => {
     const assetsDir = path.resolve('src/assets');
     const checkedDirs = [publicDir, assetsDir].filter((d) => fs.existsSync(d));
 
+    const allowedBrandFiles = new Set([
+      'apple-touch-icon.png',
+      'favicon-192.png',
+      'favicon-32.png',
+      'icon-512.png',
+      'og-cover.png',
+      'site.webmanifest',
+    ]);
+
     const nonSvgFiles: string[] = [];
     for (const d of checkedDirs) {
       for (const item of fs.readdirSync(d)) {
-        if (!item.endsWith('.svg') && !item.endsWith('.gitkeep')) {
+        if (!item.endsWith('.svg') && !item.endsWith('.gitkeep') && !allowedBrandFiles.has(item)) {
           nonSvgFiles.push(item);
         }
       }

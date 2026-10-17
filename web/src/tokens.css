@@ -1,48 +1,52 @@
 :root {
-  /* LIGHT THEME (FINORA-INSPIRED NEO-BRUTALIST · DEFAULT ON) */
+  /* LIGHT THEME (PUKAAR PALETTE · DEFAULT ON) */
   /* Surfaces */
-  --bg-void:    #f5f2eb;   /* warm eggshell canvas */
-  --bg-panel:   #fffdf9;   /* crisp cream panels */
-  --bg-raised:  #ffffff;   /* pure white cards, raised controls */
-  --bg-sunken:  #f0ece3;   /* sunken wells, input beds */
+  --bg-void:    #f2f8fc;   /* blue-tinted paper canvas */
+  --bg-panel:   #ffffff;   /* crisp white card & panel surfaces */
+  --bg-raised:  #ffffff;   /* pure white raised cards & controls */
+  --bg-sunken:  #e3f0f8;   /* subtle mist wells, input beds */
   --bg-header:  #ffffff;   /* sticky header bar */
 
-  /* Lines & Dividers — 1px & 2px hard black */
-  --line-hair:  #000000;
-  --line-firm:  #000000;
-  --line-focus: #0369a1;
+  /* Lines & Dividers — clean hairlines */
+  --line-hair:  #d6e6f1;   /* pukaar hairlines */
+  --line-firm:  #b9d3e5;   /* secondary rule */
+  --line-focus: #1d7fc4;   /* accessible focus ring */
 
   /* Ink */
-  --ink-hi:     #000000;   /* primary high-contrast ink */
-  --ink-mid:    #3f3f46;   /* zinc-700 mid ink */
-  --ink-lo:     #52525b;   /* zinc-600 captions, labels (>=3:1) */
+  --ink-hi:     #0b1f33;   /* deep navy primary ink */
+  --ink-mid:    #284560;   /* slate-navy mid ink (>=4.5:1 AA) */
+  --ink-lo:     #557089;   /* steel muted ink (>=3:1) */
 
   /* Interaction */
-  --accent:     #0369a1;   /* sky-700 (>=4.5:1 WCAG AA text on light surfaces) */
-  --accent-wash: #e0f2fe;
-  --accent-edge: #0369a1;
+  --accent:     #11679e;   /* river blue accent text & links (>=4.5:1 AA) */
+  --accent-wash: #e2f1fb;
+  --accent-edge: #11679e;
 
-  /* Overlays & Sanctioned Elevation */
-  --overlay-bg: rgba(245, 242, 235, 0.92);
-  --elevation-sticky: 0 2px 0 #000000;
+  /* Overlays & Restrained Shadows */
+  --overlay-bg: rgba(242, 248, 252, 0.92);
+  --elevation-sticky: 0 1px 3px rgba(11, 31, 51, 0.08);
+  --sh-1: 0 1px 2px rgba(11, 31, 51, 0.05), 0 1px 1px rgba(11, 31, 51, 0.03);
+  --sh-2: 0 4px 14px -3px rgba(11, 31, 51, 0.09), 0 2px 4px rgba(11, 31, 51, 0.04);
+  --sh-3: 0 12px 28px -6px rgba(11, 31, 51, 0.14), 0 4px 8px rgba(11, 31, 51, 0.05);
 
   /* Counterfactual */
-  --branch:     #7c3aed;   /* violet-600 */
-  --branch-wash: #ede9fe;
-  --branch-glow: 0 0 0 1px #7c3aed, 0 0 18px rgba(124, 58, 237, 0.20);
-  --bg-spotlight: rgba(240, 236, 227, 0.70);
+  --branch:     #6b21a8;   /* deep violet */
+  --branch-wash: #f3e8ff;
+  --branch-glow: 0 0 0 1px #6b21a8, 0 0 18px rgba(107, 33, 168, 0.20);
+  --bg-spotlight: rgba(227, 240, 248, 0.70);
 
-  /* Status */
-  --ok:         #15803d;   /* green-700 */
-  --ok-wash:    #dcfce7;
-  --warn:       #a16207;   /* yellow-700 */
-  --warn-wash:  #fef9c3;
-  --fail:       #b91c1c;   /* red-700 */
-  --fail-wash:  #fee2e2;
-  --synthetic:  #475569;   /* slate-600 */
-  --synthetic-wash: #f1f5f9;
+  /* Status (Pukaar 4-level severity scale) */
+  --ok:         #0f6443;   /* normal: teal-green */
+  --ok-wash:    #def5ea;
+  --warn:       #6b5000;   /* watch / degraded: deep yellow-amber */
+  --warn-wash:  #fff4c7;
+  --fail:       #9c0d2f;   /* critical / breach / abstain: crimson */
+  --fail-wash:  #ffdfe6;
+  --synthetic:  #557089;   /* steel muted */
+  --synthetic-wash: #e8f2f9;
 
   /* Typography */
+  --font-display: 'Anton', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
@@ -81,10 +85,11 @@
   --s6: 32px;
   --s7: 48px;
 
-  /* Neo-brutalist Radius: 0 on panels, 2px on controls & chips */
-  --r-chip:  2px;
-  --r-ctl:   2px;
-  --r-panel: 0px;
+  /* Restrained, modern Radius */
+  --r-chip:  6px;
+  --r-ctl:   8px;
+  --r-panel: 10px;
+  --r-pill:  999px;
 
   /* Layout */
   --h-header:   52px;
@@ -94,78 +99,84 @@
 }
 
 [data-theme="dark"] {
-  /* DARK THEME TOKENS */
-  --bg-void:    #070B12;   /* page background */
-  --bg-panel:   #0B1119;   /* panel base */
-  --bg-raised:  #111A25;   /* raised rows, cards, table headers */
-  --bg-sunken:  #060A10;   /* input wells, code, map plate */
-  --bg-header:  #17222F;   /* sticky header, tab strip */
+  /* DARK THEME TOKENS (PUKAAR NIGHT VALLEY) */
+  --bg-void:    #06111f;   /* deep night river canvas */
+  --bg-panel:   #0c2136;   /* midnight slate panel base */
+  --bg-raised:  #102a42;   /* raised midnight rows, cards */
+  --bg-sunken:  #081828;   /* sunken wells, map plate */
+  --bg-header:  #15334f;   /* sticky header, tab strip */
 
-  --line-hair:  #1E2A38;   /* default hairline */
-  --line-firm:  #2A3A4C;   /* section divider, table rule */
-  --line-focus: #49B4FF;   /* focus ring */
+  --line-hair:  #1a3854;   /* midnight hairline */
+  --line-firm:  #24496b;   /* section divider, table rule */
+  --line-focus: #8ad0ff;   /* bright river focus ring */
 
-  --ink-hi:     #E9EEF6;   /* primary text, numerals */
-  --ink-mid:    #9FB0C4;   /* labels, secondary */
-  --ink-lo:     #788FA8;   /* units, captions (>=4.5:1 contrast) */
+  --ink-hi:     #eaf4fb;   /* night ink primary */
+  --ink-mid:    #c3dbee;   /* secondary text */
+  --ink-lo:     #8fb0cb;   /* units, captions (>=4.5:1 contrast) */
 
-  --accent:     #49B4FF;
-  --accent-wash: rgba(73,180,255,0.14);
-  --accent-edge: rgba(73,180,255,0.42);
+  --accent:     #4fb3ff;   /* river blue */
+  --accent-wash: rgba(79, 179, 255, 0.14);
+  --accent-edge: rgba(79, 179, 255, 0.42);
 
-  --overlay-bg: rgba(7,11,18,0.85);
-  --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+  --overlay-bg: rgba(6, 17, 31, 0.88);
+  --elevation-sticky: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sh-2: 0 4px 14px -3px rgba(0, 0, 0, 0.5);
+  --sh-3: 0 12px 28px -6px rgba(0, 0, 0, 0.6);
 
-  --branch:     #B57CFF;
-  --branch-wash: rgba(181,124,255,0.12);
-  --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
-  --bg-spotlight: rgba(6, 10, 16, 0.55);
+  --branch:     #c084fc;
+  --branch-wash: rgba(192, 132, 252, 0.14);
+  --branch-glow: 0 0 0 1px rgba(192, 132, 252, 0.55), 0 0 18px rgba(192, 132, 252, 0.18);
+  --bg-spotlight: rgba(8, 24, 40, 0.55);
 
-  --ok:         #35C08A;
-  --ok-wash:    rgba(53,192,138,0.13);
-  --warn:       #E0A33E;
-  --warn-wash:  rgba(224,163,62,0.13);
-  --fail:       #F2564B;
-  --fail-wash:  rgba(242,86,75,0.13);
-  --synthetic:  #7D8EA3;
-  --synthetic-wash: rgba(125, 142, 163, 0.13);
+  --ok:         #5fd6a4;
+  --ok-wash:    rgba(60, 198, 143, 0.14);
+  --warn:       #f6d95c;
+  --warn-wash:  rgba(242, 204, 53, 0.14);
+  --fail:       #ff8098;
+  --fail-wash:  rgba(255, 77, 109, 0.16);
+  --synthetic:  #8fb0cb;
+  --synthetic-wash: rgba(143, 176, 203, 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
   [data-theme="system"] {
-    --bg-void:    #070B12;
-    --bg-panel:   #0B1119;
-    --bg-raised:  #111A25;
-    --bg-sunken:  #060A10;
-    --bg-header:  #17222F;
+    --bg-void:    #06111f;
+    --bg-panel:   #0c2136;
+    --bg-raised:  #102a42;
+    --bg-sunken:  #081828;
+    --bg-header:  #15334f;
 
-    --line-hair:  #1E2A38;
-    --line-firm:  #2A3A4C;
-    --line-focus: #49B4FF;
+    --line-hair:  #1a3854;
+    --line-firm:  #24496b;
+    --line-focus: #8ad0ff;
 
-    --ink-hi:     #E9EEF6;
-    --ink-mid:    #9FB0C4;
-    --ink-lo:     #788FA8;
+    --ink-hi:     #eaf4fb;
+    --ink-mid:    #c3dbee;
+    --ink-lo:     #8fb0cb;
 
-    --accent:     #49B4FF;
-    --accent-wash: rgba(73,180,255,0.14);
-    --accent-edge: rgba(73,180,255,0.42);
+    --accent:     #4fb3ff;
+    --accent-wash: rgba(79, 179, 255, 0.14);
+    --accent-edge: rgba(79, 179, 255, 0.42);
 
-    --overlay-bg: rgba(7,11,18,0.85);
-    --elevation-sticky: 0 1px 0 rgba(0,0,0,0.5);
+    --overlay-bg: rgba(6, 17, 31, 0.88);
+    --elevation-sticky: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --sh-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --sh-2: 0 4px 14px -3px rgba(0, 0, 0, 0.5);
+    --sh-3: 0 12px 28px -6px rgba(0, 0, 0, 0.6);
 
-    --branch:     #B57CFF;
-    --branch-wash: rgba(181,124,255,0.12);
-    --branch-glow: 0 0 0 1px rgba(181,124,255,0.55), 0 0 18px rgba(181,124,255,0.18);
-    --bg-spotlight: rgba(6, 10, 16, 0.55);
+    --branch:     #c084fc;
+    --branch-wash: rgba(192, 132, 252, 0.14);
+    --branch-glow: 0 0 0 1px rgba(192, 132, 252, 0.55), 0 0 18px rgba(192, 132, 252, 0.18);
+    --bg-spotlight: rgba(8, 24, 40, 0.55);
 
-    --ok:         #35C08A;
-    --ok-wash:    rgba(53,192,138,0.13);
-    --warn:       #E0A33E;
-    --warn-wash:  rgba(224,163,62,0.13);
-    --fail:       #F2564B;
-    --fail-wash:  rgba(242,86,75,0.13);
-    --synthetic:  #7D8EA3;
-    --synthetic-wash: rgba(125, 142, 163, 0.13);
+    --ok:         #5fd6a4;
+    --ok-wash:    rgba(60, 198, 143, 0.14);
+    --warn:       #f6d95c;
+    --warn-wash:  rgba(242, 204, 53, 0.14);
+    --fail:       #ff8098;
+    --fail-wash:  rgba(255, 77, 109, 0.16);
+    --synthetic:  #8fb0cb;
+    --synthetic-wash: rgba(143, 176, 203, 0.14);
   }
 }
