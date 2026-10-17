@@ -15,3 +15,6 @@ web/test-results/
 # still pass the grounding check. scripts/seed_demo.py regenerates it.
 data/demo_cache/agent_tool_cache.json
 data/demo_cache/precomputed/
+
+# scratch debug specs
+web/verification/_*.spec.ts
