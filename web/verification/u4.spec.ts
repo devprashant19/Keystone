@@ -293,6 +293,24 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     expect(systemThemeText).toContain('SYSTEM');
     await themeToggle.click();
     expect(await page.locator('html').getAttribute('data-theme')).toBe('light');
+
+    // 32. Blast Radius Hero panel visibility and metrics
+    const blastPanel = page.locator('#blast-radius-panel');
+    await expect(blastPanel).toBeVisible();
+    await expect(page.locator('#blast-hero-number')).toBeVisible();
+    await expect(page.locator('#blast-delta-bar')).toBeVisible();
+
+    // 33. Blast Radius band clicks
+    await page.locator('#blast-band-road').click();
+    await page.locator('#blast-band-power').click();
+    await page.locator('#blast-band-alert').click();
+    await page.locator('#blast-center-core').click();
+
+    // 34. Toggle policy table details collapse/expand
+    const detailsToggle = page.locator('#toggle-policy-table');
+    await expect(detailsToggle).toBeVisible();
+    await detailsToggle.click();
+    await detailsToggle.click();
   });
 
   test('U4-02: All 14 states reachable and captured', async ({ page }) => {

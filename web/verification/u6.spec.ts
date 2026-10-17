@@ -94,6 +94,18 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     await themeToggle.click();
     expect(await themeToggle.innerText()).toContain('DARK');
     await themeToggle.click();
+
+    // 28. Blast radius hero panel & concentric band click
+    await expect(page.locator('#blast-radius-panel')).toBeVisible();
+    await page.locator('#blast-band-road').click();
+    await page.locator('#blast-band-power').click();
+    await page.locator('#blast-band-alert').click();
+    await page.locator('#blast-center-core').click();
+
+    // 29. Toggle policy table details collapse/expand
+    const detailsToggle = page.locator('#toggle-policy-table');
+    await detailsToggle.click();
+    await detailsToggle.click();
   });
 
   test('U6-02: State coverage (14 state screenshots committed and verified)', async () => {
