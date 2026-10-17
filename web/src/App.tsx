@@ -530,6 +530,16 @@ export const App: React.FC = () => {
         <RightRail
           runData={runData}
           selectedCaseId={selectedCaseId}
+          worldSummary={worldSummary}
+          onSelectEntity={(id, kind) => {
+            if (kind === 'corridor' || id.startsWith('road_')) {
+              loadScenario(id);
+            } else if (kind === 'power') {
+              setHighlightSevered(true);
+            } else if (kind === 'alert') {
+              setHighlightSynthetic(true);
+            }
+          }}
           isStale={isStale}
           onRecomputeLive={handleRecomputeLive}
           onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}

@@ -30,6 +30,23 @@
   transition-timing-function: var(--ease-emph);
 }
 
+/* M2 — Cascade animation class */
+.motif-cascade {
+  transition-property: stroke, stroke-dashoffset, opacity, transform;
+  transition-duration: var(--dur-causal);
+  transition-timing-function: var(--ease-in-out);
+}
+
+.blast-band {
+  transition-property: border-color, background-color, transform, opacity;
+  transition-duration: var(--dur-state);
+  transition-timing-function: var(--ease-emph);
+}
+
+.blast-band:hover {
+  outline: 1px solid var(--line-focus);
+}
+
 /* M3 — Branch Fork boundary and glow */
 .graph-canvas-container.has-branch {
   border: 1px solid var(--branch);
@@ -102,12 +119,26 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .blast-band,
+  .motif-sever,
+  .motif-cascade,
   .tour-spotlight-rect,
   .tour-card,
   .tour-card.incoming,
   .tour-card.outgoing {
     transition: none !important;
     transform: none !important;
+    animation: none !important;
   }
+}
+
+[data-reduced-motion='true'] .blast-band,
+[data-reduced-motion='true'] .motif-sever,
+[data-reduced-motion='true'] .motif-cascade,
+[data-reduced-motion='true'] .tour-spotlight-rect,
+[data-reduced-motion='true'] .tour-card {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
 }
 

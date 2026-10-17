@@ -1,5 +1,7 @@
 import React from 'react';
 import { StatusBadge } from './primitives';
+import { BlastRadius } from './BlastRadius';
+import { WorldSummary } from '../graph/types';
 
 interface PolicySummary {
   name: string;
@@ -61,6 +63,8 @@ interface RunData {
 interface RightRailProps {
   runData: (RunData & { isStale?: boolean; isReadOnly?: boolean }) | null;
   selectedCaseId: string;
+  worldSummary?: WorldSummary | null;
+  onSelectEntity?: (entityId: string, kind?: string) => void;
   onOpenDecisionModal: (verdict: 'APPROVE' | 'REJECT') => void;
   onNavigateToEvidence: (caseId: string) => void;
   onRecomputeLive?: () => void;
@@ -71,6 +75,8 @@ interface RightRailProps {
 export const RightRail: React.FC<RightRailProps> = ({
   runData,
   selectedCaseId,
+  worldSummary,
+  onSelectEntity,
   onOpenDecisionModal,
   onNavigateToEvidence,
   onRecomputeLive,
@@ -179,12 +185,53 @@ export const RightRail: React.FC<RightRailProps> = ({
         </div>
       )}
 
-      {/* 1. Policy Comparison Section */}
-      <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)', flexWrap: 'wrap', gap: 'var(--s2)' }}>
-          <h2 style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', letterSpacing: '0.04em', margin: 0 }}>
-            Policy Comparison (182-Case Foundation)
-          </h2>
+      {/* 1. Blast Radius Hero Visual Component */}
+      <BlastRadius
+        f1CorridorId={runData.f1_corridor_id}
+        f2CorridorId={selectedCaseId && selectedCaseId.includes('__') ? selectedCaseId.split('__')[1] : undefined}
+        worldSummary={worldSummary || null}
+        runData={runData}
+        selectedCaseId={selectedCaseId}
+        onSelectEntity={onSelectEntity}
+        onNavigateToEvidence={onNavigateToEvidence}
+      />
+
+      {/* 2. Policy Comparison Collapsible Section (Visuals over text) */}
+      <details
+        id="policy-comparison-details"
+        open
+        style={{
+          borderBottom: '1px solid var(--line-hair)',
+          backgroundColor: 'var(--bg-panel)',
+        }}
+      >
+        <summary
+          id="toggle-policy-table"
+          style={{
+            padding: 'var(--s3) var(--s4)',
+            cursor: 'pointer',
+            backgroundColor: 'var(--bg-raised)',
+            borderBottom: '1px solid var(--line-hair)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: 'var(--fs-micro)',
+            textTransform: 'uppercase',
+            color: 'var(--ink-lo)',
+            letterSpacing: '0.04em',
+            fontWeight: 700,
+            userSelect: 'none',
+          }}
+        >
+          <span>Policy Comparison (182-Case Foundation)</span>
+          <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--accent)', fontWeight: 600 }}>▼ DETAILS</span>
+        </summary>
+
+        <div style={{ padding: 'var(--s4)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)', flexWrap: 'wrap', gap: 'var(--s2)' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
+              182-case evaluated foundation
+            </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
             <a
               id="scenario-provenance-chip"
@@ -434,6 +481,7 @@ export const RightRail: React.FC<RightRailProps> = ({
           <span className="mono">{decomposition.headline_interaction_only_count}</span> interaction-only cases where neither corridor breaches alone.
         </div>
       </div>
+    </details>
 
       {/* 2. Recommendation or Abstention Card */}
       <div style={{ padding: 'var(--s4)', borderBottom: '1px solid var(--line-hair)' }}>

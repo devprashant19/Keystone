@@ -763,3 +763,41 @@ VERIFICATIONS:
   - axe-core accessibility audit (verification/a11y.spec.ts & U6-04): 0 violations
   - Dead-control sweep: all controls active (U6-01: 26/26 live controls verified)
 NEXT: K4 — Blast Radius Hero Visual
+
+---
+
+## K4 — Blast Radius Hero Visual
+STATUS: PASS
+AT: 2026-10-17T03:26 IST
+CHANGES & IMPLEMENTATIONS:
+  1. BlastRadius Hero Component (`web/src/components/BlastRadius.tsx`):
+     - Dominant primary visual surface at the top of the Incident Command Deck's RightRail.
+     - Concentric dependency cascade bands for the three infrastructure layers:
+       - Core (`#blast-center-core`): Failed root corridor (f1), with real length, travel cost, and "OBSERVED CORRIDOR FAILURE".
+       - Band 1 (`#blast-band-road`): Road layer, displaying severed corridor count (e.g. 1 / 14 corridors severed) with interactive entity pills.
+       - Band 2 (`#blast-band-power`): Power feeder layer, displaying severed carried feeders (e.g. 1 / 7 feeders dark) with status `DARK / SEVERED`.
+       - Band 3 (`#blast-band-alert`): Alert & telecom layer, displaying unpowered towers (1 / 8 towers) and isolated relays (2 / 12 relays) with status `UNPOWERED / ISOLATED`.
+     - Prominent Hero Metric (`#blast-hero-metric`):
+       - High-visibility metric (`--fs-metric`: 36px font size, bold monospace tabular numbers) showing critical facilities outside SLA (e.g. 2 / 9 or 4 / 9) with ghosted baseline (0 / 9) comparison.
+       - Visual delta progress bar (`#blast-delta-bar`) with ghosted baseline capacity and system degradation percentage.
+     - Direct evidence drill-through button (`#blast-evidence-shortcut-btn`) leading directly to FalkorDB causality proof.
+  2. Motion & Easing Motifs Integration:
+     - Leveraged canonical M1 Sever (`motif-sever`) and M2 Cascade (`motif-cascade`) CSS animations from `web/src/motion/motion.css`.
+     - Zero raw hex or unsanctioned box-shadow properties; strictly adheres to design tokens (`--fail`, `--warn`, `--branch`, `--accent`, `--line-hair`, `--bg-raised`).
+     - Full reduced-motion parity (`@media (prefers-reduced-motion)` and `data-reduced-motion="true"`) renders final stable state without animations.
+  3. Collapsible Policy Comparison Foundation:
+     - Demoted numeric policy comparison table to a collapsible `<details id="policy-comparison-details" open>` section with `<summary id="toggle-policy-table">`.
+     - Prioritizes dominant visual impact while preserving 100% of policy rows, baseline arithmetic, null-result panel, and decision cards.
+  4. Wiring & Dead-Control Inventory Sweep:
+     - All new controls (`#blast-radius-panel`, `#blast-hero-number`, `#blast-delta-bar`, `#blast-band-road`, `#blast-band-power`, `#blast-band-alert`, `#blast-center-core`, `#toggle-policy-table`, `#blast-evidence-shortcut-btn`) integrated into `web/verification/u4.spec.ts` (U4-01) and `web/verification/u6.spec.ts` (U6-01).
+VERIFICATIONS:
+  - npm run build: 0 TypeScript or build errors (1.01s)
+  - Playwright U1 suite (npx playwright test verification/u1.spec.ts): 10 passed (6.4s) (0 unsanctioned tokens, 0 raw hex)
+  - Playwright U2 suite (npx playwright test verification/u2.spec.ts): 16 passed (23.8s)
+  - Playwright U3 suite (npx playwright test verification/u3.spec.ts): 13 passed (11.3s) (0 ad-hoc inline transitions)
+  - Playwright U4 suite (npx playwright test verification/u4.spec.ts): 21 passed (36.0s) (all 21 state/viewport tests clean)
+  - Playwright U5 suite (npx playwright test verification/u5.spec.ts): 10 passed (3.3m) (pytest 97 passed verified)
+  - Playwright U6 suite (npx playwright test verification/u6.spec.ts): 11 passed (31.6s) (dead-control sweep 28 controls active)
+  - Playwright a11y & presenter suites: 7 passed (16.7s) (0 axe-core serious/critical violations)
+NEXT: K5 — Landing Dashboard
+
