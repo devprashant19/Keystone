@@ -134,7 +134,7 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({ caseId, runId, onBac
               Staged Mutation Ledger ({data.mutation_ledger.length} events)
             </h2>
             <p style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s3)' }}>
-              Written to <code className="mono">jaal_memory</code> before physical deletion to preserve cause attribution.
+              Written to <code className="mono">keystone_memory</code> before physical deletion to preserve cause attribution.
             </p>
 
             <table style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse' }}>

@@ -10,7 +10,7 @@
   /* Lines & Dividers — 1px & 2px hard black */
   --line-hair:  #000000;
   --line-firm:  #000000;
-  --line-focus: #0284c7;
+  --line-focus: #0369a1;
 
   /* Ink */
   --ink-hi:     #000000;   /* primary high-contrast ink */
@@ -18,9 +18,9 @@
   --ink-lo:     #52525b;   /* zinc-600 captions, labels (>=3:1) */
 
   /* Interaction */
-  --accent:     #0284c7;   /* sky-600 */
+  --accent:     #0369a1;   /* sky-700 (>=4.5:1 WCAG AA text on light surfaces) */
   --accent-wash: #e0f2fe;
-  --accent-edge: #0284c7;
+  --accent-edge: #0369a1;
 
   /* Overlays & Sanctioned Elevation */
   --overlay-bg: rgba(245, 242, 235, 0.92);

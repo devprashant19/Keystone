@@ -100,9 +100,9 @@ export const Header: React.FC<HeaderProps> = ({
             alignItems: 'center',
             gap: 'var(--s2)',
           }}
-          aria-label="Jaal Pre-Mortem Home"
+          aria-label="KEYSTONE Pre-Mortem Home"
         >
-          <span style={{ color: 'var(--accent)' }}>JAAL</span> PRE-MORTEM
+          <span style={{ color: 'var(--accent)' }}>KEYSTONE</span> PRE-MORTEM
           <span
             style={{
               fontSize: 'var(--fs-micro)',

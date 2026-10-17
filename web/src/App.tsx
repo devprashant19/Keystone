@@ -513,7 +513,7 @@ export const App: React.FC = () => {
             highlightSevered={highlightSevered}
             onToggleSevered={() => setHighlightSevered(!highlightSevered)}
             worldSummary={worldSummary}
-            branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
+            branchName={runData ? `keystone_branch_${runData.run_id}_${selectedCaseId}` : ''}
             onOpenEvidence={(caseId) => {
               setEvidenceCaseId(caseId);
               setCurrentRoute(`/evidence/${caseId}`);
@@ -548,7 +548,7 @@ export const App: React.FC = () => {
       <FrameBar
         currentFrame={currentFrame}
         onSelectFrame={setCurrentFrame}
-        branchName={runData ? `jaal_branch_${runData.run_id}_${selectedCaseId}` : ''}
+        branchName={runData ? `keystone_branch_${runData.run_id}_${selectedCaseId}` : ''}
       />
 
       {/* Modals */}

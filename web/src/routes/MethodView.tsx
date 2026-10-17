@@ -24,7 +24,7 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
   };
 
   const handleResetDemo = async () => {
-    if (!window.confirm('Are you sure you want to reset the demo? This will sweep orphan branches, clear run history, and reload jaal_world.')) {
+    if (!window.confirm('Are you sure you want to reset the demo? This will sweep orphan branches, clear run history, and reload keystone_world.')) {
       return;
     }
     setResetting(true);
@@ -77,7 +77,7 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
           Methodology, Provenance & Scientific Integrity
         </h1>
         <p style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', marginBottom: 'var(--s5)' }}>
-          Jaal Pre-Mortem is built under a strict pre-registration discipline. All constants, evaluators, and denominator definitions are frozen before runtime execution to prevent cherry-picking.
+          KEYSTONE Pre-Mortem is built under a strict pre-registration discipline. All constants, evaluators, and denominator definitions are frozen before runtime execution to prevent cherry-picking.
         </p>
 
         {/* 1. Frozen Config Card */}
@@ -133,7 +133,7 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
             2. Three-Way Case Decomposition & Denominators
           </h2>
           <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', marginBottom: 'var(--s3)' }}>
-            To avoid inflating headline claims, Jaal decomposes all 182 scenario pairs into three disjoint classes before any policy comparison:
+            To avoid inflating headline claims, KEYSTONE decomposes all 182 scenario pairs into three disjoint classes before any policy comparison:
           </p>
           <ul style={{ fontSize: 'var(--fs-cap)', lineHeight: 'var(--lh-prose)', paddingLeft: 'var(--s5)', color: 'var(--ink-hi)' }}>
             <li>
@@ -462,7 +462,7 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
             5. Explicit Limitations & Boundaries
           </h2>
           <ul style={{ fontSize: 'var(--fs-cap)', lineHeight: 'var(--lh-prose)', paddingLeft: 'var(--s5)', color: 'var(--ink-mid)' }}>
-            <li>Zero probability or stochastic claims: Jaal evaluates deterministic conditional worst-case reachability.</li>
+            <li>Zero probability or stochastic claims: KEYSTONE evaluates deterministic conditional worst-case reachability.</li>
             <li>No population density data or live emergency dispatch integration.</li>
             <li>
               <code className="mono">wtp_wazirabad</code> is excluded from access SLA metrics because it sits 3.53 km from any modeled road node; snapping it would fabricate false connectivity.

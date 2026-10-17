@@ -113,7 +113,7 @@ export const FrameBar: React.FC<FrameBarProps> = ({
         <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>GRAPH STATE:</span>
         <StatusBadge
           status={currentFrame >= 2 ? 'BRANCH' : 'OK'}
-          label={currentFrame >= 2 ? (branchName || 'jaal_branch_counterfactual') : 'jaal_world (base)'}
+          label={currentFrame >= 2 ? (branchName || 'keystone_branch_counterfactual') : 'keystone_world (base)'}
         />
       </div>
     </footer>

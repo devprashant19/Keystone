@@ -32,7 +32,7 @@ export const TOUR_STEPS_DEF = [
   {
     stepNumber: 3,
     title: 'Conditional N-1 Pre-Mortem',
-    narration: 'Jaal forks 13 isolated counterfactual branches in FalkorDB to evaluate every potential second corridor failure ahead of time.',
+    narration: 'KEYSTONE forks 13 isolated counterfactual branches in FalkorDB to evaluate every potential second corridor failure ahead of time.',
     targetSelector: '#run-sweep-btn',
   },
   {
@@ -56,7 +56,7 @@ export const TOUR_STEPS_DEF = [
   {
     stepNumber: 7,
     title: 'Abstention and Audit Memory',
-    narration: 'When no robust plan exists Jaal abstains and disables approval; otherwise commander decisions commit immutably to jaal_memory.',
+    narration: 'When no robust plan exists KEYSTONE abstains and disables approval; otherwise commander decisions commit immutably to keystone_memory.',
     targetSelector: '#decision-action-block',
   },
 ];

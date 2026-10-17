@@ -65,7 +65,7 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
         </h2>
         <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s4)' }}>
           This action will commit a permanent decision record into the graph memory (
-          <code className="mono">jaal_memory</code>). An operational rationale of at least 10 characters is mandatory.
+          <code className="mono">keystone_memory</code>). An operational rationale of at least 10 characters is mandatory.
         </p>
 
         <div style={{ marginBottom: 'var(--s3)' }}>

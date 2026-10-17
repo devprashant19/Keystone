@@ -485,7 +485,7 @@ export const RightRail: React.FC<RightRailProps> = ({
                 scrollbarWidth: 'thin',
               }}
             >
-              No single allowed action preserves all critical SLAs across every evaluated second failure. Jaal refuses to recommend a plan that leaves known breaches.
+              No single allowed action preserves all critical SLAs across every evaluated second failure. KEYSTONE refuses to recommend a plan that leaves known breaches.
             </p>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
               Uncovered second failures ({recommendation.exposed_count}):
@@ -600,7 +600,7 @@ export const RightRail: React.FC<RightRailProps> = ({
               "{decision?.rationale}"
             </div>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)', marginTop: 'var(--s1)' }}>
-              Recorded by {decision?.actor} in jaal_memory.
+              Recorded by {decision?.actor} in keystone_memory.
             </div>
           </div>
         )}

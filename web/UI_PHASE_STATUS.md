@@ -723,3 +723,43 @@ VERIFICATIONS:
   - npm run build: 0 TypeScript errors (929ms)
   - pytest test_k1_instant_engine.py: 3 passed (27.37s)
 NEXT: K3 — Rename to KEYSTONE
+
+---
+
+## K3 — Rename to KEYSTONE
+STATUS: PASS
+AT: 2026-10-17T02:48 IST
+CHANGES & IMPLEMENTATIONS:
+  1. Product Renamed to KEYSTONE Pre-Mortem:
+     - All user-facing references, titles, labels, badges, aria-labels, and docs renamed to KEYSTONE.
+     - `web/package.json`: "keystone-web".
+     - `web/index.html`: `<title>KEYSTONE | Incident Command Deck</title>`.
+     - `README.md`: `# KEYSTONE Pre-Mortem` (Devanagari removed).
+     - `web/src/components/Header.tsx`: `<span style={{ color: 'var(--accent)' }}>KEYSTONE</span> PRE-MORTEM`.
+     - `web/src/routes/MethodView.tsx` & `EvidenceView.tsx`: KEYSTONE Pre-Mortem provenance and methodology.
+  2. FalkorDB Graph Namespace Migration:
+     - Base world migrated to `keystone_world`.
+     - Memory / run audit log graph migrated to `keystone_memory`.
+     - Counterfactual branch prefix migrated to `keystone_branch_{run}_{case}`.
+     - All Python modules (`orchestrator.py`, `planner.py`, `tools.py`, `app.py`) updated with `keystone_world` defaults and safety checks.
+     - Scripts (`load_world.py`, `reset_demo.py`, `seed_demo.py`, `run_benchmark.py`, `smoke.py`) re-seeded under `keystone_world`.
+     - Old graph keys (`jaal_world`, `jaal_memory`, `test_jaal_world`) purged from FalkorDB.
+  3. Seed & Decomposition Invariants Preserved:
+     - Canonical world digest: `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a` (verified identical).
+     - Decomposition: `104/48/30/0` across 182 scenarios (verified identical).
+     - 14 precomputed corridor scenarios re-stamped and re-verified.
+  4. Test Suite Alignment:
+     - All unit, smoke, data, branch, evaluator, planner, API, benchmark, agent, and demo tests updated to `keystone_world` and `keystone_memory`.
+  5. WCAG AA Contrast Refinement:
+     - `--accent` tuned to `#0369a1` (sky-700) to provide 5.84:1 contrast on `--bg-panel` and 5.31:1 on `--bg-void` (exceeding WCAG AA 4.5:1 text requirement).
+     - `contrast.mjs` passes all checks across both light and dark themes.
+     - axe-core automated scans report 0 serious or critical violations across all 3 routes (`/`, `/evidence/...`, `/method`).
+VERIFICATIONS:
+  - pytest tests -q: 97 passed, 1 warning (308.07s) (94 baseline + 3 K1 instant engine tests)
+  - npm run build: 0 TypeScript errors (1.14s)
+  - Playwright U6 battery (npx playwright test verification/u6.spec.ts): 11 passed (31.7s)
+  - Playwright U5 battery (npx playwright test verification/u5.spec.ts): 7 passed (21.2s)
+  - Playwright U4 battery (npx playwright test verification/u4.spec.ts): 21 passed (42.1s)
+  - axe-core accessibility audit (verification/a11y.spec.ts & U6-04): 0 violations
+  - Dead-control sweep: all controls active (U6-01: 26/26 live controls verified)
+NEXT: K4 — Blast Radius Hero Visual
