@@ -91,7 +91,7 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
       className="blast-radius-panel"
       style={{
         padding: 'var(--s4)',
-        borderBottom: '2px solid var(--line-firm)',
+        borderBottom: '1px solid var(--line-hair)',
         backgroundColor: 'var(--bg-panel)',
         display: 'flex',
         flexDirection: 'column',
@@ -154,8 +154,9 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
         id="blast-hero-metric"
         style={{
           backgroundColor: 'var(--bg-raised)',
-          border: '2px solid var(--line-firm)',
+          border: '1px solid var(--line-hair)',
           borderRadius: 'var(--r-panel)',
+          boxShadow: 'var(--sh-1)',
           padding: 'var(--s3) var(--s4)',
         }}
       >
@@ -257,7 +258,7 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           onKeyDown={(e) => { if (e.key === 'Enter') handleEntityClick(f1CorridorId, 'corridor'); }}
           style={{
             backgroundColor: 'var(--fail-wash)',
-            border: '2px solid var(--fail)',
+            border: '1px solid var(--fail)',
             borderRadius: 'var(--r-ctl)',
             padding: 'var(--s2) var(--s3)',
             cursor: 'pointer',
