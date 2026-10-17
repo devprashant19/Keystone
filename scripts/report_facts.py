@@ -6,6 +6,7 @@ Enforces: NEVER TYPE FIGURES FROM MEMORY. ALWAYS RUN report_facts.py.
 import urllib.request
 import json
 import sys
+import os
 from pathlib import Path
 
 
@@ -13,10 +14,11 @@ def get_report_facts():
     # 1. Query live API (or fallback to in-process TestClient if standalone server is not running)
     health = None
     world = None
+    api_base = (os.getenv("API_URL") or os.getenv("KEYSTONE_API_URL") or "http://127.0.0.1:8000").rstrip("/")
     try:
-        req_health = urllib.request.urlopen("http://127.0.0.1:8000/api/health", timeout=2)
+        req_health = urllib.request.urlopen(f"{api_base}/api/health", timeout=2)
         health = json.loads(req_health.read().decode("utf-8"))
-        req_summary = urllib.request.urlopen("http://127.0.0.1:8000/api/world/summary", timeout=2)
+        req_summary = urllib.request.urlopen(f"{api_base}/api/world/summary", timeout=2)
         world = json.loads(req_summary.read().decode("utf-8"))
     except Exception:
         pass
