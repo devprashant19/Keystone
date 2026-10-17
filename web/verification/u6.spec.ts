@@ -108,13 +108,26 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     await detailsToggle.click();
     await detailsToggle.click();
 
-    // 30. Landing controls and navigation
+    // 30. Landing controls and navigation sweep
     await page.locator('#nav-landing-btn').click();
     await expect(page.locator('#landing-dashboard')).toBeVisible();
-    await page.locator('#break-something-btn').click();
+    await expect(page.locator('#landing-provenance-strip')).toBeVisible();
+    await page.locator('#card-cross-layer-btn').click();
+    await page.waitForURL(/\/evidence/);
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#landing-method-btn').click();
+    await page.waitForURL(/\/method/);
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#card-scientific-honesty-btn').click();
+    await page.waitForURL(/\/method/);
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#card-counterfactual-btn').click();
     await page.waitForURL(/\/deck/);
     await page.locator('#nav-landing-btn').click();
     await page.locator('#landing-deck-btn').click();
+    await page.waitForURL(/\/deck/);
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#break-something-btn').click();
     await page.waitForURL(/\/deck/);
   });
 
