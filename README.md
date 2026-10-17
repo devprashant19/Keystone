@@ -66,10 +66,12 @@ flowchart TD
 
 | | |
 |---|---|
-| ![Scene 1: Golden Case](web/verification/demo/scene1_golden_case.png) | ![Three-band cross-layer view](web/verification/u2/schematic_view.png) |
-| **Instant Incident Command Deck.** Evaluates pre-mortems with no loading step — all fourteen corridor sweeps are precomputed and digest-validated — with live blast radius cascading across road, power, and alert layers. | **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. |
-| ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) | ![The honest null finding](web/verification/demo/scene3_null_result.png) |
-| **ABSTAIN with real reason code.** Honest refusal when no candidate action prevents all SLA breaches across every second-failure contingency. | **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. |
+| ![Landing dashboard](web/verification/landing/landing-1440x900.png) | ![Incident Command Deck, golden case](web/verification/demo/scene1_golden_case.png) |
+| **Landing dashboard.** The entry point. Three counters read live from `/api/world/summary` — never hard-coded — over a provenance strip naming the licence of the real data and labelling the synthetic layers. | **Incident Command Deck.** All fourteen corridor sweeps are precomputed and digest-validated, so there is no loading step. Blast radius cascades across road, power and alert layers. |
+| ![Three-band cross-layer view](web/verification/u2/schematic_view.png) | ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) |
+| **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays and power feeders in one synchronised schematic — the vertical connectors are the cross-layer dependency the product traverses. | **ABSTAIN with a real reason code.** When no candidate action prevents every SLA breach across every second failure, the deck refuses to recommend one and says why. |
+| ![The honest null finding](web/verification/demo/scene3_null_result.png) | ![Methodology and provenance](web/verification/demo/still_method_provenance.png) |
+| **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold, reported openly on the primary path rather than buried. | **Methodology and provenance.** One page carrying the data sources, the frozen configuration, all three denominators, the threshold sweep, and the limits. |
 
 - **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:33) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
 - **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` (e.g., `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
