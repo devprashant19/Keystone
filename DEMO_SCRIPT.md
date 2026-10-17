@@ -79,7 +79,7 @@ slowly with the cursor: road → feeder → tower → relay → facility.
 > Watch the vertical connectors. This road corridor **carries** a power feeder. That feeder
 > powers a tower. That tower reaches the relay covering Sushruta Trauma Centre.
 > So cutting one road does not just block an ambulance. It can take a hospital off the alert
-> network. That chain is four relationship types and three hops. It is one traversal in
+> network. That chain is four relationship types and four hops. It is one traversal in
 > FalkorDB, and it is a nightmare in a relational schema."
 
 **Why this scores:** Track 01 asks for **multi-hop reasoning**, and this is the clearest
