@@ -349,8 +349,8 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           className="blast-band motif-cascade"
           tabIndex={0}
           role="button"
-          onClick={() => handleEntityClick(severedFeeders[0]?.id || 'pf_chandrawal', 'power')}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleEntityClick(severedFeeders[0]?.id || 'pf_chandrawal', 'power'); }}
+          onClick={() => { if (severedFeeders[0]) handleEntityClick(severedFeeders[0].id, 'power'); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' && severedFeeders[0]) handleEntityClick(severedFeeders[0].id, 'power'); }}
           style={{
             backgroundColor: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
@@ -368,12 +368,17 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
               </span>
             </div>
             <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--warn)', fontWeight: 700 }}>
-              {severedFeeders.length || 1} / {totalPowerFeeders} feeders dark
+              {severedFeeders.length} / {totalPowerFeeders} feeders dark
             </span>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s1)' }}>
-            {(severedFeeders.length ? severedFeeders : [{ id: 'pf_chandrawal', name: 'Chandrawal Grid Feeder' }]).map((pf: any) => (
+            {severedFeeders.length === 0 && (
+              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+                no feeder carried on this corridor
+              </span>
+            )}
+            {severedFeeders.map((pf: any) => (
               <span
                 key={pf.id}
                 id={`blast-entity-${pf.id}`}
@@ -419,12 +424,17 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
               </span>
             </div>
             <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--branch)', fontWeight: 700 }}>
-              {unpoweredTowers.length || 1} / {totalTowers} towers · {isolatedRelays.length || 2} / {totalRelays} relays
+              {unpoweredTowers.length} / {totalTowers} towers · {isolatedRelays.length} / {totalRelays} relays
             </span>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s1)' }}>
-            {(unpoweredTowers.length ? unpoweredTowers : [{ id: 'tower_chandgiram', name: 'Chandgiram Akhara Tower' }]).map((t: any) => (
+            {unpoweredTowers.length === 0 && (
+              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+                no tower unpowered by this failure
+              </span>
+            )}
+            {unpoweredTowers.map((t: any) => (
               <span
                 key={t.id}
                 id={`blast-entity-${t.id}`}
@@ -442,7 +452,12 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
                 📡 {t.name || t.id} (unpowered)
               </span>
             ))}
-            {(isolatedRelays.length ? isolatedRelays : [{ id: 'relay_chandrawal', name: 'Chandrawal WTP Relay' }, { id: 'relay_dfs', name: 'DFS HQ Relay' }]).map((r: any) => (
+            {isolatedRelays.length === 0 && (
+              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+                no relay isolated by this failure
+              </span>
+            )}
+            {isolatedRelays.map((r: any) => (
               <span
                 key={r.id}
                 id={`blast-entity-${r.id}`}

@@ -920,3 +920,22 @@ SUMMARY:
     - System invariants: Seed content digest `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a`, decomposition `104/48/30/0` (182 scenarios).
 ALL KEYSTONE STAGES (K0 through K8) ARE COMPLETE AND VERIFIED.
 
+
+---
+
+## Correction — 2026-10-17 (pre-recording verification)
+
+Entries above describing landing copy and demo narration as "sub-10 millisecond" are
+**superseded and were factually wrong**. No measurement in this repository ever supported
+that figure. Measured on 2026-10-17 against the live stack:
+
+| Operation | Measured |
+|---|---|
+| `GET /api/scenario/{id}` over HTTP | 235–280 ms (3 reps) |
+| `GRAPH.COPY` of `keystone_world` | 114–286 ms (5 reps) |
+| Frame-time p95 (U6-08, the only perf assertion in the suite) | 17.8 ms, budget < 20 ms |
+
+The claim was removed from `README.md`, `web/src/components/LandingDashboard.tsx` (3 sites)
+and `RECORDING.md` (2 narration sites), and `RECORDING.md` now lists "sub-10 milliseconds"
+as a forbidden phrase. The defensible claim is that all 14 corridor sweeps are precomputed
+and digest-validated, so switching has no loading step.

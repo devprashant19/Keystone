@@ -88,7 +88,7 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               lineHeight: 'var(--lh-prose)',
             }}
           >
-            KEYSTONE evaluates complex cross-layer infrastructure failures in sub-10 milliseconds using FalkorDB branch copying.
+            KEYSTONE evaluates complex cross-layer infrastructure failures on isolated FalkorDB branches, with every corridor sweep precomputed and digest-validated.
             Explore cascading consequences across road, power, and telecom layers before disaster strikes.
           </p>
 
@@ -306,13 +306,13 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           >
             <div>
               <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--branch)', letterSpacing: '0.04em', marginBottom: 'var(--s1)' }}>
-                02 · Sub-10 Millisecond Forking
+                02 · Branch-Isolated Forking
               </div>
               <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
                 Zero-Overhead Branches
               </h3>
               <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', margin: '0 0 var(--s3) 0' }}>
-                Relational tables require full DB copies or complex locks. FalkorDB forks isolated graph memory with GRAPH.COPY in sub-10 milliseconds, evaluating mitigation policies across all second failures simultaneously.
+                Relational tables require full DB copies or complex locks. FalkorDB forks isolated graph memory with GRAPH.COPY per scenario, evaluating mitigation policies across all second failures without locking the base graph.
               </p>
             </div>
             <button
