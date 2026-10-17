@@ -80,7 +80,7 @@ Evaluated on 5-node directed test graph with weighted `ROAD_ARC` relationships:
 - **Status**: **PASS**
 
 ### SM-07 — Latency Gate (30-Cycle Copy+Delete Benchmark)
-Executed 30 consecutive sequential `GRAPH.COPY` and `Graph.delete()` cycles on the loaded `jaal_world` graph:
+Executed 30 consecutive sequential `GRAPH.COPY` and `Graph.delete()` cycles on the loaded `keystone_world` graph:
 - **Min Latency**: `89.18 ms`
 - **Median Latency**: `104.59 ms`
 - **P95 Latency**: `163.71 ms`

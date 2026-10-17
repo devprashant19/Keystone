@@ -118,7 +118,7 @@ none
 ## Measured numbers
 Contrast:
 ```text
-=== JAAL PRE-MORTEM DESIGN TOKEN CONTRAST MATRIX ===
+=== KEYSTONE PRE-MORTEM DESIGN TOKEN CONTRAST MATRIX ===
 
 --- 1. Ink on Surfaces ---
   --ink-hi   on --bg-void    : 16.92:1 [Target >= 4.5:1] -> PASS

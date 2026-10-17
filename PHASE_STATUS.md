@@ -215,11 +215,11 @@ AT: 2026-10-14T22:34 IST
 RAN: python scripts/smoke.py
 OUTPUT: All 10 checks (SM-01..SM-10) PASSED
 VERIFIED:
-- scripts/smoke.py isolated from product world: runs on probe_world, not jaal_world.
+- scripts/smoke.py isolated from product world: runs on probe_world, not keystone_world.
 - All probe entities prefixed with probe_ (probe_depot_north, probe_tower_isbt, probe_pf_chandrawal, etc.).
 - Explanatory comment added stating it is an engine probe fixture, not the product fixture.
 - Zero entity collision with product fixture IDs.
-- jaal_world remains untouched (node_count=60, edge_count=100 verified).
+- keystone_world remains untouched (node_count=60, edge_count=100 verified).
 NEXT: STEP 6 — UI STAGES U2..U6 (I-6)
 
 

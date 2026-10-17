@@ -1,5 +1,5 @@
 # Graph Hacks — Official Rules Verification
-**Project**: Jaal Pre-Mortem  
+**Project**: KEYSTONE Pre-Mortem  
 **Hackathon**: Graph Hacks: Context for AI Agents (WeMakeDevs × FalkorDB)  
 **Track**: Track 01 — Agents That Act on Connected Data  
 **Team**: `codeXHW9QQ` ("Parser") — Solo Entry (1 of 4 seats)  

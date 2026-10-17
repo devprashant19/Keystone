@@ -104,6 +104,8 @@ A flat relational database or key-value store cannot efficiently answer the ques
 
 ## 4. Graph Model & Schema
 
+> **Note on Project & Namespace Alignment:** The product, interface, API, and FalkorDB graph keys are unified under KEYSTONE throughout. The Python backend package lives at `src/jaal/` (retaining its development package namespace so imports read `from jaal.…`), and the local Docker container is `jaal_falkordb`.
+
 KEYSTONE maintains three distinct graph namespaces in FalkorDB:
 - `keystone_world`: Pristine infrastructure topology (immutable after ingest, protected by SHA-256 digest guard).
 - `keystone_branch_{run}_{case}`: Disposable counterfactual branch copies (created via `GRAPH.COPY`, deleted in `finally:` blocks).

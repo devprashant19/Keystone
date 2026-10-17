@@ -1,4 +1,4 @@
-# Jaal Pre-Mortem — UI Verification & Phase Ledger
+# KEYSTONE Pre-Mortem — UI Verification & Phase Ledger
 
 ## Pre-Flight Status
 STATUS: PASS
@@ -70,7 +70,7 @@ Measured p95 frame time: 17.80ms
 P0 CHECKS: U2-01 ✓ U2-02 ✓ U2-03 ✓ U2-04 ✓ U2-05 ✓ U2-06 ✓ U2-07 ✓ U2-08 ✓ U2-09 ✓ U2-10 ✓ U2-11 ✓ U2-15 ✓
 P1 CHECKS: U2-12 ✓ U2-13 (p95: 17.80ms < 20ms) ✓ U2-14 ✓
 SCREENSHOTS: web/verification/u2/{geographic_view,schematic_view,greyscale_severed,dependency_chain}.png
-FAILED: none (initial attempt 1 failed direct URL evidence drill-through when runId was not in memory; resolved by jaal_memory fallback in API /api/run/{id}; pointer-events none added to survey grid rect)
+FAILED: none (initial attempt 1 failed direct URL evidence drill-through when runId was not in memory; resolved by keystone_memory fallback in API /api/run/{id}; pointer-events none added to survey grid rect)
 FALLBACK APPLIED: none
 NEXT: U3 — motion system
 
@@ -105,7 +105,7 @@ Measured motion p95 frame time: 23.70ms
 P0 CHECKS: U3-01 ✓ U3-02 ✓ U3-03 ✓ U3-04 ✓ U3-05 ✓ U3-06 ✓ U3-07 ✓ U3-08 ✓ U3-09 ✓ U3-10 ✓ U3-13 ✓
 P1 CHECKS: U3-11 ✓ U3-12 (motion p95: 23.70ms < 25ms budget) ✓
 SCREENSHOTS: web/verification/u3/reduced_motion.png
-FAILED: none (initial attempt timed out waiting for DOM on / due to Vite proxy to localhost resolving IPv6 ::1; resolved by binding proxy target to 127.0.0.1 and enhancing get_run schema reconstruction from jaal_memory)
+FAILED: none (initial attempt timed out waiting for DOM on / due to Vite proxy to localhost resolving IPv6 ::1; resolved by binding proxy target to 127.0.0.1 and enhancing get_run schema reconstruction from keystone_memory)
 FALLBACK APPLIED: none
 NEXT: U4 — screens and states
 
@@ -282,10 +282,10 @@ AT: 2026-10-15T09:23 IST
 ### Implementation & Verification
 1. Created `scripts/seed_demo.py`:
    - Sweeps orphan scenario branches via `BranchOrchestrator.sweep_orphan_branches()`.
-   - Deletes and reloads `jaal_world` from pristine `data/` geojson & synthetic specifications.
+   - Deletes and reloads `keystone_world` from pristine `data/` geojson & synthetic specifications.
    - Enforces exact CONTENT digest equality against recorded ground truth: `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a` (fails loudly on any fixture drift).
-   - Clears `jaal_memory`.
-   - Pre-computes and caches the two demo runs (`run_golden_demo` for `road_ring_monastery_chandgiram` and `run_abstain_demo` for `road_ring_kashmere_monastery`) to `data/demo_cache/` and records them in `jaal_memory`.
+   - Clears `keystone_memory`.
+   - Pre-computes and caches the two demo runs (`run_golden_demo` for `road_ring_monastery_chandgiram` and `run_abstain_demo` for `road_ring_kashmere_monastery`) to `data/demo_cache/` and records them in `keystone_memory`.
    - Connected `app.py` `POST /api/run` and `GET /api/run/{id}` to `data/demo_cache/` so demo sweeps return in <50ms without 23-second delays.
    - Emits canonical DEMO READY block:
      ```text
@@ -318,7 +318,7 @@ AT: 2026-10-15T09:38 IST
      4. Evidence-Backed Causal Chains (`#policy-row-C` / `#open-evidence-btn`) — dependency chain decomposition summing exactly to the total.
      5. Fair Baseline Comparison (`#policy-row-C`) — evaluates policies A, B, and C over identical denominators.
      6. The Honest Finding (`#null-result-panel`) — null-interaction panel displaying 104/48/30 at 6.8 km SLA and link to 8.0 km sweep.
-     7. Abstention and Audit Memory (`#decision-action-block`) — loads `run_abstain_demo`, approval disabled on abstention, commander approval on golden case reloaded from jaal_memory.
+     7. Abstention and Audit Memory (`#decision-action-block`) — loads `run_abstain_demo`, approval disabled on abstention, commander approval on golden case reloaded from keystone_memory.
    - Entry points: "Guided tour" button in Header (`#start-tour-btn`) and URL query parameter `?tour=1`.
    - Deep-linking supported for every step: `?tour=1&step=X` synced with browser URL for instant jumping during Q&A.
    - Controls: Back (`#tour-back-btn`), Next (`#tour-next-btn`), Exit (`#tour-exit-btn`), Esc key, keyboard arrows (`ArrowLeft`, `ArrowRight`), step counter (`#tour-step-counter`: "STEP 3 / 7"), and 7-segment progress rail (`#tour-progress-rail`).
@@ -582,8 +582,8 @@ RAN:
 CHANGES:
   1. `src/jaal/tools/tools.py` & `src/jaal/tools/__init__.py`:
      - Implemented 5 strictly validated Pydantic tools (`extra: "forbid"`):
-       - `get_corridor_inventory`: queries 14 arterial corridors from `jaal_world`.
-       - `evaluate_contingency`: clones `jaal_world` to 13 branches, evaluates counterfactual second-failure closures.
+       - `get_corridor_inventory`: queries 14 arterial corridors from `keystone_world`.
+       - `evaluate_contingency`: clones `keystone_world` to 13 branches, evaluates counterfactual second-failure closures.
        - `get_case_evidence` (alias: `inspect_causal_chain`): evaluates pair $(f_1, f_2)$ Dijkstra and alert walks.
        - `check_system_health`: validates FalkorDB connectivity, node counts, and version `6.0.2`.
        - `record_commander_decision`: gated write-tool requiring `confirmed: true`.
@@ -743,7 +743,7 @@ CHANGES & IMPLEMENTATIONS:
      - Counterfactual branch prefix migrated to `keystone_branch_{run}_{case}`.
      - All Python modules (`orchestrator.py`, `planner.py`, `tools.py`, `app.py`) updated with `keystone_world` defaults and safety checks.
      - Scripts (`load_world.py`, `reset_demo.py`, `seed_demo.py`, `run_benchmark.py`, `smoke.py`) re-seeded under `keystone_world`.
-     - Old graph keys (`jaal_world`, `jaal_memory`, `test_jaal_world`) purged from FalkorDB.
+     - Old graph keys (`keystone_world`, `keystone_memory`, `test_keystone_world`) purged from FalkorDB.
   3. Seed & Decomposition Invariants Preserved:
      - Canonical world digest: `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a` (verified identical).
      - Decomposition: `104/48/30/0` across 182 scenarios (verified identical).

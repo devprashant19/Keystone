@@ -1,5 +1,5 @@
 # AI_DISCLOSURE.md — Rule 11 Compliance & Agent Architecture Disclosure
-**Project**: Jaal Pre-Mortem  
+**Project**: KEYSTONE Pre-Mortem  
 **Hackathon**: Graph Hacks: Context for AI Agents (WeMakeDevs × FalkorDB)  
 **Track**: Track 01 — Agents That Act on Connected Data  
 **Team**: `codeXHW9QQ` ("Parser") — Solo Entry (1 of 4 seats)  
@@ -8,7 +8,7 @@
 
 ## 1. Disclosure of AI Assistant Usage (Rule 11)
 In strict compliance with Hackathon Rule 11:
-- An AI coding assistant (Google Antigravity / Gemini) was utilized during the development of Jaal Pre-Mortem for drafting boilerplate tests, executing diagnostic checks, and code navigation.
+- An AI coding assistant (Google Antigravity / Gemini) was utilized during the development of KEYSTONE Pre-Mortem for drafting boilerplate tests, executing diagnostic checks, and code navigation.
 - All system architectures, Cypher queries, graph schemas, benchmark protocols, and agent controllers were designed and verified under human direction and pre-authorized planning specifications.
 - Every metric, test result, and topological count cited in this repository was computed by executing code against a running FalkorDB instance and verified using automated test batteries (`pytest tests -q` and `npx playwright test`).
 
@@ -43,7 +43,7 @@ The Jaal Incident Copilot is an operational agent purpose-built to act on connec
                        │                                     │
                        ▼                                     ▼
         ┌─────────────────────────────┐       ┌─────────────────────────────┐
-        │  FalkorDB jaal_world        │       │  FalkorDB jaal_memory       │
+        │  FalkorDB keystone_world    │       │  FalkorDB keystone_memory   │
         │  & Ephemeral Graph Branches │       │  Append-Only Audit Ledger   │
         └──────────────┬──────────────┘       └─────────────────────────────┘
                        │
@@ -71,11 +71,11 @@ All agent actions interface through strictly validated Pydantic models forbiddin
 
 | Tool Name | Type | Input Schema | Purpose & Graph Target |
 |---|---|---|---|
-| `get_corridor_inventory` | Read | `GetCorridorInventoryInput(filter_status?)` | Queries `jaal_world` for all 14 arterial corridors, lengths, and operational statuses. |
-| `evaluate_contingency` | Read (Branching) | `EvaluateContingencyInput(f1_corridor_id, action_id?)` | Clones `jaal_world` into 13 ephemeral counterfactual branches via `GRAPH.COPY`, evaluates second-failure closures, and outputs 3-way decomposition. |
+| `get_corridor_inventory` | Read | `GetCorridorInventoryInput(filter_status?)` | Queries `keystone_world` for all 14 arterial corridors, lengths, and operational statuses. |
+| `evaluate_contingency` | Read (Branching) | `EvaluateContingencyInput(f1_corridor_id, action_id?)` | Clones `keystone_world` into 13 ephemeral counterfactual branches via `GRAPH.COPY`, evaluates second-failure closures, and outputs 3-way decomposition. |
 | `get_case_evidence` / `inspect_causal_chain` | Read (Branching) | `GetCaseEvidenceInput(f1_corridor_id, f2_corridor_id)` | Creates branch for pair $(f_1, f_2)$, evaluates Dijkstra access times, alert directed walks, and mutation ledgers. |
-| `check_system_health` | Read | `CheckSystemHealthInput()` | Validates FalkorDB connectivity, `jaal_world` node counts (13 intersections, 8 facilities, 2 depots), and engine version (`6.0.2`). |
-| `record_commander_decision` | Write (Gated) | `RecordCommanderDecisionInput(run_id, verdict, rationale, actor, action_id?, confirmed)` | Writes decision into append-only `jaal_memory`. **Enforces human-in-the-loop confirmation (`confirmed: true`)**. |
+| `check_system_health` | Read | `CheckSystemHealthInput()` | Validates FalkorDB connectivity, `keystone_world` node counts (13 intersections, 8 facilities, 2 depots), and engine version (`6.0.2`). |
+| `record_commander_decision` | Write (Gated) | `RecordCommanderDecisionInput(run_id, verdict, rationale, actor, action_id?, confirmed)` | Writes decision into append-only `keystone_memory`. **Enforces human-in-the-loop confirmation (`confirmed: true`)**. |
 
 ---
 
@@ -104,7 +104,7 @@ The participant thoroughly understands and can technically defend:
    - `Intersection`, `ROAD_ARC` (paired directed arcs sharing `corridor_id`), `Facility`, `Depot`, `Responder`.
    - The coupled cross-layer dependency chain: `PowerFeeder` carrying power along road corridors -> `FEEDS_TOWER` -> `Tower` -> `ALERT_ARC` -> `RelayContact` -> `COVERS` -> `Facility`.
 2. **Branching & Scenario Isolation**:
-   - Usage of native `GRAPH.COPY` to create ephemeral counterfactual branches (`jaal_branch_*`) for evaluating candidate corridor failures.
+   - Usage of native `GRAPH.COPY` to create ephemeral counterfactual branches (`keystone_branch_*`) for evaluating candidate corridor failures.
    - Deterministic cleanup using `Graph.delete()` with pre- and post-run SHA-256 graph digest assertions ensuring world immutability.
 3. **The Shared Evaluator & Three Policies**:
    - Single shared evaluation function calculating access deadlines via Dijkstra and alert delivery over bounded directed walks.

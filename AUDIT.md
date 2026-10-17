@@ -1,4 +1,4 @@
-# Jaal Pre-Mortem: Complete Test-Implementation Audit (Step 2)
+# KEYSTONE Pre-Mortem: Complete Test-Implementation Audit (Step 2)
 
 ## Executive Summary
 
@@ -35,14 +35,14 @@ Every test in `tests/` and `web/verification/` was inspected at the body/AST lev
 | `DV-06` | [`tests/phase2_data/test_data_validation.py:105`](file:///tests/phase2_data/test_data_validation.py#L105) | SUBSTANTIVE | Asserts offset_km on every ACCESS_VIA; wtp_wazirabad is 3.53km and is_assumed=true. |
 | `DV-07` | [`tests/phase2_data/test_data_validation.py:118`](file:///tests/phase2_data/test_data_validation.py#L118) | SUBSTANTIVE | Asserts The 5 submerged/blocked corridors fragment the graph into 4 components. |
 | `test_world_digest_stability_across_reloads` | [`tests/phase2_data/test_digest_stability.py:12`](file:///tests/phase2_data/test_digest_stability.py#L12) | SUBSTANTIVE | Asserts reload the world twice;. |
-| `BR-01` | [`tests/phase3_branch/test_branch.py:32`](file:///tests/phase3_branch/test_branch.py#L32) | SUBSTANTIVE | Asserts jaal_world digest identical before and after branch mutations. |
+| `BR-01` | [`tests/phase3_branch/test_branch.py:32`](file:///tests/phase3_branch/test_branch.py#L32) | SUBSTANTIVE | Asserts keystone_world digest identical before and after branch mutations. |
 | `BR-02` | [`tests/phase3_branch/test_branch.py:50`](file:///tests/phase3_branch/test_branch.py#L50) | SUBSTANTIVE | Asserts After failing one corridor, 0 ROAD_ARC with that corridor_id remain; 28 -> 26 to. |
 | `BR-03` | [`tests/phase3_branch/test_branch.py:80`](file:///tests/phase3_branch/test_branch.py#L80) | SUBSTANTIVE | Asserts Ledger rows exist for road arcs, carried alert arcs, carried feeders and unpower. |
-| `BR-04` | [`tests/phase3_branch/test_branch.py:118`](file:///tests/phase3_branch/test_branch.py#L118) | SUBSTANTIVE | Asserts Zero jaal_branch_* graphs remain after a run, including after induced exception. |
+| `BR-04` | [`tests/phase3_branch/test_branch.py:118`](file:///tests/phase3_branch/test_branch.py#L118) | SUBSTANTIVE | Asserts Zero keystone_branch_* graphs remain after a run, including after induced exception. |
 | `BR-04` | [`tests/phase3_branch/test_branch.py:141`](file:///tests/phase3_branch/test_branch.py#L141) | SUBSTANTIVE | Asserts sweep_orphan_branches cleans up lingering branches. |
 | `BR-05` | [`tests/phase3_branch/test_branch.py:152`](file:///tests/phase3_branch/test_branch.py#L152) | SUBSTANTIVE | Asserts Copying onto an existing branch name raises BranchCollisionError. |
 | `BR-06` | [`tests/phase3_branch/test_branch.py:166`](file:///tests/phase3_branch/test_branch.py#L166) | SUBSTANTIVE | Asserts Injected transient failures retry up to 3 times with backoff. |
-| `BR-07` | [`tests/phase3_branch/test_branch.py:191`](file:///tests/phase3_branch/test_branch.py#L191) | SUBSTANTIVE | Asserts Query on jaal_world after branch mutations returns original unsevered arcs. |
+| `BR-07` | [`tests/phase3_branch/test_branch.py:191`](file:///tests/phase3_branch/test_branch.py#L191) | SUBSTANTIVE | Asserts Query on keystone_world after branch mutations returns original unsevered arcs. |
 | `BR-08` | [`tests/phase3_branch/test_branch.py:207`](file:///tests/phase3_branch/test_branch.py#L207) | SUBSTANTIVE | Asserts Confirm CLONE_PER_CASE mode is active, and test scratch clone rollback invarianc. |
 | `EV-01` | [`tests/phase4_evaluator/test_evaluator.py:27`](file:///tests/phase4_evaluator/test_evaluator.py#L27) | SUBSTANTIVE | Asserts Access distance equals hand arithmetic over the printed arc costs. |
 | `EV-02` | [`tests/phase4_evaluator/test_evaluator.py:53`](file:///tests/phase4_evaluator/test_evaluator.py#L53) | SUBSTANTIVE | Asserts Result equals minimum of the per-depot values, not the first depot's. |

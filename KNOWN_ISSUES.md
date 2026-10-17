@@ -1,4 +1,4 @@
-# KNOWN_ISSUES.md — Jaal Pre-Mortem Known Issues & Verification Ledger
+# KNOWN_ISSUES.md — KEYSTONE Pre-Mortem Known Issues & Verification Ledger
 **Initial Creation**: Kickoff Phase 1 (2026-10-14)  
 **Status**: ACTIVE SUBMISSION LEDGER  
 
