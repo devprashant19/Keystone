@@ -1,0 +1,14 @@
+{
+  "name": "KEYSTONE Pre-Mortem",
+  "short_name": "KEYSTONE",
+  "description": "Graph-native disaster-response pre-mortem decision agent. Evaluates every second-failure contingency on isolated FalkorDB branches.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2eb",
+  "theme_color": "#f5f2eb",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/favicon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
