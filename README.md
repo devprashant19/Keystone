@@ -1,4 +1,4 @@
-# Jaal Pre-Mortem (जाल प्री-मॉर्टम)
+# KEYSTONE Pre-Mortem
 **Graph-Native Disaster-Response Pre-Mortem Decision Agent**  
 *Track 01 — Solo Entry | WeMakeDevs × FalkorDB Graph Hacks (15–18 October 2026)*
 
@@ -13,9 +13,9 @@
 ## 1. Executive Summary & The Vertical Slice
 
 > **The Vertical Slice in One Sentence:**  
-> When an initial arterial road failure occurs during an urban disaster, Jaal evaluates **every** possible secondary corridor failure on isolated FalkorDB branches, computes multi-hop road access and alert reachability under a single shared evaluator, and delivers an evidence-linked preventive action **or an explicit abstention** that the incident commander approves or rejects — with the approval persisted into the graph.
+> When an initial arterial road failure occurs during an urban disaster, KEYSTONE evaluates **every** possible secondary corridor failure on isolated FalkorDB branches, computes multi-hop road access and alert reachability under a single shared evaluator, and delivers an evidence-linked preventive action **or an explicit abstention** that the incident commander approves or rejects — with the approval persisted into the graph.
 
-Jaal is not a predictive weather dashboard, nor does it claim to calculate real-world emergency dispatch probabilities. It is a deterministic, graph-native pre-mortem decision engine. By evaluating **conditional $N-1$ contingencies** on isolated graph clones (`GRAPH.COPY`), Jaal solves the cascading failure problem that static tabular heuristics cannot see.
+KEYSTONE is not a predictive weather dashboard, nor does it claim to calculate real-world emergency dispatch probabilities. It is a deterministic, graph-native pre-mortem decision engine. By evaluating **conditional $N-1$ contingencies** on isolated graph clones (`GRAPH.COPY`), KEYSTONE solves the cascading failure problem that static tabular heuristics cannot see.
 
 ---
 
@@ -57,10 +57,10 @@ A flat relational database or key-value store cannot efficiently answer the ques
 
 ## 4. Graph Model & Schema
 
-Jaal maintains three distinct graph namespaces in FalkorDB:
-- `jaal_world`: Pristine infrastructure topology (immutable after ingest, protected by SHA-256 digest guard).
-- `jaal_branch_{run}_{case}`: Disposable counterfactual branch copies (created via `GRAPH.COPY`, deleted in `finally:` blocks).
-- `jaal_memory`: Append-only audit log storing runs, scenario mutation ledgers, and commander decisions.
+KEYSTONE maintains three distinct graph namespaces in FalkorDB:
+- `keystone_world`: Pristine infrastructure topology (immutable after ingest, protected by SHA-256 digest guard).
+- `keystone_branch_{run}_{case}`: Disposable counterfactual branch copies (created via `GRAPH.COPY`, deleted in `finally:` blocks).
+- `keystone_memory`: Append-only audit log storing runs, scenario mutation ledgers, and commander decisions.
 
 ```
                   ┌────────────────────────┐
@@ -392,7 +392,7 @@ Jaal includes an operational Track 01 Incident Copilot Agent that acts on connec
                     │                                           │
                     ▼                                           ▼
      ┌─────────────────────────────┐             ┌─────────────────────────────┐
-     │  FalkorDB jaal_world        │             │  FalkorDB jaal_memory       │
+     │  FalkorDB keystone_world    │             │  FalkorDB keystone_memory   │
      │  & Ephemeral Graph Branches │             │  Append-Only Audit Ledger   │
      └──────────────┬──────────────┘             └─────────────────────────────┘
                     │
@@ -412,11 +412,11 @@ Jaal includes an operational Track 01 Incident Copilot Agent that acts on connec
 ```
 
 ### Tool Catalog (5 Typed Pydantic Tools)
-1. **`get_corridor_inventory`**: Queries `jaal_world` for all 14 arterial road corridors, lengths, and operational statuses.
+1. **`get_corridor_inventory`**: Queries `keystone_world` for all 14 arterial road corridors, lengths, and operational statuses.
 2. **`evaluate_contingency`**: Evaluates 13 counterfactual scenario branches via ephemeral `GRAPH.COPY` clones; returns 3-way case decomposition and Policy C recommendation.
 3. **`get_case_evidence`** (alias: `inspect_causal_chain`): Reconstructs the exact branch for failure pair $(f_1, f_2)$, evaluating Dijkstra hospital travel times, alert directed walks, and mutation ledgers.
-4. **`check_system_health`**: Verifies FalkorDB connectivity, `jaal_world` node counts (13 intersections, 8 facilities, 2 depots), and engine version (`6.0.2`).
-5. **`record_commander_decision`**: Gated write-tool that records human approval/rejection with rationale into `jaal_memory`. Requires explicit `confirmed: true`.
+4. **`check_system_health`**: Verifies FalkorDB connectivity, `keystone_world` node counts (13 intersections, 8 facilities, 2 depots), and engine version (`6.0.2`).
+5. **`record_commander_decision`**: Gated write-tool that records human approval/rejection with rationale into `keystone_memory`. Requires explicit `confirmed: true`.
 
 ### Grounding Guarantees
 - **Strict Post-Validation (AG-08):** Every numeric metric ($\ge 2$) and entity ID in the narrative is checked against the tool output trace. If an ungrounded metric is detected, the agent suppresses prose narration (`"Narration unavailable: ungrounded metric detected"`) and returns deterministic raw metrics.
