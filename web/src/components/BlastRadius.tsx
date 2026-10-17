@@ -244,7 +244,7 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--s2)',
+          gap: 'var(--s3)',
         }}
       >
         {/* Core: Failed Corridor */}
@@ -267,7 +267,7 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           }}
           title="Click to inspect root corridor failure"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', minWidth: 0 }}>
             <span style={{ fontSize: 'var(--fs-ui)', lineHeight: 1 }}>🎯</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--fail)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>

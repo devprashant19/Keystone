@@ -158,7 +158,7 @@ export const RightRail: React.FC<RightRailProps> = ({
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--s2)',
+            gap: 'var(--s3)',
           }}
         >
           <span>⚠</span>
@@ -228,11 +228,11 @@ export const RightRail: React.FC<RightRailProps> = ({
         </summary>
 
         <div style={{ padding: 'var(--s4)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)', flexWrap: 'wrap', gap: 'var(--s2)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--s3)', flexWrap: 'wrap', gap: 'var(--s3)' }}>
             <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
               182-case evaluated foundation
             </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)' }}>
             <a
               id="scenario-provenance-chip"
               href="/method"
@@ -291,14 +291,14 @@ export const RightRail: React.FC<RightRailProps> = ({
           <div
             id="null-result-panel"
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--bg-raised)',
               border: '1px solid var(--line-hair)',
               borderRadius: 'var(--r-ctl)',
               marginBottom: 'var(--s3)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', marginBottom: 'var(--s2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', marginBottom: 'var(--s2)' }}>
               <span style={{ color: 'var(--accent)', fontSize: 'var(--fs-ui)' }}>◈</span>
               <strong style={{ color: 'var(--ink-hi)', fontSize: 'var(--fs-cap)', letterSpacing: '0.02em' }}>
                 EMPIRICAL FINDING: NULL INTERACTION
@@ -331,14 +331,14 @@ export const RightRail: React.FC<RightRailProps> = ({
         )}
 
         {/* Policy Rows */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s3)' }}>
           {/* Policy A */}
           <div
             id="policy-row-A"
             className="policy-row"
             onClick={() => setExpandedPolicy(expandedPolicy === 'A' ? null : 'A')}
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--bg-raised)',
               borderRadius: 'var(--r-ctl)',
               border: '1px solid',
@@ -381,7 +381,7 @@ export const RightRail: React.FC<RightRailProps> = ({
             className="policy-row"
             onClick={() => setExpandedPolicy(expandedPolicy === 'B' ? null : 'B')}
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--bg-raised)',
               borderRadius: 'var(--r-ctl)',
               border: '1px solid',
@@ -426,7 +426,7 @@ export const RightRail: React.FC<RightRailProps> = ({
             className="policy-row"
             onClick={() => setExpandedPolicy(expandedPolicy === 'C' ? null : 'C')}
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--bg-raised)',
               borderRadius: 'var(--r-ctl)',
               border: '1px solid var(--accent)',
@@ -492,14 +492,14 @@ export const RightRail: React.FC<RightRailProps> = ({
         {isAbstained ? (
           <div
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--fail-wash)',
               border: '1px solid var(--fail)',
               borderRadius: 'var(--r-ctl)',
             }}
             role="status"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', marginBottom: 'var(--s1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', marginBottom: 'var(--s1)' }}>
               <strong style={{ color: 'var(--fail)', fontSize: 'var(--fs-body)' }}>ABSTAIN — NO ROBUST PLAN</strong>
             </div>
             {recommendation.reason && (
@@ -605,13 +605,13 @@ export const RightRail: React.FC<RightRailProps> = ({
         ) : (
           <div
             style={{
-              padding: 'var(--s3)',
+              padding: 'var(--s4)',
               backgroundColor: 'var(--ok-wash)',
               border: '1px solid var(--ok)',
               borderRadius: 'var(--r-ctl)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', marginBottom: 'var(--s1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', marginBottom: 'var(--s1)' }}>
               <strong style={{ color: 'var(--ok)', fontSize: 'var(--fs-body)' }}>ROBUST RECOMMENDATION AVAILABLE</strong>
             </div>
             <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-hi)', lineHeight: 'var(--lh-data)', marginBottom: 'var(--s2)' }}>
@@ -661,15 +661,15 @@ export const RightRail: React.FC<RightRailProps> = ({
         style={{
           borderTop: '1px solid var(--line-hair)',
           backgroundColor: 'var(--bg-panel)',
-          padding: 'var(--s3)',
+          padding: 'var(--s4)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--s2)',
+          gap: 'var(--s3)',
           zIndex: 5,
           flexShrink: 0,
         }}
       >
-        <div style={{ display: 'flex', gap: 'var(--s2)' }}>
+        <div style={{ display: 'flex', gap: 'var(--s3)' }}>
           <button
             onClick={() => onOpenDecisionModal('APPROVE')}
             disabled={isAbstained || isDecided || isStale || isReadOnly}

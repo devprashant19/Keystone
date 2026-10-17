@@ -247,7 +247,7 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             <span id="sweep-complete-badge" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>100% COMPLETE</span>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--s2)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 'var(--s3)', flexWrap: 'wrap' }}>
             <StatusBadge status="BREACH" label={`BREACH ${breachCount}`} />
             <StatusBadge status="DEGRADED" label={`DEGRADED ${degradedCount}`} />
             <span title="Headline denominator: cases where neither corridor breaches alone">

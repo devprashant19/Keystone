@@ -68,3 +68,7 @@ code, pre, .mono, [data-mono], .tabular {
   }
 }
 
+
+/* De-congestion pass: vertical rhythm for dense data surfaces. */
+.case-row { min-height: 32px; }
+[role="region"] + [role="region"] { margin-top: var(--s3); }

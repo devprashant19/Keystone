@@ -177,10 +177,21 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       }));
 
       let placed = false;
+      // DE-CONGESTION: only CRITICAL facilities carry a standing label. Everything
+      // else is placed (so hover/focus has a collision-free position ready) but is
+      // not drawn until hovered. Twenty-three competing labels made the map unreadable
+      // even when no two boxes strictly overlapped. Criticals are never suppressed.
+      const labelByDefault = item.priority === 1;
+
       for (const opt of offsets) {
         if (!placedBoxes.some((b) => overlaps(opt.box, b))) {
-          placedBoxes.push(opt.box);
-          placements[item.id] = { relX: opt.relX, relY: opt.relY, textAnchor: opt.textAnchor, visible: true };
+          if (labelByDefault) placedBoxes.push(opt.box);
+          placements[item.id] = {
+            relX: opt.relX,
+            relY: opt.relY,
+            textAnchor: opt.textAnchor,
+            visible: labelByDefault,
+          };
           placed = true;
           break;
         }

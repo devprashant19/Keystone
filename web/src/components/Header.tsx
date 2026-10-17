@@ -79,13 +79,13 @@ export const Header: React.FC<HeaderProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 var(--s4)',
+        padding: '0 var(--s5)',
         userSelect: 'none',
         boxShadow: 'var(--elevation-sticky)',
       }}
       role="banner"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s4)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', minWidth: 0 }}>
         <button
           onClick={() => onNavigate('/')}
           style={{
@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           aria-label="KEYSTONE Pre-Mortem Home"
         >
-          <span style={{ color: 'var(--accent)' }}>KEYSTONE</span> PRE-MORTEM
+          <span style={{ color: 'var(--accent)', whiteSpace: 'nowrap' }}>KEYSTONE</span>
           <span
             style={{
               fontSize: 'var(--fs-micro)',
@@ -110,9 +110,10 @@ export const Header: React.FC<HeaderProps> = ({
               color: 'var(--ink-lo)',
               borderLeft: '1px solid var(--line-hair)',
               paddingLeft: 'var(--s2)',
+              whiteSpace: 'nowrap',
             }}
           >
-            Delhi Arterial · District Scale
+            Delhi Arterial
           </span>
         </button>
 
@@ -197,14 +198,13 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           title="Click to copy full Config SHA-256"
         >
-          <span>CONFIG: <strong style={{ color: 'var(--ink-hi)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong></span>
+          <span>cfg <strong style={{ color: 'var(--ink-hi)' }}>{configHash ? configHash.slice(0, 8) : '—'}</strong></span>
           {copiedTarget === 'config' && (
             <span style={{ backgroundColor: 'var(--ok)', color: 'var(--bg-void)', padding: '1px 4px', borderRadius: 'var(--r-chip)', fontSize: 'var(--fs-micro)', fontWeight: 700 }}>
               COPIED
             </span>
           )}
         </button>
-        <span style={{ color: 'var(--line-hair)' }}>•</span>
         <button
           id="copy-digest-btn"
           onClick={() => {
@@ -227,14 +227,13 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           title="Click to copy full World Content Digest"
         >
-          <span>DIGEST: <strong style={{ color: 'var(--ink-hi)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong></span>
+          <span>wld <strong style={{ color: 'var(--ink-hi)' }}>{worldDigest ? worldDigest.slice(0, 8) : '—'}</strong></span>
           {copiedTarget === 'digest' && (
             <span style={{ backgroundColor: 'var(--ok)', color: 'var(--bg-void)', padding: '1px 4px', borderRadius: 'var(--r-chip)', fontSize: 'var(--fs-micro)', fontWeight: 700 }}>
               COPIED
             </span>
           )}
         </button>
-        <span style={{ color: 'var(--line-hair)' }}>•</span>
         <button
           id="health-dot"
           onClick={() => onNavigate('/method')}
@@ -303,7 +302,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Toggle Reduced Motion"
           aria-label="Toggle Reduced Motion"
         >
-          {reducedMotion ? '⊘ MOTION' : '◎ MOTION'}
+          {reducedMotion ? '⊘' : '◎'}
         </button>
 
         {onStartTour && (
@@ -361,7 +360,7 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           title="Past Run History"
         >
-          Run History
+          History
         </button>
 
         {onOpenShortcuts && (
@@ -402,7 +401,7 @@ export const Header: React.FC<HeaderProps> = ({
             fontWeight: 600,
           }}
         >
-          {currentRoute === '/method' ? 'Back to Deck' : 'Methodology'}
+          {currentRoute === '/method' ? 'Back' : 'Method'}
         </button>
       </div>
     </header>
