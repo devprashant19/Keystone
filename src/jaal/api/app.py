@@ -1,5 +1,5 @@
 """
-jaal.api.app - FastAPI implementation for Jaal Pre-Mortem Command Deck.
+jaal.api.app - FastAPI implementation for KEYSTONE Pre-Mortem Command Deck.
 """
 
 import json
@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="Jaal Pre-Mortem API",
+    title="KEYSTONE Pre-Mortem API",
     version="0.1.0",
     description="Graph-native disaster-response pre-mortem decision engine",
     lifespan=lifespan
@@ -96,7 +96,7 @@ def get_health():
     try:
         client = get_graph_client()
         client.connection.ping()
-        world = client.select_graph("jaal_world")
+        world = client.select_graph("keystone_world")
         digest, nodes, edges = compute_graph_digest(world)
         content_digest, _, _ = compute_content_digest(world)
         cfg_path = Path(__file__).resolve().parents[3] / "config" / "frozen_config.json"
@@ -126,7 +126,7 @@ def get_world_summary():
     """Returns full topological inventory, provenance, and critical entities."""
     try:
         client = get_graph_client()
-        world = client.select_graph("jaal_world")
+        world = client.select_graph("keystone_world")
         digest, n_cnt, e_cnt = compute_graph_digest(world)
         content_digest, _, _ = compute_content_digest(world)
 
@@ -441,7 +441,7 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
     try:
         client = get_graph_client()
         planner = PreMortemPlanner(client)
-        world = client.select_graph("jaal_world")
+        world = client.select_graph("keystone_world")
         initial_digest, _, _ = compute_graph_digest(world)
 
         # 1. Three-way decomposition (PL-07: calculated & published before policy comparison)
@@ -545,8 +545,8 @@ def trigger_pre_mortem_run(req: CreateRunRequest):
         # Cache for idempotency
         RUN_CACHE[run_id] = response_payload
 
-        # Record run start in jaal_memory
-        mem_graph = client.select_graph("jaal_memory")
+        # Record run start in keystone_memory
+        mem_graph = client.select_graph("keystone_memory")
         mem_graph.query(
             "CREATE (r:Run {run_id: $rid, f1: $f1, started_at: $ts, config_hash: $chash, "
             "world_digest: $wdigest, status: 'complete', abstain: $abstain, "
@@ -586,7 +586,7 @@ def get_corridor_scenario(corridor_id: str, live: bool = False):
 
     try:
         client = get_graph_client()
-        world = client.select_graph("jaal_world")
+        world = client.select_graph("keystone_world")
         live_content_digest, _, _ = compute_content_digest(world)
 
         demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
@@ -725,7 +725,7 @@ def list_runs(limit: int = 25):
     """
     try:
         client = get_graph_client()
-        mem_graph = client.select_graph("jaal_memory")
+        mem_graph = client.select_graph("keystone_memory")
         runs_res = mem_graph.query(
             "MATCH (r:Run) "
             "OPTIONAL MATCH (d:Decision {run_id: r.run_id}) "
@@ -811,7 +811,7 @@ def get_run(run_id: str):
             pass
     try:
         client = get_graph_client()
-        mem = client.select_graph("jaal_memory")
+        mem = client.select_graph("keystone_memory")
         res = mem.query(
             "MATCH (r:Run {run_id: $rid}) "
             "OPTIONAL MATCH (d:Decision {run_id: r.run_id}) "
@@ -926,7 +926,7 @@ def get_case_detail(run_id: str, case_id: str):
         }
 
     # Build cross-layer dependency chain per U_PRE_API_CONTRACT Section 2.3
-    world_g = client.select_graph("jaal_world")
+    world_g = client.select_graph("keystone_world")
     chain = []
 
     # Map entity reasons from mutation ledger
@@ -1094,7 +1094,7 @@ def record_decision(run_id: str, req: CreateDecisionRequest):
     """
     AG-06: Write-gating for commander decision.
     Refuses without explicit APPROVE/REJECT and rationale >= 10 chars.
-    Persists decision to jaal_memory.
+    Persists decision to keystone_memory.
     """
     run = get_run(run_id)
 
@@ -1113,7 +1113,7 @@ def record_decision(run_id: str, req: CreateDecisionRequest):
         )
 
     client = get_graph_client()
-    mem_graph = client.select_graph("jaal_memory")
+    mem_graph = client.select_graph("keystone_memory")
     dec_id = f"dec_{uuid.uuid4().hex[:12]}"
     now_ts = datetime.now(timezone.utc).isoformat()
 
@@ -1151,7 +1151,7 @@ def get_method():
         cfg = json.load(f)
 
     return {
-        "title": "Jaal Pre-Mortem Methodology & Transparency",
+        "title": "KEYSTONE Pre-Mortem Methodology & Transparency",
         "provenance": {
             "road_corridors": "CityGraph project (MIT) — author-digitised arterial corridors; no upstream source cited by that project, so treated as unofficial historical reference geometry, not an authoritative dataset",
             "flood_hazard": "Delhi July 2023 Historic Flood Record (CityGraph)",
@@ -1175,7 +1175,7 @@ def get_method():
 
 @app.post("/api/reset")
 def reset_demo(req: ResetRequest):
-    """Resets demo: clears runs, sweeps orphan branches, reloads jaal_world."""
+    """Resets demo: clears runs, sweeps orphan branches, reloads keystone_world."""
     if not req.confirm:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Confirmation required")
 
@@ -1184,12 +1184,12 @@ def reset_demo(req: ResetRequest):
     orchestrator = BranchOrchestrator(client)
     orphans = orchestrator.sweep_orphan_branches()
 
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     data_dir = Path(__file__).resolve().parents[3] / "data"
     digest = load_world_graph(base_graph, data_root=data_dir)
 

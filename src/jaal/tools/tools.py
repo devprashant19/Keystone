@@ -46,7 +46,7 @@ class GetCorridorInventoryInput(BaseModel):
 
 def get_corridor_inventory(args: GetCorridorInventoryInput) -> Dict[str, Any]:
     client = get_graph_client()
-    world = client.select_graph("jaal_world")
+    world = client.select_graph("keystone_world")
     res = world.query(
         "MATCH (a:Intersection)-[r:ROAD_ARC]->(b:Intersection) "
         "RETURN DISTINCT r.corridor_id AS cid, r.name AS name, r.length_km AS len, r.status AS status "
@@ -196,7 +196,7 @@ def record_commander_decision(args: RecordCommanderDecisionInput) -> Dict[str, A
         raise ValueError("Rationale must be at least 10 non-whitespace characters")
 
     client = get_graph_client()
-    mem_graph = client.select_graph("jaal_memory")
+    mem_graph = client.select_graph("keystone_memory")
     decision_id = f"dec_{uuid.uuid4().hex[:12]}"
     now_ts = datetime.now(timezone.utc).isoformat()
 
@@ -231,7 +231,7 @@ class CheckSystemHealthInput(BaseModel):
 def check_system_health(args: Optional[CheckSystemHealthInput] = None) -> Dict[str, Any]:
     """AG-07: Diagnostic graph health check tool."""
     client = get_graph_client()
-    world = client.select_graph("jaal_world")
+    world = client.select_graph("keystone_world")
     res_nodes = world.query("MATCH (n) RETURN count(n) AS cnt")
     node_count = int(res_nodes.result_set[0][0]) if res_nodes.result_set else 0
 

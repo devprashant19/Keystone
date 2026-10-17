@@ -20,15 +20,15 @@ class BranchTransientError(Exception):
     pass
 
 class ImmutabilityViolationError(Exception):
-    """Raised when jaal_world graph digest changes after a run."""
+    """Raised when keystone_world graph digest changes after a run."""
     pass
 
 class BranchOrchestrator:
     def __init__(
         self,
         client: FalkorDB,
-        base_graph_name: str = "jaal_world",
-        memory_graph_name: str = "jaal_memory",
+        base_graph_name: str = "keystone_world",
+        memory_graph_name: str = "keystone_memory",
         max_retries: int = 3,
         backoff_sec: float = 0.05
     ):
@@ -53,11 +53,11 @@ class BranchOrchestrator:
 
     def create_branch(self, run_id: str, case_id: str, nonce: str = "") -> str:
         """
-        Creates an isolated copy of jaal_world named jaal_branch_{run_id}_{case_id}{nonce}.
+        Creates an isolated copy of keystone_world named keystone_branch_{run_id}_{case_id}{nonce}.
         Enforces collision detection (BR-05) and transient retries (BR-06).
         """
         suffix = f"_{nonce}" if nonce else ""
-        branch_name = f"jaal_branch_{run_id}_{case_id}{suffix}"
+        branch_name = f"keystone_branch_{run_id}_{case_id}{suffix}"
         
         existing = self.list_graphs()
         if branch_name in existing:
@@ -90,7 +90,7 @@ class BranchOrchestrator:
         except Exception:
             return False
 
-    def sweep_orphan_branches(self, prefix: str = "jaal_branch_") -> List[str]:
+    def sweep_orphan_branches(self, prefix: str = "keystone_branch_") -> List[str]:
         """Sweeps and deletes any lingering branch graphs."""
         deleted = []
         for g in self.list_graphs():
@@ -100,7 +100,7 @@ class BranchOrchestrator:
         return deleted
 
     def record_ledger_entries(self, entries: List[Dict[str, Any]]) -> None:
-        """Writes mutation ledger rows to jaal_memory graph."""
+        """Writes mutation ledger rows to keystone_memory graph."""
         if not entries:
             return
         mem_graph = self.client.select_graph(self.memory_graph_name)
@@ -286,7 +286,7 @@ class BranchOrchestrator:
             self.delete_branch(branch_name)
 
     def assert_immutability(self, expected_digest: str) -> None:
-        """Asserts that the base jaal_world graph digest matches the expected digest (BR-01, BR-07)."""
+        """Asserts that the base keystone_world graph digest matches the expected digest (BR-01, BR-07)."""
         base_graph = self.client.select_graph(self.base_graph_name)
         current_digest, _, _ = compute_graph_digest(base_graph)
         if current_digest != expected_digest:

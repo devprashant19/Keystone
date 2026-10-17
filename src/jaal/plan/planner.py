@@ -60,7 +60,7 @@ class PreMortemPlanner:
         evaluator: Optional[SharedEvaluator] = None,
         orchestrator: Optional[BranchOrchestrator] = None,
         config_path: Optional[Path] = None,
-        base_graph_name: str = "jaal_world"
+        base_graph_name: str = "keystone_world"
     ):
         self.client = client
         self.base_graph_name = base_graph_name
@@ -72,7 +72,7 @@ class PreMortemPlanner:
             self.config = json.load(f)
 
     def get_all_corridors(self) -> List[str]:
-        """Returns sorted list of distinct corridor IDs from jaal_world."""
+        """Returns sorted list of distinct corridor IDs from keystone_world."""
         world = self.client.select_graph(self.base_graph_name)
         res = world.query("MATCH ()-[r:ROAD_ARC]->() RETURN DISTINCT r.corridor_id AS cid ORDER BY cid ASC")
         return [row[0] for row in res.result_set]
