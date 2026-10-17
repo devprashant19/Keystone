@@ -35,9 +35,10 @@ flowchart TD
         Agent["JaalAgent<br/>(Autonomous Copilot)"]
         T1["get_corridor_inventory"]
         T2["evaluate_contingency"]
-        T3["get_case_evidence"]
-        T4["record_commander_decision"]
-        Agent --> T1 & T2 & T3 & T4
+        T3["inspect_causal_chain"]
+        T4["check_system_health"]
+        T5["record_commander_decision"]
+        Agent --> T1 & T2 & T3 & T4 & T5
     end
 
     subgraph Database["FalkorDB 6.0.2 (:6379)"]
@@ -49,7 +50,7 @@ flowchart TD
     UI -->|HTTP / JSON| Endpoints
     Endpoints --> Orchestrator
     Endpoints -.->|Optional Tool Calls| Agent
-    T1 & T2 & T3 & T4 --> Orchestrator
+    T1 & T2 & T3 & T4 & T5 --> Orchestrator
     Orchestrator -->|Read Base| World
     Orchestrator -->|GRAPH.COPY / Mutations| Branches
     Branches --> Evaluator
@@ -66,7 +67,7 @@ flowchart TD
 | | |
 |---|---|
 | ![Scene 1: Golden Case](web/verification/demo/scene1_golden_case.png) | ![Three-band cross-layer view](web/verification/u2/schematic_view.png) |
-| **Instant Incident Command Deck.** Evaluates pre-mortems in sub-10 milliseconds with live blast radius cascading across road, power, and alert layers. | **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. |
+| **Instant Incident Command Deck.** Evaluates pre-mortems with no loading step — all fourteen corridor sweeps are precomputed and digest-validated — with live blast radius cascading across road, power, and alert layers. | **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. |
 | ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) | ![The honest null finding](web/verification/demo/scene3_null_result.png) |
 | **ABSTAIN with real reason code.** Honest refusal when no candidate action prevents all SLA breaches across every second-failure contingency. | **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. |
 
