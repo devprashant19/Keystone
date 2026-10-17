@@ -7,12 +7,13 @@ import os
 from typing import Tuple, Dict, Any, List
 from falkordb import FalkorDB
 
-def get_graph_client(host: str = None, port: int = None, password: str = None) -> FalkorDB:
+def get_graph_client(host: str = None, port: int = None, password: str = None, username: str = None) -> FalkorDB:
     """Returns a connected FalkorDB client instance."""
     h = host or os.getenv("FALKORDB_HOST", "localhost")
     p = port or int(os.getenv("FALKORDB_PORT", "6379"))
     pw = password or os.getenv("FALKORDB_PASSWORD", None)
-    return FalkorDB(host=h, port=p, password=pw)
+    u = username or os.getenv("FALKORDB_USERNAME", None)
+    return FalkorDB(host=h, port=p, username=u, password=pw)
 
 def ensure_constraints_and_indexes(graph) -> None:
     """
