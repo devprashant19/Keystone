@@ -21,7 +21,7 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
 
   // Mock fixtures for states
   const MOCK_SUMMARY = {
-    world_id: 'jaal_world',
+    world_id: 'keystone_world',
     nodes_count: 60,
     edges_count: 100,
     intersections: [
@@ -729,7 +729,7 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
       await expect(bodyText).toBeVisible();
       const textContent = await bodyText.innerText();
       expect(textContent).toContain('No single allowed action preserves all critical SLAs');
-      expect(textContent).toContain('Jaal refuses to recommend a plan that leaves known breaches.');
+      expect(textContent).toContain('KEYSTONE refuses to recommend a plan that leaves known breaches.');
 
       // c. Explicitly compare scrollHeight to clientHeight on the text element (zero clipping)
       const dimensions = await bodyText.evaluate((el) => ({

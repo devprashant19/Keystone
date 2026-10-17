@@ -11,13 +11,13 @@ const lightColors = {
 
   lineHair: '#000000',
   lineFirm: '#000000',
-  lineFocus: '#0284c7',
+  lineFocus: '#0369a1',
 
   inkHi: '#000000',
   inkMid: '#3f3f46',
   inkLo: '#52525b',
 
-  accent: '#0284c7',
+  accent: '#0369a1',
   branch: '#7c3aed',
   ok: '#15803d',
   warn: '#a16207',
@@ -106,7 +106,7 @@ function contrastRatio(rgb1, rgb2) {
 let allPass = true;
 
 function evaluateTheme(colors) {
-  console.log(`=== JAAL PRE-MORTEM DESIGN TOKEN CONTRAST MATRIX (${colors.name}) ===\n`);
+  console.log(`=== KEYSTONE PRE-MORTEM DESIGN TOKEN CONTRAST MATRIX (${colors.name}) ===\n`);
 
   const surfaces = [
     { name: '--bg-void', hex: colors.bgVoid },
