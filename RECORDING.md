@@ -86,6 +86,12 @@ Quote these authoritative figures verbatim from `scripts/report_facts.py`; do no
 
 ## 4. The Seven Beats
 
+> **For filming, use [](DEMO_SCRIPT.md).** It is the shot-by-shot script:
+> ten beats with timecodes, exact clicks, verbatim narration, per-beat fallbacks, and a map
+> from each beat to the Track 01 judging criteria. It adds the agent tool-selection beat,
+> which the seven-beat table below does not cover. The table here remains as the condensed
+> reference.
+
 | Beat & Timecode | Exact Clicks in Order | Verbatim Narration | What Should Appear on Screen | Fallback / Contingency |
 | :--- | :--- | :--- | :--- | :--- |
 | **Beat 1: Landing Dashboard & Live Counters**<br>`0:00 - 0:25` | 1. Open `http://localhost:5173/`<br>2. Hover `#card-cross-layer`<br>3. Hover `#card-counterfactual`<br>4. Hover `#card-scientific-honesty` | *"This is KEYSTONE. In urban disasters, first infrastructure failures don't cause collapse on their own—it is the unexpected second failure thirty minutes later that severs critical hospital corridors. KEYSTONE evaluates every combinatorial secondary contingency on isolated FalkorDB graph copies."* | Landing page fills 1440x900 viewport without scrollbar. Three live counters pull from API (14 Corridors, 182 Cases, 60/100 Graph Topology). Bottom provenance strip shows FalkorDB 6.0.2 and Digest. | If counters show `—`, verify `:8000/api/world/summary` is reachable. If scrollbar appears, verify viewport is 1440x900. |
