@@ -1,7 +1,7 @@
 [project]
-name = "jaal-premortem"
+name = "keystone-premortem"
 version = "0.1.0"
-description = "Jaal Pre-Mortem: Graph-Native Incident Decision Assistant for Crisis Commanders"
+description = "KEYSTONE Pre-Mortem: Graph-Native Incident Decision Assistant for Crisis Commanders"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
