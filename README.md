@@ -23,10 +23,10 @@ KEYSTONE is not a predictive weather dashboard, nor does it claim to calculate r
 
 | | |
 |---|---|
-| ![Three-band cross-layer view](web/verification/u2/schematic_view.png) | ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) |
-| **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. | **ABSTAIN with real reason code.** Honest refusal with real reason code when no candidate action prevents all SLA breaches across every second-failure contingency. |
-| ![The honest null finding](web/verification/demo/scene3_null_result.png) | |
-| **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. | |
+| ![Scene 1: Golden Case](web/verification/demo/scene1_golden_case.png) | ![Three-band cross-layer view](web/verification/u2/schematic_view.png) |
+| **Instant Incident Command Deck.** Evaluates pre-mortems in sub-10 milliseconds with live blast radius cascading across road, power, and alert layers. | **Three-band cross-layer view.** Delhi arterial roads, telecom alert relays, and power feeders in one synchronized schematic. |
+| ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) | ![The honest null finding](web/verification/demo/scene3_null_result.png) |
+| **ABSTAIN with real reason code.** Honest refusal when no candidate action prevents all SLA breaches across every second-failure contingency. | **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. |
 
 - **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:26) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
 - **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` (e.g., `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
@@ -258,7 +258,7 @@ Built with **Vite, React, and TypeScript** using plain SVG rendering (zero WebGL
 
 ## 11. Limits & Boundaries
 
-- **No Probabilistic Claims:** Jaal computes deterministic graph reachability, not probability distributions.
+- **No Probabilistic Claims:** KEYSTONE computes deterministic graph reachability, not probability distributions.
 - **No Lives-Saved Claims:** This is an operational decision support prototype.
 - **Monsoon Speed Constant:** 24 km/h is an assumed planning constant.
 - **WTP Wazirabad Excluded:** Sits 3.53 km from any modeled road node and is excluded from access SLA metrics to prevent fabricating adjacency.
@@ -363,7 +363,7 @@ In compliance with Rule 11 of the WeMakeDevs × FalkorDB Graph Hacks:
 
 ## 15. Track 01 Agent Architecture (Incident Copilot)
 
-Jaal includes an operational Track 01 Incident Copilot Agent that acts on connected graph data through deterministic tools and strict grounding guarantees.
+KEYSTONE includes an operational Track 01 Incident Copilot Agent that acts on connected graph data through deterministic tools and strict grounding guarantees.
 
 ### Architecture Diagram
 ```
@@ -374,7 +374,7 @@ Jaal includes an operational Track 01 Incident Copilot Agent that acts on connec
                                           │
                                           ▼
                      ┌─────────────────────────────────────────┐
-                     │          JaalAgent Controller           │
+                     │        KeystoneAgent Controller         │
                      │   - Intent Dispatch & Tool Selection    │
                      │   - AG-09 Injection / Jailbreak Filter  │
                      │   - AG-06 Commander Write-Action Gate   │
