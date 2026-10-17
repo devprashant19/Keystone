@@ -49,7 +49,7 @@ def compute_graph_digest(graph):
 
 # NOTE: This world is an isolated engine probe for SM-07 and SM-08 performance gates,
 # NOT the product fixture. All entity IDs use the 'probe_' prefix so they cannot collide
-# with product fixture IDs, and operations run on 'probe_world' rather than 'jaal_world'.
+# with product fixture IDs, and operations run on 'probe_world' rather than 'keystone_world'.
 def load_probe_world(graph):
     """
     Loads isolated probe road corridors, infrastructure, and probe power/alert layers into graph.
@@ -633,7 +633,7 @@ Evaluated on 5-node directed test graph with weighted `ROAD_ARC` relationships:
 - **Status**: **PASS**
 
 ### SM-07 — Latency Gate (30-Cycle Copy+Delete Benchmark)
-Executed 30 consecutive sequential `GRAPH.COPY` and `Graph.delete()` cycles on the loaded `jaal_world` graph:
+Executed 30 consecutive sequential `GRAPH.COPY` and `Graph.delete()` cycles on the loaded `keystone_world` graph:
 - **Min Latency**: `{results['SM-07']['min_ms']} ms`
 - **Median Latency**: `{results['SM-07']['median_ms']} ms`
 - **P95 Latency**: `{results['SM-07']['p95_ms']} ms`

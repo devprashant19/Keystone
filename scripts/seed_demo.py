@@ -1,10 +1,10 @@
 """
-scripts/seed_demo.py — Deterministic seeded demo harness for Jaal Pre-Mortem.
+scripts/seed_demo.py — Deterministic seeded demo harness for KEYSTONE Pre-Mortem.
 Puts the system into one known, reproducible state:
   1. Sweeps orphan branches.
-  2. Deletes and reloads jaal_world from data/.
+  2. Deletes and reloads keystone_world from data/.
   3. Asserts the content digest equals the recorded expected value.
-  4. Clears jaal_memory.
+  4. Clears keystone_memory.
   5. Pre-runs and caches the two demo runs (golden case and abstention case).
   6. Prints the DEMO READY block.
 """
@@ -128,14 +128,14 @@ def seed_demo():
     # 1. Sweep orphan branches
     orphans = orchestrator.sweep_orphan_branches()
 
-    # 2. Delete and reload jaal_world from data/
-    base_graph = client.select_graph("jaal_world")
+    # 2. Delete and reload keystone_world from data/
+    base_graph = client.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
 
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     data_dir = root_dir / "data"
     load_world_graph(base_graph, data_root=data_dir)
 
@@ -149,9 +149,9 @@ def seed_demo():
             f"Nodes: {n_cnt}, Edges: {e_cnt}"
         )
 
-    # 4. Clear jaal_memory
+    # 4. Clear keystone_memory
     try:
-        mem_graph = client.select_graph("jaal_memory")
+        mem_graph = client.select_graph("keystone_memory")
         mem_graph.delete()
     except Exception:
         pass
@@ -220,8 +220,8 @@ def seed_demo():
     with open(DEMO_CACHE_DIR / "by_corridor.json", "w", encoding="utf-8") as f:
         json.dump(by_corridor, f, indent=2)
 
-    # Record both in jaal_memory
-    mem_graph = client.select_graph("jaal_memory")
+    # Record both in keystone_memory
+    mem_graph = client.select_graph("keystone_memory")
     mem_graph.query(
         "CREATE (r:Run {run_id: $rid, f1: $f1, started_at: $ts, config_hash: $chash, "
         "world_digest: $wdigest, status: 'complete', abstain: $abstain, "

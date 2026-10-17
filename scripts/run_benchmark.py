@@ -31,12 +31,12 @@ def run_benchmark():
     client = get_graph_client()
 
     # Load fresh world
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=project_root / "data")
     digest, node_cnt, edge_cnt = compute_graph_digest(base_graph)
     content_digest, _, _ = compute_content_digest(base_graph)
