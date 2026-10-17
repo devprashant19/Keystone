@@ -279,16 +279,16 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
   });
 
   test('U2-14: Label collision: critical facility labels never suppressed and zero pairwise overlap in geographic and schematic', async ({ page }) => {
-    for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }]) {
+    for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }, { width: 1920, height: 1080 }]) {
       await page.setViewportSize(viewport);
       await page.goto('/');
 
-      // 1. Geographic View
+      // 1. Geographic View (Fresh Map)
       await page.locator('#tab-geographic').click();
       await page.waitForSelector('.facility-node');
       await expect(page.locator('.facility-node', { hasText: 'LNJP' })).toBeVisible();
 
-      const geoOverlaps = await page.evaluate(() => {
+      const freshGeoOverlaps = await page.evaluate(() => {
         const labels = Array.from(document.querySelectorAll('.map-label-text, .edge-label-text'));
         const boxes = labels.map((l) => {
           const r = l.getBoundingClientRect();
@@ -308,14 +308,14 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
         }
         return collisions;
       });
-      expect(geoOverlaps, `Found Geographic label collisions at ${viewport.width}x${viewport.height}: ${geoOverlaps.join(', ')}`).toEqual([]);
+      expect(freshGeoOverlaps, `Found Geographic fresh map label collisions at ${viewport.width}x${viewport.height}: ${freshGeoOverlaps.join(', ')}`).toEqual([]);
 
-      // 2. Schematic View
+      // 2. Schematic View (Fresh Map)
       await page.locator('#tab-schematic').click();
       await page.waitForSelector('.band-road');
       await page.waitForTimeout(200);
 
-      const schematicOverlaps = await page.evaluate(() => {
+      const freshSchematicOverlaps = await page.evaluate(() => {
         const labels = Array.from(document.querySelectorAll('.map-label-text, .edge-label-text'));
         const boxes = labels.map((l) => {
           const r = l.getBoundingClientRect();
@@ -336,8 +336,67 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
         return { count: boxes.length, collisions };
       });
 
-      expect(schematicOverlaps.count).toBeGreaterThanOrEqual(25);
-      expect(schematicOverlaps.collisions, `Found Schematic label collisions at ${viewport.width}x${viewport.height}: ${schematicOverlaps.collisions.join(', ')}`).toEqual([]);
+      expect(freshSchematicOverlaps.count).toBeGreaterThanOrEqual(25);
+      expect(freshSchematicOverlaps.collisions, `Found Schematic fresh map label collisions at ${viewport.width}x${viewport.height}: ${freshSchematicOverlaps.collisions.join(', ')}`).toEqual([]);
+
+      // 3. Loaded-Scenario State (select road_ring_kashmere_monastery)
+      await page.locator('#corridor-select').selectOption('road_ring_kashmere_monastery');
+      await page.waitForSelector('#sweep-complete-badge', { timeout: 15000 });
+      await page.waitForTimeout(400); // allow transitions to settle
+
+      // 3a. Geographic View (Loaded Scenario)
+      await page.locator('#tab-geographic').click();
+      await page.waitForSelector('.facility-node');
+      await page.waitForTimeout(200);
+
+      const loadedGeoOverlaps = await page.evaluate(() => {
+        const labels = Array.from(document.querySelectorAll('.map-label-text, .edge-label-text, .depot-node text'));
+        const boxes = labels.map((l) => {
+          const r = l.getBoundingClientRect();
+          return { id: l.getAttribute('data-label-id') || l.textContent || '', rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
+        }).filter((b) => b.rect.w > 0 && b.rect.h > 0);
+
+        const collisions: string[] = [];
+        for (let i = 0; i < boxes.length; i++) {
+          for (let j = i + 1; j < boxes.length; j++) {
+            const a = boxes[i].rect;
+            const b = boxes[j].rect;
+            const isOverlap = a.x < b.x + b.w - 1 && a.x + a.w > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1;
+            if (isOverlap) {
+              collisions.push(`${boxes[i].id} collides with ${boxes[j].id}`);
+            }
+          }
+        }
+        return collisions;
+      });
+      expect(loadedGeoOverlaps, `Found Geographic loaded-scenario label collisions at ${viewport.width}x${viewport.height}: ${loadedGeoOverlaps.join(', ')}`).toEqual([]);
+
+      // 3b. Schematic View (Loaded Scenario)
+      await page.locator('#tab-schematic').click();
+      await page.waitForSelector('.band-road');
+      await page.waitForTimeout(200);
+
+      const loadedSchematicOverlaps = await page.evaluate(() => {
+        const labels = Array.from(document.querySelectorAll('.map-label-text, .edge-label-text'));
+        const boxes = labels.map((l) => {
+          const r = l.getBoundingClientRect();
+          return { id: l.getAttribute('data-label-id') || l.textContent || '', rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
+        }).filter((b) => b.rect.w > 0 && b.rect.h > 0);
+
+        const collisions: string[] = [];
+        for (let i = 0; i < boxes.length; i++) {
+          for (let j = i + 1; j < boxes.length; j++) {
+            const a = boxes[i].rect;
+            const b = boxes[j].rect;
+            const isOverlap = a.x < b.x + b.w - 1 && a.x + a.w > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1;
+            if (isOverlap) {
+              collisions.push(`${boxes[i].id} collides with ${boxes[j].id}`);
+            }
+          }
+        }
+        return { count: boxes.length, collisions };
+      });
+      expect(loadedSchematicOverlaps.collisions, `Found Schematic loaded-scenario label collisions at ${viewport.width}x${viewport.height}: ${loadedSchematicOverlaps.collisions.join(', ')}`).toEqual([]);
 
       if (viewport.width === 1440) {
         const shot = await page.screenshot();

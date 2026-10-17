@@ -87,36 +87,54 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
     interface Candidate {
       id: string;
       name: string;
-      priority: number;
+      priority: number; // 1: critical facilities, 2: depots, 3: non-critical facilities, 4: intersections
       isCritical: boolean;
       pt: Point;
+      type: 'facility' | 'depot' | 'intersection';
     }
 
     const list: Candidate[] = [];
 
-    // Facilities
+    // 1. Facilities
     for (const fac of world.facilities || []) {
       const pt = facilityPoints[fac.id];
       if (!pt || fac.excluded_from_metrics) continue;
       list.push({
         id: `fac_${fac.id}`,
         name: fac.name,
-        priority: fac.is_critical ? 1 : 2,
+        priority: fac.is_critical ? 1 : 3,
         isCritical: Boolean(fac.is_critical),
         pt,
+        type: 'facility',
       });
     }
 
-    // Intersections
+    // 2. Depots
+    for (const depot of world.depots || []) {
+      const accPt = depot.intersection ? intersectionPoints[depot.intersection] : null;
+      if (!accPt) continue;
+      const pt = { x: accPt.x - 18, y: accPt.y + 12 };
+      list.push({
+        id: `depot_${depot.id}`,
+        name: depot.name,
+        priority: 2,
+        isCritical: false,
+        pt,
+        type: 'depot',
+      });
+    }
+
+    // 3. Intersections
     for (const int of world.intersections || []) {
       const pt = intersectionPoints[int.id];
       if (!pt) continue;
       list.push({
         id: `int_${int.id}`,
         name: int.name,
-        priority: 3,
+        priority: 4,
         isCritical: false,
         pt,
+        type: 'intersection',
       });
     }
 
@@ -127,7 +145,7 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
     });
 
     const placedBoxes: Array<{ x: number; y: number; w: number; h: number }> = [];
-    const placements: Record<string, { relX: number; relY: number; textAnchor: 'start' | 'end' | 'middle'; visible: boolean }> = {};
+    const placements: Record<string, { relX: number; relY: number; textAnchor: 'start' | 'end' | 'middle'; visible: boolean; hasLeader: boolean }> = {};
 
     const overlaps = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) => {
       const margin = 2;
@@ -154,22 +172,28 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       return { x, y, w, h };
     };
 
-    for (const item of list) {
-      const textWidth = Math.max(34, item.name.length * 7.5 + 8);
-      const textHeight = 13;
-      const offsetDist = 13;
+    // Multi-tier candidate offsets (14px, 26px, 42px, 62px, 82px)
+    const tiers = [14, 26, 42, 62, 82];
 
-      // 8 candidate offsets in fixed deterministic order
-      const candidates = [
-        { relX: offsetDist, relY: 4, textAnchor: 'start' as const }, // East
-        { relX: -offsetDist, relY: 4, textAnchor: 'end' as const }, // West
-        { relX: 0, relY: -15, textAnchor: 'middle' as const }, // North
-        { relX: 0, relY: 18, textAnchor: 'middle' as const }, // South
-        { relX: offsetDist, relY: -10, textAnchor: 'start' as const }, // North-East
-        { relX: offsetDist, relY: 15, textAnchor: 'start' as const }, // South-East
-        { relX: -offsetDist, relY: -10, textAnchor: 'end' as const }, // North-West
-        { relX: -offsetDist, relY: 15, textAnchor: 'end' as const }, // South-West
-      ];
+    for (const item of list) {
+      const textWidth = Math.max(34, item.name.length * 7.2 + 8);
+      const textHeight = 13;
+
+      // Build directional candidates across distance tiers
+      const candidates: Array<{ relX: number; relY: number; textAnchor: 'start' | 'end' | 'middle'; hasLeader: boolean }> = [];
+      for (const d of tiers) {
+        const hasLeader = d >= 24;
+        candidates.push(
+          { relX: d, relY: 4, textAnchor: 'start', hasLeader },                      // East
+          { relX: -d, relY: 4, textAnchor: 'end', hasLeader },                       // West
+          { relX: 0, relY: -d, textAnchor: 'middle', hasLeader },                    // North
+          { relX: 0, relY: d + 4, textAnchor: 'middle', hasLeader },                 // South
+          { relX: Math.round(d * 0.8), relY: -Math.round(d * 0.7), textAnchor: 'start', hasLeader }, // NE
+          { relX: -Math.round(d * 0.8), relY: -Math.round(d * 0.7), textAnchor: 'end', hasLeader },  // NW
+          { relX: Math.round(d * 0.8), relY: Math.round(d * 0.8), textAnchor: 'start', hasLeader },  // SE
+          { relX: -Math.round(d * 0.8), relY: Math.round(d * 0.8), textAnchor: 'end', hasLeader }   // SW
+        );
+      }
 
       const offsets = candidates.map((c) => ({
         ...c,
@@ -177,41 +201,92 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       }));
 
       let placed = false;
-      // DE-CONGESTION: only CRITICAL facilities carry a standing label. Everything
-      // else is placed (so hover/focus has a collision-free position ready) but is
-      // not drawn until hovered. Twenty-three competing labels made the map unreadable
-      // even when no two boxes strictly overlapped. Criticals are never suppressed.
-      const labelByDefault = item.priority === 1;
 
-      for (const opt of offsets) {
-        if (!placedBoxes.some((b) => overlaps(opt.box, b))) {
-          if (labelByDefault) placedBoxes.push(opt.box);
-          placements[item.id] = {
-            relX: opt.relX,
-            relY: opt.relY,
-            textAnchor: opt.textAnchor,
-            visible: labelByDefault,
-          };
-          placed = true;
-          break;
+      if (item.isCritical) {
+        // Critical facilities are NEVER suppressed. Find the first collision-free candidate.
+        for (const opt of offsets) {
+          const inBounds =
+            opt.box.x >= 12 &&
+            opt.box.x + opt.box.w <= width - 12 &&
+            opt.box.y >= 12 &&
+            opt.box.y + opt.box.h <= height - 12;
+
+          if (inBounds && !placedBoxes.some((b) => overlaps(opt.box, b))) {
+            placedBoxes.push(opt.box);
+            placements[item.id] = {
+              relX: opt.relX,
+              relY: opt.relY,
+              textAnchor: opt.textAnchor,
+              visible: true,
+              hasLeader: opt.hasLeader,
+            };
+            placed = true;
+            break;
+          }
         }
-      }
 
-      if (!placed) {
-        if (item.isCritical) {
+        if (!placed) {
+          // If perfectly within bounds was tight, choose first non-overlapping offset
+          for (const opt of offsets) {
+            if (!placedBoxes.some((b) => overlaps(opt.box, b))) {
+              placedBoxes.push(opt.box);
+              placements[item.id] = {
+                relX: opt.relX,
+                relY: opt.relY,
+                textAnchor: opt.textAnchor,
+                visible: true,
+                hasLeader: opt.hasLeader,
+              };
+              placed = true;
+              break;
+            }
+          }
+        }
+
+        if (!placed) {
+          // Guaranteed safe offset with leader
           const fallback = offsets[0];
           placedBoxes.push(fallback.box);
-          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: true };
-        } else {
-          // Suppressed from default view; visible on hover
-          const fallback = offsets[0];
-          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: false };
+          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: true, hasLeader: true };
         }
+      } else if (item.type === 'depot') {
+        // Non-critical depot: show standing label ONLY if tier 1 or tier 2 candidate has zero collision
+        for (let i = 0; i < Math.min(16, offsets.length); i++) {
+          const opt = offsets[i];
+          const inBounds =
+            opt.box.x >= 12 &&
+            opt.box.x + opt.box.w <= width - 12 &&
+            opt.box.y >= 12 &&
+            opt.box.y + opt.box.h <= height - 12;
+
+          if (inBounds && !placedBoxes.some((b) => overlaps(opt.box, b))) {
+            placedBoxes.push(opt.box);
+            placements[item.id] = {
+              relX: opt.relX,
+              relY: opt.relY,
+              textAnchor: opt.textAnchor,
+              visible: true,
+              hasLeader: opt.hasLeader,
+            };
+            placed = true;
+            break;
+          }
+        }
+
+        if (!placed) {
+          // Hover-only for non-critical label when crowded
+          const fallback = offsets[0];
+          placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: false, hasLeader: false };
+        }
+      } else {
+        // Intersections and non-critical facilities: hover-only to prevent visual clutter
+        const fallback = offsets[0];
+        placements[item.id] = { relX: fallback.relX, relY: fallback.relY, textAnchor: fallback.textAnchor, visible: false, hasLeader: false };
       }
     }
 
     return placements;
-  }, [world.facilities, world.intersections, facilityPoints, intersectionPoints]);
+  }, [world.facilities, world.depots, world.intersections, facilityPoints, intersectionPoints, width, height]);
 
   return (
     <svg
@@ -566,22 +641,35 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
                 const isVisible = labelP && (labelP.visible || isHovered);
                 if (!labelP || !isVisible) return null;
                 return (
-                  <text
-                    x={pt.x + labelP.relX}
-                    y={pt.y + labelP.relY}
-                    textAnchor={labelP.textAnchor}
-                    fill="var(--ink-hi)"
-                    fontSize="var(--fs-micro)"
-                    fontWeight={isCritical ? '600' : '400'}
-                    className="map-label-text"
-                    data-label-id={`fac_${fac.id}`}
-                    style={{
-                      textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {fac.name}
-                  </text>
+                  <g>
+                    {labelP.hasLeader && (
+                      <line
+                        x1={pt.x}
+                        y1={pt.y}
+                        x2={pt.x + (labelP.textAnchor === 'end' ? labelP.relX : labelP.textAnchor === 'start' ? labelP.relX : labelP.relX)}
+                        y2={pt.y + labelP.relY - 3}
+                        stroke="var(--line-firm)"
+                        strokeWidth="1"
+                        strokeDasharray="2 2"
+                      />
+                    )}
+                    <text
+                      x={pt.x + labelP.relX}
+                      y={pt.y + labelP.relY}
+                      textAnchor={labelP.textAnchor}
+                      fill="var(--ink-hi)"
+                      fontSize="var(--fs-micro)"
+                      fontWeight={isCritical ? '600' : '400'}
+                      className="map-label-text"
+                      data-label-id={`fac_${fac.id}`}
+                      style={{
+                        textShadow: '0 0 2px var(--bg-panel), 0 0 2px var(--bg-panel)',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {fac.name}
+                    </text>
+                  </g>
                 );
               })()}
             </g>
@@ -596,6 +684,9 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
           if (!accPt) return null;
           const pt = { x: accPt.x - 18, y: accPt.y + 12 };
           const isSelected = selectedEntityId === depot.id;
+          const isHovered = hoveredEntityId === depot.id;
+          const labelP = labelPlacements[`depot_${depot.id}`];
+          const isVisible = labelP && (labelP.visible || isHovered);
 
           return (
             <g
@@ -627,16 +718,34 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
               <circle cx="5" cy="-6" r="2.5" fill="var(--accent)" />
               <circle cx="9" cy="-6" r="2.5" fill="var(--accent)" />
 
-              <text
-                x="12"
-                y="3"
-                fill="var(--accent)"
-                fontSize="var(--fs-micro)"
-                fontFamily="var(--font-mono)"
-                style={{ textShadow: '0 0 2px var(--bg-panel)' }}
-              >
-                {depot.name}
-              </text>
+              {isVisible && labelP && (
+                <g>
+                  {labelP.hasLeader && (
+                    <line
+                      x1={0}
+                      y1={0}
+                      x2={labelP.relX}
+                      y2={labelP.relY - 3}
+                      stroke="var(--accent)"
+                      strokeWidth="1"
+                      strokeDasharray="2 2"
+                    />
+                  )}
+                  <text
+                    x={labelP.relX}
+                    y={labelP.relY}
+                    textAnchor={labelP.textAnchor}
+                    fill="var(--accent)"
+                    fontSize="var(--fs-micro)"
+                    fontFamily="var(--font-mono)"
+                    className="map-label-text"
+                    data-label-id={`depot_${depot.id}`}
+                    style={{ textShadow: '0 0 2px var(--bg-panel)' }}
+                  >
+                    {depot.name}
+                  </text>
+                </g>
+              )}
             </g>
           );
         })}
