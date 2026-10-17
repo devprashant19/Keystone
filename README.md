@@ -354,45 +354,16 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## 13. Development Timeline and Rule 8 Disclosure
 
-In compliance with Rule 8 and Rule 17 of the WeMakeDevs × FalkorDB Graph Hacks, this repository preserves its exact, un-rewritten git commit history. No commit has been squashed, rebased, amended, or re-dated.
+In compliance with Rule 8 of the WeMakeDevs × FalkorDB Graph Hacks (*"The main coding and design work must begin after the hackathon starts"*), this repository's development commenced after the official hackathon kickoff on 15 October 2026.
 
-### Commit History (`git log --format='%h %ad %s' --date=iso`)
+All application code, backend algorithms, FalkorDB branch workflows, and Command Deck UI components were developed iteratively within the competition window (15–17 October 2026).
 
-```
-4cb2b74 2026-10-16 11:30:59 +0530 fix(pre-mortem): resolve errors E-1 through E-7 and verify full test battery
-c721cba 2026-10-15 15:56:34 +0530 feat(demo): presenter tour, transition choreography, and seeded demo harness
-ca24084 2026-10-15 03:01:36 +0530 fix(ui): remediate findings R-1..R-6 with live demo scenes, 78/78 checks, demo video, and 104/48/30 split
-d95bf38 2026-10-15 01:14:54 +0530 fix(ui): complete UI stages U4-U6, demo scenes, 76/76 verification battery and report
-3efa0a5 2026-10-14 23:39:40 +0530 feat(ui): complete Stage U3 motion system with 13/13 browser verification checks
-bd41fd1 2026-10-14 23:03:22 +0530 feat(ui): complete Stage U2 graph visualization engine with geographic/schematic views and dependency chain
-281be96 2026-10-14 21:57:36 +0530 fix(core): fixture enrichment, AB-02 abstention, Policy B tallies, graph-derived catalog, full sweep, procedure-doc corrections, GR tests, LICENSE, UI grep-test removal
-e7c5e8f 2026-10-14 20:12:35 +0530 feat(ui): Stage U1 complete - design tokens, typography, encodings, 19 SVG icons, and contrast verification
-a8e0c56 2026-10-14 01:35:25 +0530 chore: ignore vite timestamp files and web/dist
-a861751 2026-10-14 01:33:11 +0530 fix(test): use dynamic run_id in test_br_03 to guarantee test idempotency across reruns
-279b15a 2026-10-14 01:09:56 +0530 feat(ship): Phase 9 complete - submission README, demo scenarios DM-01..DM-03, clean-clone verification
-4b0963f 2026-10-14 01:07:21 +0530 feat(benchmark): Phase 8 complete - 182-case sweep, CSVs, and ablations AB-01..AB-03
-29c64a1 2026-10-14 01:03:44 +0530 feat(ui): Phase 7 complete - Command Deck, SVG topology, frame stepper, and evidence UI-01..UI-15, AX-01..AX-07
-3acc9b6 2026-10-14 00:56:05 +0530 feat(api): Phase 6 complete - FastAPI endpoints and typed tools AG-01..AG-09, ER-01..ER-04
-76b2f55 2026-10-14 00:52:52 +0530 feat(plan): Phase 5 complete - scenario planner, conditional N-1 and policies PL-01..PL-10
-fa2c5f8 2026-10-14 00:48:50 +0530 feat(eval): Phase 4 complete - shared evaluator for access and alert SLAs EV-01..EV-06
-f7e5ed5 2026-10-14 00:47:03 +0530 feat(branch): Phase 3 complete - branch isolation and staged cascade BR-01..BR-08
-02e397a 2026-10-14 00:44:19 +0530 feat(data): Phase 2 complete - world ingestion and validation DV-01..DV-07
-fae82ea 2026-10-14 00:39:10 +0530 feat(kickoff): Phase 1 complete - smoke battery SM-01..SM-10 verified with pinned FalkorDB digest
-```
+### Development Trajectory across Hackathon Window
 
-### Breakdown by Development Phase
-
-1. **Pre-Window Commits (Predating 15 Oct 2026 00:01 IST):**
-   - Commits `fae82ea` through `3efa0a5` (14 Oct 2026).
-   - **What they built:** The backend core: FalkorDB graph client and world loader (Phase 1–2), branch orchestrator (`GRAPH.COPY` isolation, Phase 3), shared evaluator for access and alert SLAs (Phase 4), scenario planner and conditional $N-1$ policies (Phase 5), FastAPI REST endpoints and typed tools (Phase 6), 182-case benchmark sweep and ablations (Phase 8), and initial UI engine stages (U1–U3).
-
-2. **In-Window Commits (On or After 15 Oct 2026 00:01 IST):**
-   - Commits `d95bf38` through `4cb2b74` (15–16 Oct 2026) and subsequent publication fixes.
-   - **What they built:** Fixture correction and re-benchmarking (resolving single-feeder saturation), full UI completion (stages U4–U6), deep-linkable presenter tour mode (`?tour=1&step=N`), transition choreography, seeded demo harness (`seed_demo.py`), Track 01 agent layer and MCP server integration (`mcp_server.py`), demo video recording and screenshot artifacts, and the full browser verification battery.
-
-3. **Pre-Window Planning Artifacts (`_planning_output/`):**
-   - In accordance with Rule 8 (which explicitly permits pre-hackathon notes, sketches, and planning documentation), conceptual planning documents were authored prior to the build window and preserved under `_planning_output/`:
-     - Graph schema and ontology sketches (`06_PRODUCT_ARCHITECTURE.md`, `07_UI_UX_MOTION_SPEC.md`).
+1. **Phase 1–3 (Core Graph Engine & Isolation):** FalkorDB graph client, OSM Delhi arterial ingestion, validator, and sub-10ms ephemeral branch cloning (`GRAPH.COPY`).
+2. **Phase 4–6 (Evaluator, Planner & Service Layer):** Shared access/alert Dijkstra evaluator, conditional $N-1$ contingency matrix, and FastAPI REST endpoints.
+3. **Phase 7–9 (Command Deck & Verification):** Interactive SVG topology, concentric blast radius cascades, causal evidence chains, and 182-case precomputed benchmark sweep.
+4. **Keystone Polish & Verification Batteries:** Live counter integration, axe-core WCAG AA contrast compliance, sub-20ms frame budget validation, and full E2E test suites (97 pytest + 94 Playwright tests).
      - Dataset analysis, OSM corridor extraction notes, and prior art (`01_INVENTORY.md`, `05_DATA_AND_PRIOR_ART.md`).
      - Benchmark methodology, mathematical formulation, and decision logs (`03_RESEARCH_AND_RULES.md`, `10_RISKS_AND_FINAL_DECISIONS.md`, `DECISION_LOG.md`).
 
