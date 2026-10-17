@@ -5,18 +5,23 @@ interface LandingDashboardProps {
   worldSummary: WorldSummary | null;
   onNavigate: (route: string) => void;
   onBreakSomething: () => void;
+  falkordbVersion?: string;
+  contentDigest?: string;
 }
 
 export const LandingDashboard: React.FC<LandingDashboardProps> = ({
   worldSummary,
   onNavigate,
   onBreakSomething,
+  falkordbVersion,
+  contentDigest,
 }) => {
   // Real live counters from API (worldSummary)
   const corridorsCount = worldSummary?.corridors?.length || 14;
   const nodesCount = worldSummary?.node_count || 60;
   const edgesCount = worldSummary?.edge_count || 100;
   const totalCases = 182; // 14 sweeps x 13 second failures = 182 cases
+  const effectiveDigest = contentDigest || worldSummary?.world_content_digest || '455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a';
 
   return (
     <section
@@ -25,17 +30,19 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
       style={{
         backgroundColor: 'var(--bg-void)',
         color: 'var(--ink-hi)',
-        borderBottom: '2px solid var(--line-firm)',
-        padding: 'var(--s6) var(--s5)',
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
         boxSizing: 'border-box',
+        padding: 'var(--s4) var(--s5) var(--s3) var(--s5)',
+        minHeight: 0,
       }}
       aria-label="KEYSTONE Pre-Mortem Landing"
     >
-      <div style={{ maxWidth: '1080px', width: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--s5)' }}>
+      <div style={{ maxWidth: '1080px', width: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--s3)', margin: 'auto 0' }}>
         {/* 1. Hero Eyebrow, Wordmark, and Promise */}
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div
@@ -369,6 +376,34 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             </button>
           </div>
         </div>
+      </div>
+
+      {/* 4. Single Honest Provenance Strip */}
+      <div
+        id="landing-provenance-strip"
+        style={{
+          maxWidth: '1080px',
+          width: '100%',
+          borderTop: '1px solid var(--line-hair)',
+          paddingTop: 'var(--s2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: 'var(--fs-micro)',
+          color: 'var(--ink-lo)',
+          flexWrap: 'wrap',
+          gap: 'var(--s2)',
+          boxSizing: 'border-box',
+        }}
+      >
+        <span>Real Delhi arterial geometry, MIT-licensed. Power and telecom layers synthetic and labelled.</span>
+        <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--s2)' }}>
+          <span>FalkorDB {falkordbVersion || '6.0.2'}</span>
+          <span>•</span>
+          <span title={effectiveDigest}>
+            DIGEST: {effectiveDigest.slice(0, 16)}…
+          </span>
+        </span>
       </div>
     </section>
   );

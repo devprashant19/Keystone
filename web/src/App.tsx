@@ -70,6 +70,8 @@ export const App: React.FC = () => {
 
   // World & Health state
   const [worldDigest, setWorldDigest] = useState<string>('');
+  const [contentDigest, setContentDigest] = useState<string>('');
+  const [falkordbVersion, setFalkordbVersion] = useState<string>('6.0.2');
   const [configHash, setConfigHash] = useState<string>('');
   const [isDbHealthy, setIsDbHealthy] = useState<boolean>(true);
   const [worldSummary, setWorldSummary] = useState<WorldSummary | null>(null);
@@ -138,6 +140,8 @@ export const App: React.FC = () => {
       })
       .then((data) => {
         setWorldDigest(data.world_digest);
+        setContentDigest(data.world_content_digest || data.world_digest || '');
+        setFalkordbVersion(data.falkordb_version || '6.0.2');
         setConfigHash(data.config_hash);
         setIsDbHealthy(true);
       })
@@ -400,6 +404,7 @@ export const App: React.FC = () => {
 
   const handleBreakSomething = useCallback(() => {
     setShowLandingExplicit(false);
+    setSelectedF1('road_ring_monastery_chandgiram');
     loadScenario('road_ring_monastery_chandgiram');
     setCurrentRoute('/deck');
   }, [loadScenario]);
@@ -489,7 +494,7 @@ export const App: React.FC = () => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          height: '100vh',
           width: '100vw',
           backgroundColor: 'var(--bg-void)',
           color: 'var(--ink-hi)',
@@ -517,6 +522,8 @@ export const App: React.FC = () => {
 
         <LandingDashboard
           worldSummary={worldSummary}
+          falkordbVersion={falkordbVersion}
+          contentDigest={contentDigest}
           onNavigate={handleNavigate}
           onBreakSomething={handleBreakSomething}
         />
