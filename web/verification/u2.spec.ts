@@ -246,21 +246,29 @@ test.describe('U2 — Graph Visualization Engine Battery', () => {
       requestAnimationFrame(t);
     });
 
-    // Scripted pan, zoom, and select interactions
-    await page.locator('#zoom-in-btn').click();
-    await page.locator('#zoom-in-btn').click();
-    await page.locator('.intersection-node').first().click();
-    await page.locator('#zoom-out-btn').click();
-    await page.waitForTimeout(1000);
-
-    // Minimum of three passes: reduces contention noise without moving the 20ms bar
-    // (see the same rationale in u6.spec.ts U6-08).
+    // Minimum of three INDEPENDENT passes. Each pass clears the frame log and re-runs the
+    // scripted interaction, so the three numbers are three measurements rather than three
+    // reads of one polluted accumulation -- which is what made this test report an
+    // identical value three times and then fail at 23.90ms at the tail of a 15-minute
+    // battery. Zooming is balanced (2 in, 2 out) so each pass starts from the same scale.
+    // This does not move the 20ms bar: a real regression fails every pass.
     const samples: number[] = [];
     for (let pass = 0; pass < 3; pass++) {
+      await page.evaluate(() => {
+        (window as any).__f = [];
+      });
+
+      await page.locator('#zoom-in-btn').click();
+      await page.locator('#zoom-in-btn').click();
+      await page.locator('.intersection-node').first().click();
+      await page.locator('#zoom-out-btn').click();
+      await page.locator('#zoom-out-btn').click();
+      await page.waitForTimeout(800);
+
       const sample = await page.evaluate(() => {
-      const arr = ((window as any).__f || []).slice(5).sort((a: number, b: number) => a - b);
-      if (arr.length === 0) return 16;
-      return arr[Math.floor(arr.length * 0.95)];
+        const arr = ((window as any).__f || []).slice(5).sort((a: number, b: number) => a - b);
+        if (arr.length === 0) return 16;
+        return arr[Math.floor(arr.length * 0.95)];
       });
       samples.push(sample);
     }
