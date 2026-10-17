@@ -92,7 +92,7 @@ def test_gr_04_dijkstra_agrees_with_native_sppaths():
     section 2a), so this is a real cross-implementation check, not a fallback excuse.
     """
     client = get_graph_client()
-    world = client.select_graph("jaal_world")
+    world = client.select_graph("keystone_world")
     ev = SharedEvaluator(CFG)
 
     ints = [r[0] for r in world.query(

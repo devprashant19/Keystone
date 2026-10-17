@@ -75,12 +75,12 @@ def test_sm06_variable_length_literal_vs_param(db):
     g.delete()
 
 def test_sm07_latency_gate_measurement(db):
-    g = db.select_graph("jaal_world")
+    g = db.select_graph("keystone_world")
     # Quick 5-cycle validation of latency gate
     times = []
     for i in range(5):
         t0 = time.perf_counter()
-        db.connection.execute_command("GRAPH.COPY", "jaal_world", f"probe_lat_{i}")
+        db.connection.execute_command("GRAPH.COPY", "keystone_world", f"probe_lat_{i}")
         db.select_graph(f"probe_lat_{i}").delete()
         times.append((time.perf_counter() - t0) * 1000.0)
     median_ms = sorted(times)[len(times) // 2]
@@ -88,12 +88,12 @@ def test_sm07_latency_gate_measurement(db):
     assert median_ms < 1000.0
 
 def test_sm08_world_immutability(db):
-    g_world = db.select_graph("jaal_world")
+    g_world = db.select_graph("keystone_world")
     pre_nodes = g_world.query("MATCH (n) RETURN count(n)").result_set[0][0]
     pre_edges = g_world.query("MATCH ()-[r]->() RETURN count(r)").result_set[0][0]
     
     # Branch and mutate
-    db.connection.execute_command("GRAPH.COPY", "jaal_world", "probe_mutation_branch")
+    db.connection.execute_command("GRAPH.COPY", "keystone_world", "probe_mutation_branch")
     g_b = db.select_graph("probe_mutation_branch")
     g_b.query("MATCH ()-[r:ROAD_ARC]->() DELETE r")
     g_b.delete()

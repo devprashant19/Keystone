@@ -15,11 +15,11 @@ def test_world_digest_stability_across_reloads():
     mutation digest differs (ingested_at changes), content digest identical;
     """
     client = get_graph_client()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
 
     # Load world run 1
     base_graph.delete()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=Path("data"))
     mut_digest_1, n1, e1 = compute_graph_digest(base_graph)
     content_digest_1, cn1, ce1 = compute_content_digest(base_graph)
@@ -29,7 +29,7 @@ def test_world_digest_stability_across_reloads():
 
     # Load world run 2
     base_graph.delete()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=Path("data"))
     mut_digest_2, n2, e2 = compute_graph_digest(base_graph)
     content_digest_2, cn2, ce2 = compute_content_digest(base_graph)

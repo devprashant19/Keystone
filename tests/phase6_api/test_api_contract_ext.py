@@ -16,12 +16,12 @@ from jaal.ingest.loader import load_world_graph
 def api_client():
     # Ensure fresh world loaded
     db = get_graph_client()
-    base_graph = db.select_graph("jaal_world")
+    base_graph = db.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
-    base_graph = db.select_graph("jaal_world")
+    base_graph = db.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=Path("data"))
     client = TestClient(app)
     return client

@@ -108,7 +108,7 @@ def test_ab_03_independent_recomputation():
     """AB-03: Independent stdlib Dijkstra reproduces response times within 0.001 min."""
     client = get_graph_client()
     evaluator = SharedEvaluator()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
 
     res = evaluator.evaluate_graph(base_graph, "recomp")
     lnjp_metric = res.facility_metrics["hosp_lnjp"]

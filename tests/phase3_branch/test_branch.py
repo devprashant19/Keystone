@@ -16,12 +16,12 @@ from jaal.branch.orchestrator import (
 @pytest.fixture(scope="module")
 def setup_world():
     client = get_graph_client()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=Path("data"))
     orchestrator = BranchOrchestrator(client)
     # Ensure no leftover branches
@@ -30,9 +30,9 @@ def setup_world():
     orchestrator.sweep_orphan_branches()
 
 def test_br_01_world_immutability(setup_world):
-    """BR-01: jaal_world digest identical before and after branch mutations."""
+    """BR-01: keystone_world digest identical before and after branch mutations."""
     client, orchestrator = setup_world
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     digest_before, n_before, e_before = compute_graph_digest(base_graph)
 
     # Perform a branch run
@@ -116,7 +116,7 @@ def test_br_03_cascade_order_and_ledger(setup_world):
         assert mem_res.result_set[0][0] == len(ledger)
 
 def test_br_04_cleanup_on_normal_and_exception(setup_world):
-    """BR-04: Zero jaal_branch_* graphs remain after a run, including after induced exception."""
+    """BR-04: Zero keystone_branch_* graphs remain after a run, including after induced exception."""
     client, orchestrator = setup_world
     run_id = "test_br04"
 
@@ -134,7 +134,7 @@ def test_br_04_cleanup_on_normal_and_exception(setup_world):
     assert err_branch not in orchestrator.list_graphs()
 
     # Verify no orphan branches remain for this run (scoped cleanup assertion)
-    run_prefix = f"jaal_branch_{run_id}_"
+    run_prefix = f"keystone_branch_{run_id}_"
     remaining = [g for g in orchestrator.list_graphs() if g.startswith(run_prefix)]
     assert len(remaining) == 0
 
@@ -145,7 +145,7 @@ def test_br_04_standalone_orphan_sweep(setup_world):
     orphan = orchestrator.create_branch(sweep_run_id, "case_stranded")
     assert orphan in orchestrator.list_graphs()
 
-    deleted = orchestrator.sweep_orphan_branches(prefix=f"jaal_branch_{sweep_run_id}_")
+    deleted = orchestrator.sweep_orphan_branches(prefix=f"keystone_branch_{sweep_run_id}_")
     assert orphan in deleted
     assert orphan not in orchestrator.list_graphs()
 
@@ -189,9 +189,9 @@ def test_br_06_transient_fork_failure_retries(setup_world):
         orchestrator.transient_fail_injector = None
 
 def test_br_07_no_branch_leakage_into_base(setup_world):
-    """BR-07: Query on jaal_world after branch mutations returns original unsevered arcs."""
+    """BR-07: Query on keystone_world after branch mutations returns original unsevered arcs."""
     client, orchestrator = setup_world
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     corridor = "road_ring_kashmere_monastery"
 
     with orchestrator.branch_context("test_br07", "leak_check") as (branch_name, _):
@@ -207,7 +207,7 @@ def test_br_07_no_branch_leakage_into_base(setup_world):
 def test_br_08_branch_mode_and_scratch_invariance(setup_world):
     """BR-08: Confirm CLONE_PER_CASE mode is active, and test scratch clone rollback invariance."""
     client, orchestrator = setup_world
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     initial_digest, _, _ = compute_graph_digest(base_graph)
 
     # Test clone-modify-destroy cycle produces no residue

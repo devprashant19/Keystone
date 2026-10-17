@@ -14,12 +14,12 @@ from jaal.plan.planner import PreMortemPlanner, Action
 @pytest.fixture(scope="module")
 def planner_env():
     client = get_graph_client()
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     try:
         base_graph.delete()
     except Exception:
         pass
-    base_graph = client.select_graph("jaal_world")
+    base_graph = client.select_graph("keystone_world")
     load_world_graph(base_graph, data_root=Path("data"))
     evaluator = SharedEvaluator()
     orchestrator = BranchOrchestrator(client)

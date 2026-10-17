@@ -15,12 +15,12 @@ def db():
 
 @pytest.fixture(scope="module")
 def world_graph(db):
-    graph = db.select_graph("test_jaal_world")
+    graph = db.select_graph("test_keystone_world")
     try:
         graph.delete()
     except Exception:
         pass
-    graph = db.select_graph("test_jaal_world")
+    graph = db.select_graph("test_keystone_world")
     load_world_graph(graph, data_root=Path("data"))
     return graph
 
@@ -118,7 +118,7 @@ def test_dv06_facility_snapping_disclosed(world_graph):
 def test_dv07_flood_severance_reproduces(db, world_graph):
     """DV-07: The 5 submerged/blocked corridors fragment the graph into 4 components."""
     # Clone world to an in-memory branch for severance test
-    db.connection.execute_command("GRAPH.COPY", "test_jaal_world", "test_severance_branch")
+    db.connection.execute_command("GRAPH.COPY", "test_keystone_world", "test_severance_branch")
     g_sev = db.select_graph("test_severance_branch")
     
     # Five historical peak corridors
