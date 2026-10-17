@@ -84,7 +84,7 @@ def get_report_facts():
         "config_hash": config_hash,
         "falkordb_version": falkordb_version,
         "decomposition": decomposition,
-        "pytest_count": 94,
+        "pytest_count": 97,
         "playwright_count": 89,
     }
     return facts
