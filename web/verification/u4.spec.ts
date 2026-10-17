@@ -311,6 +311,38 @@ test.describe('U4 — Screens, States and Control Wiring Battery', () => {
     await expect(detailsToggle).toBeVisible();
     await detailsToggle.click();
     await detailsToggle.click();
+
+    // 35. Landing Dashboard and Break Something
+    await page.locator('#nav-landing-btn').click();
+    await expect(page.locator('#landing-dashboard')).toBeVisible();
+    await expect(page.locator('#counter-corridors')).toBeVisible();
+    await expect(page.locator('#counter-scenarios')).toBeVisible();
+    await expect(page.locator('#counter-entities')).toBeVisible();
+    
+    // Landing action buttons
+    await page.locator('#break-something-btn').click();
+    await page.waitForURL(/\/deck/);
+    await expect(page.locator('#corridor-select')).toHaveValue('road_ring_monastery_chandgiram');
+    
+    // Header navigation back to landing
+    await page.locator('#nav-landing-btn').click();
+    await page.waitForURL('/');
+    await expect(page.locator('#landing-dashboard')).toBeVisible();
+    
+    // Landing deck button
+    await page.locator('#landing-deck-btn').click();
+    await page.waitForURL(/\/deck/);
+    
+    // Nav back to landing and check secondary buttons
+    await page.locator('#nav-landing-btn').click();
+    await page.waitForURL('/');
+    await page.locator('#card-cross-layer-btn').click();
+    await page.waitForURL(/\/evidence\//);
+    await page.locator('text=Back to Command Deck').click();
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#landing-method-btn').click();
+    await page.waitForURL(/\/method/);
+    await page.locator('text=Return to Incident Command Deck').click();
   });
 
   test('U4-02: All 14 states reachable and captured', async ({ page }) => {

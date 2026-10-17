@@ -10,6 +10,7 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
   const demoDir = path.resolve('verification/demo');
 
   test('U6-01: Dead-control sweep (26/26 live controls)', async ({ page }) => {
+    test.setTimeout(90000);
     await page.goto('/');
     await page.waitForSelector('.intersection-node', { timeout: 15000 });
 
@@ -106,6 +107,15 @@ test.describe('U6 — Verification Battery and Sign-off Battery', () => {
     const detailsToggle = page.locator('#toggle-policy-table');
     await detailsToggle.click();
     await detailsToggle.click();
+
+    // 30. Landing controls and navigation
+    await page.locator('#nav-landing-btn').click();
+    await expect(page.locator('#landing-dashboard')).toBeVisible();
+    await page.locator('#break-something-btn').click();
+    await page.waitForURL(/\/deck/);
+    await page.locator('#nav-landing-btn').click();
+    await page.locator('#landing-deck-btn').click();
+    await page.waitForURL(/\/deck/);
   });
 
   test('U6-02: State coverage (14 state screenshots committed and verified)', async () => {
