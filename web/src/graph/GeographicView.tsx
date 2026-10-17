@@ -172,8 +172,8 @@ export const GeographicView: React.FC<GeographicViewProps> = ({
       return { x, y, w, h };
     };
 
-    // Multi-tier candidate offsets (14px, 26px, 42px, 62px, 82px)
-    const tiers = [14, 26, 42, 62, 82];
+    // Multi-tier candidate offsets (15px, 27px, 42px, 62px, 82px)
+    const tiers = [15, 27, 42, 62, 82];
 
     for (const item of list) {
       const textWidth = Math.max(34, item.name.length * 7.2 + 8);

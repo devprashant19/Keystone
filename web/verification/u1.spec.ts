@@ -177,8 +177,8 @@ test.describe('U1 — Design System Verification Battery', () => {
   test('U1-08: Focus ring contrast >= 3:1 against surfaces', async () => {
     const contrastScript = path.resolve('verification/contrast.mjs');
     const output = execSync(`node "${contrastScript}"`, { encoding: 'utf-8' });
-    expect(output).toContain('--line-focus on --bg-void    : 8.69:1 [Target >= 3.0:1] -> PASS');
-    expect(output).toContain('--line-focus on --bg-panel   : 8.35:1 [Target >= 3.0:1] -> PASS');
+    expect(output).toMatch(/--line-focus on --bg-void\s+:\s+[\d.]+:1 \[Target >= 3\.0:1\] -> PASS/);
+    expect(output).toMatch(/--line-focus on --bg-panel\s+:\s+[\d.]+:1 \[Target >= 3\.0:1\] -> PASS/);
   });
 
   test('U1-09: Body floor: no text below 11px', async () => {

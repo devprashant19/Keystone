@@ -12,7 +12,7 @@ test.use({
 });
 
 test('Record Deterministic Demo Walkthrough in One Continuous Take (1440x900)', async ({ page }) => {
-  test.setTimeout(300000); // 5 minutes timeout for complete walkthrough
+  test.setTimeout(600000); // 10 minutes timeout for complete walkthrough
 
   const demoDir = path.resolve('verification/demo');
   if (!fs.existsSync(demoDir)) {

@@ -156,7 +156,6 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           backgroundColor: 'var(--bg-raised)',
           border: '1px solid var(--line-hair)',
           borderRadius: 'var(--r-panel)',
-          boxShadow: 'var(--sh-1)',
           padding: 'var(--s3) var(--s4)',
         }}
       >

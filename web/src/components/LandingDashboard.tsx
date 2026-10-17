@@ -74,7 +74,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               textTransform: 'uppercase',
               color: 'var(--accent)',
               marginBottom: 'clamp(6px, 1vh, 12px)',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             <span>◈</span>
@@ -116,9 +115,9 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               id="break-something-btn"
               onClick={onBreakSomething}
               style={{
-                background: 'linear-gradient(180deg, #c8173f 0%, #9c0d2f 100%)',
-                color: '#ffffff',
-                border: '1px solid rgba(0, 0, 0, 0.15)',
+                backgroundColor: 'var(--fail)',
+                color: 'var(--bg-void)',
+                border: '1px solid var(--fail)',
                 borderRadius: 'var(--r-ctl)',
                 padding: '10px 24px',
                 fontSize: 'var(--fs-ui)',
@@ -126,8 +125,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
-                boxShadow: '0 6px 18px -4px rgba(156, 13, 47, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
-                transition: 'transform 160ms var(--ease-out), box-shadow 160ms',
               }}
               aria-label="Break something: launch incident command deck on golden scenario"
             >
@@ -146,8 +143,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
                 fontSize: 'var(--fs-cap)',
                 fontWeight: 600,
                 cursor: 'pointer',
-                boxShadow: 'var(--sh-1)',
-                transition: 'background-color 160ms, border-color 160ms',
               }}
             >
               Enter Incident Command Deck
@@ -165,7 +160,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
                 fontSize: 'var(--fs-cap)',
                 fontWeight: 600,
                 cursor: 'pointer',
-                transition: 'border-color 160ms, background-color 160ms',
               }}
             >
               Methodology & Provenance
@@ -195,7 +189,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
@@ -220,7 +213,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
@@ -245,7 +237,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
@@ -285,7 +276,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             {/* Ghost Numeral */}
@@ -383,7 +373,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             {/* Ghost Numeral */}
@@ -481,7 +470,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              boxShadow: 'var(--sh-1)',
             }}
           >
             {/* Ghost Numeral */}

@@ -76,7 +76,7 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({ isOpen, onClose }) => {
         maxHeight: '380px',
         backgroundColor: 'var(--bg-panel)',
         borderTop: '1px solid var(--line-hair)',
-        boxShadow: 'var(--sh-3)',
+        boxShadow: 'var(--elevation-sticky)',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 50,
