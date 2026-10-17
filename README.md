@@ -32,7 +32,7 @@ flowchart TD
     end
 
     subgraph AgentBranch["Optional Copilot Agent (Decoupled)"]
-        Agent["JaalAgent<br/>(Autonomous Copilot)"]
+        Agent["KeystoneAgent<br/>(Autonomous Copilot)"]
         T1["get_corridor_inventory"]
         T2["evaluate_contingency"]
         T3["inspect_causal_chain"]
