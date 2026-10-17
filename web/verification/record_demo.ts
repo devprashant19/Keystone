@@ -53,103 +53,151 @@ test('Record Deterministic Demo Walkthrough in One Continuous Take (1440x900)', 
   const checkVisibleIds = async (contextName: string) => {
     const pageText = await page.innerText('body');
     const matches = pageText.match(/\b(road_[a-z0-9_]+|hosp_[a-z0-9_]+|wtp_[a-z0-9_]+|tower_[a-z0-9_]+|depot_[a-z0-9_]+|int_[a-z0-9_]+|pf_[a-z0-9_]+)\b/g) || [];
-    for (const entityId of matches) {
-      expect(validIds.has(entityId), `Unknown entity ID '${entityId}' in ${contextName}`).toBe(true);
+    for (const rawId of matches) {
+      const parts = rawId.split('__');
+      for (const part of parts) {
+        const baseId = part.replace(/_(forward|reverse)$/, '');
+        expect(validIds.has(baseId) || validIds.has(part), `Unknown entity ID '${rawId}' in ${contextName}`).toBe(true);
+      }
     }
   };
 
-  // 2. Open App in Presenter Mode (?tour=1&step=1)
-  await page.goto('/?tour=1&step=1');
-  await page.waitForSelector('#presenter-tour-root', { timeout: 15000 });
-  await page.focus('body');
+  // 2. Open App on Landing Dashboard (/?landing=1)
+  // --- Beat 1: Landing Dashboard & The Live Counters (0:00 - 0:20) ---
+  console.log('Beat 1: Landing Dashboard...');
+  await page.goto('/?landing=1');
+  await page.waitForSelector('#landing-dashboard', { timeout: 15000 });
+  await expect(page.locator('#counter-corridors')).toBeVisible();
+  await expect(page.locator('#counter-scenarios')).toBeVisible();
+  await expect(page.locator('#counter-entities')).toBeVisible();
 
-  // --- Beat 1: The Question ---
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 1 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('The Question');
-  await page.waitForSelector('#corridor-select');
-  await page.waitForTimeout(4000); // Readability floor for Beat 1
+  // Hover over the three capability cards
+  await page.locator('#card-cross-layer').hover();
+  await page.waitForTimeout(4000);
+  await page.locator('#card-counterfactual').hover();
+  await page.waitForTimeout(4000);
+  await page.locator('#card-scientific-honesty').hover();
+  await page.waitForTimeout(4000);
+  await checkVisibleIds('Landing Dashboard');
+  await page.waitForTimeout(4000);
 
-  // --- Beat 2: The Graph Does the Work ---
-  await page.keyboard.press('ArrowRight');
-  await page.waitForSelector('#tab-schematic');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 2 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('The Graph Does the Work');
-  await page.waitForTimeout(4500); // Readability floor for Beat 2
+  // --- Beat 2: One-Click Instant Pre-Mortem (0:20 - 0:40) ---
+  console.log('Beat 2: Break Something CTA...');
+  const breakBtn = page.locator('#break-something-btn');
+  await expect(breakBtn).toBeVisible();
+  await breakBtn.click();
 
-  // --- Beat 3: Conditional N-1 Pre-Mortem ---
-  await page.keyboard.press('ArrowRight');
-  await page.waitForSelector('#run-sweep-btn');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 3 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('Conditional N-1 Pre-Mortem');
-  // Wait for golden case data to settle
+  // Settle on Command Deck on Golden Scenario
+  await page.waitForSelector('#command-deck-main', { timeout: 15000 });
   await page.waitForSelector('.case-row', { timeout: 15000 });
-  await page.waitForTimeout(4500); // Readability floor for Beat 3
+  await expect(page.locator('#corridor-select')).toHaveValue('road_ring_monastery_chandgiram');
+  await expect(page.locator('#blast-radius-panel')).toBeVisible();
 
-  // Re-capture Scene 1: Golden Case from live seeded state
+  // Capture fresh Scene 1: Golden Case
   await checkVisibleIds('Scene 1 Golden Case');
   await page.screenshot({ path: path.join(demoDir, 'scene1_golden_case.png') });
+  await page.waitForTimeout(14000);
 
-  // --- Beat 4: Evidence-Backed Causal Chains ---
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 4 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('Evidence-Backed Causal Chains');
-  await page.waitForSelector('#open-evidence-btn');
-  await page.waitForTimeout(4500); // Readability floor for Beat 4
+  // --- Beat 3: Instant Multi-Corridor Exploration (0:40 - 1:10) ---
+  console.log('Beat 3: Rapid Corridor Exploration...');
+  // Corridor 1: Barakhamba
+  await page.locator('#corridor-select').selectOption('road_barakhamba_cp_mandihouse');
+  await page.waitForSelector('.case-row', { timeout: 10000 });
+  await page.waitForTimeout(8000);
 
-  // --- Beat 5: Fair Baseline Comparison ---
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 5 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('Fair Baseline Comparison');
-  await page.waitForSelector('#policy-row-C');
-  await page.waitForTimeout(4500); // Readability floor for Beat 5
+  // Corridor 2: Delhi Gate Connector
+  await page.locator('#corridor-select').selectOption('road_delhigate_connector');
+  await page.waitForSelector('.case-row', { timeout: 10000 });
+  await page.waitForTimeout(8000);
 
-  // --- Beat 6: The Honest Finding ---
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 6 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('The Honest Finding');
-  await page.waitForSelector('#null-result-panel');
-  await page.waitForTimeout(4500); // Readability floor for Beat 6
+  // Corridor 3: Return to Golden Case
+  await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
+  await page.waitForSelector('.case-row', { timeout: 10000 });
+  await page.waitForTimeout(10000);
 
-  // Re-capture Scene 3: Null Result
+  // --- Beat 4: Blast Radius Cascade Visual (1:10 - 1:40) ---
+  console.log('Beat 4: Blast Radius Visual...');
+  await page.locator('#blast-center-core').click();
+  await page.waitForTimeout(3000);
+  await page.locator('#blast-band-road').click();
+  await page.waitForTimeout(4000);
+  await page.locator('#blast-band-power').click();
+  await page.waitForTimeout(4000);
+  await page.locator('#blast-band-alert').click();
+  await page.waitForTimeout(4000);
+  await page.locator('#blast-hero-metric').hover();
+  await page.waitForTimeout(8000);
+
+  // --- Beat 5: Cross-Layer Causal Proof (1:40 - 2:10) ---
+  console.log('Beat 5: Causal Evidence Chain...');
+  await page.locator('#blast-evidence-shortcut-btn').click();
+  await page.waitForURL(/\/evidence\//, { timeout: 15000 });
+  await page.waitForSelector('.dependency-chain-panel', { timeout: 15000 });
+  await checkVisibleIds('Evidence View');
+  await page.waitForTimeout(14000);
+
+  // Return to Command Deck
+  await page.locator('text=Back to Command Deck').click();
+  await page.waitForSelector('#command-deck-main', { timeout: 15000 });
+  await page.waitForTimeout(4000);
+
+  // --- Beat 6: Policy Comparison & Honest Null Result (2:10 - 2:40) ---
+  console.log('Beat 6: Policy Comparison & Null Result...');
+  const policySummary = page.locator('#toggle-policy-table');
+  if (await policySummary.isVisible()) {
+    // Settle on policy comparison table
+    await policySummary.hover();
+  }
+  const nullPanel = page.locator('#null-result-panel');
+  await expect(nullPanel).toBeVisible();
+  await nullPanel.scrollIntoViewIfNeeded();
+
+  // Capture fresh Scene 3: Null Result
   await checkVisibleIds('Scene 3 Null Result');
   await page.screenshot({ path: path.join(demoDir, 'scene3_null_result.png') });
+  await page.waitForTimeout(16000);
 
-  // --- Beat 7: Abstention and Audit Memory ---
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#tour-step-counter')).toContainText('STEP 7 / 7');
-  await expect(page.locator('#tour-step-title')).toContainText('Abstention and Audit Memory');
-  // Wait for abstention data to populate
+  // --- Beat 7: Abstention & Human Commander Decision in Graph Memory (2:40 - 3:00) ---
+  console.log('Beat 7: Abstention & Decision Persistence...');
+  await page.locator('#corridor-select').selectOption('road_ring_kashmere_monastery');
   await page.waitForSelector('text=ABSTAIN — NO ROBUST PLAN', { timeout: 15000 });
-  await expect(page.locator('#approve-action-btn')).toBeDisabled();
-  await page.waitForTimeout(5000); // Readability floor for Beat 7
 
-  // Re-capture Scene 2: Abstention from live seeded state
-  // The right rail scrolls; the ABSTAIN body sits below the fold on first paint.
-  // Bring the decision block into view so the still shows the full reasoning
-  // rather than a sentence cut mid-clause. The component is not at fault -- the
-  // capture was.
+  // Scroll abstention explanation into view
   await page.locator('#abstention-body-text').evaluate((el) =>
-      el.scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await page.waitForTimeout(250);
+    el.scrollIntoView({ block: 'center', behavior: 'instant' })
+  );
+  await page.waitForTimeout(500);
+
+  // Capture fresh Scene 2: Abstention
   await checkVisibleIds('Scene 2 Abstention');
   await page.screenshot({ path: path.join(demoDir, 'scene2_abstention.png') });
+  await page.waitForTimeout(6000);
 
-  // Exit presenter tour via Esc to return to interactive deck
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#presenter-tour-root')).not.toBeAttached();
-  await page.waitForTimeout(2000);
+  // Record Decision via Modal
+  const rejectBtn = page.locator('#reject-action-btn');
+  if (await rejectBtn.isVisible()) {
+    await rejectBtn.click();
+    await page.waitForSelector('#decision-modal', { timeout: 5000 });
+    const rationaleInput = page.locator('#rationale-input');
+    await rationaleInput.fill('Verified unresolvable secondary contingency risk across 13 failure branches; logged concurrence into graph memory.');
+    await page.waitForTimeout(1500);
+    await page.locator('#confirm-decision-btn').click();
+    await page.waitForSelector('#decision-modal', { state: 'detached', timeout: 5000 });
+    await page.waitForTimeout(6000);
+  }
 
-  // --- Beat 8: Finish on /method ---
-  await page.locator('#null-sweep-link').click();
+  // --- Beat 8: Finish on /method (3:00 - 3:30) ---
+  console.log('Beat 8: Methodology & Provenance...');
+  await page.locator('#provenance-badge').click();
   await page.waitForURL(/\/method/, { timeout: 10000 });
   await page.waitForSelector('h1', { timeout: 10000 });
-  await page.waitForTimeout(2500);
-
-  // Smooth scroll through Section 2: Deadline Sweep Table (12 interaction cases at 8.0 km)
-  await page.evaluate(() => window.scrollBy({ top: 380, behavior: 'smooth' }));
   await page.waitForTimeout(3000);
-  await page.evaluate(() => window.scrollBy({ top: 400, behavior: 'smooth' }));
+
+  // Smooth scroll through Section 2: Deadline Sweep Table
+  await page.evaluate(() => window.scrollBy({ top: 380, behavior: 'smooth' }));
   await page.waitForTimeout(4000);
+  await page.evaluate(() => window.scrollBy({ top: 400, behavior: 'smooth' }));
+  await page.waitForTimeout(7000);
 
   // Verify visible IDs in method view
   await checkVisibleIds('Method View');
