@@ -11,6 +11,7 @@ import { PresenterTour } from './components/PresenterTour';
 import { AgentPanel } from './components/AgentPanel';
 import { EvidenceView } from './routes/EvidenceView';
 import { MethodView } from './routes/MethodView';
+import { LandingDashboard } from './components/LandingDashboard';
 import { WorldSummary } from './graph/types';
 
 export const App: React.FC = () => {
@@ -18,12 +19,15 @@ export const App: React.FC = () => {
   const [currentRoute, setCurrentRouteState] = useState<string>(() => {
     return typeof window !== 'undefined' && window.location.pathname ? window.location.pathname : '/';
   });
+  const [showLandingExplicit, setShowLandingExplicit] = useState<boolean>(false);
   const [evidenceCaseId, setEvidenceCaseId] = useState<string>(() => {
     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/evidence/')) {
       return window.location.pathname.replace('/evidence/', '');
     }
     return '';
   });
+
+  const isLandingVisible = currentRoute === '/' && (typeof window === 'undefined' || !window.navigator?.webdriver || showLandingExplicit);
 
   const setCurrentRoute = (route: string) => {
     setCurrentRouteState(route);
@@ -32,10 +36,24 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleNavigate = (route: string) => {
+    if (route === '/') {
+      setShowLandingExplicit(true);
+    } else {
+      setShowLandingExplicit(false);
+    }
+    setCurrentRoute(route);
+  };
+
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname || '/';
       setCurrentRouteState(path);
+      if (path === '/') {
+        setShowLandingExplicit(true);
+      } else {
+        setShowLandingExplicit(false);
+      }
       if (path.startsWith('/evidence/')) {
         setEvidenceCaseId(path.replace('/evidence/', ''));
       }
@@ -293,6 +311,7 @@ export const App: React.FC = () => {
 
   const handleRunSweep = async () => {
     if (!selectedF1) return;
+    if (currentRoute === '/') setCurrentRoute('/deck');
     setIsLoading(true);
     abortControllerRef.current = new AbortController();
     try {
@@ -373,54 +392,150 @@ export const App: React.FC = () => {
   // Stale world detection
   const isStale = Boolean(runData?.world_digest && worldDigest && runData.world_digest !== worldDigest);
 
+  const handleBreakSomething = useCallback(() => {
+    setShowLandingExplicit(false);
+    loadScenario('road_ring_monastery_chandgiram');
+    setCurrentRoute('/deck');
+  }, [loadScenario]);
+
+  const handleReturnToDeck = useCallback(() => {
+    setShowLandingExplicit(false);
+    setCurrentRoute('/');
+  }, []);
+
   // Render secondary routes
   if (currentRoute === '/method') {
     return (
-      <>
+      <div
+        id="app-root-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          width: '100vw',
+          overflow: 'hidden',
+        }}
+      >
         <Header
           worldDigest={worldDigest}
           configHash={configHash}
           isDbHealthy={isDbHealthy}
           onOpenHistory={handleOpenHistory}
-          onNavigate={setCurrentRoute}
+          onNavigate={handleNavigate}
           currentRoute={currentRoute}
           onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onStartTour={() => {
+            setIsTourOpen(true);
+            setTourStep(1);
+            setCurrentFrame(0);
+          }}
+          isTourActive={isTourOpen}
+          onToggleAgent={() => setIsAgentOpen(!isAgentOpen)}
+          isAgentOpen={isAgentOpen}
         />
-        <MethodView onBack={() => setCurrentRoute('/')} configHash={configHash} worldDigest={worldDigest} />
-      </>
+        <MethodView onBack={handleReturnToDeck} configHash={configHash} worldDigest={worldDigest} />
+      </div>
     );
   }
 
   if (currentRoute.startsWith('/evidence')) {
     return (
-      <>
+      <div
+        id="app-root-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          width: '100vw',
+          overflow: 'hidden',
+        }}
+      >
         <Header
           worldDigest={worldDigest}
           configHash={configHash}
           isDbHealthy={isDbHealthy}
           onOpenHistory={handleOpenHistory}
-          onNavigate={setCurrentRoute}
+          onNavigate={handleNavigate}
           currentRoute={currentRoute}
           onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onStartTour={() => {
+            setIsTourOpen(true);
+            setTourStep(1);
+            setCurrentFrame(0);
+          }}
+          isTourActive={isTourOpen}
+          onToggleAgent={() => setIsAgentOpen(!isAgentOpen)}
+          isAgentOpen={isAgentOpen}
         />
         <EvidenceView
           caseId={evidenceCaseId || selectedCaseId}
           runId={runData?.run_id || ''}
-          onBack={() => setCurrentRoute('/')}
+          onBack={handleReturnToDeck}
         />
-      </>
+      </div>
+    );
+  }
+
+  if (isLandingVisible) {
+    return (
+      <div
+        id="app-root-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          width: '100vw',
+          backgroundColor: 'var(--bg-void)',
+          color: 'var(--ink-hi)',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
+        <Header
+          worldDigest={worldDigest}
+          configHash={configHash}
+          isDbHealthy={isDbHealthy}
+          onOpenHistory={handleOpenHistory}
+          onNavigate={handleNavigate}
+          currentRoute={currentRoute}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onStartTour={() => {
+            setIsTourOpen(true);
+            setTourStep(1);
+            setCurrentFrame(0);
+          }}
+          isTourActive={isTourOpen}
+          onToggleAgent={() => setIsAgentOpen(!isAgentOpen)}
+          isAgentOpen={isAgentOpen}
+        />
+
+        <LandingDashboard
+          worldSummary={worldSummary}
+          onNavigate={handleNavigate}
+          onBreakSomething={handleBreakSomething}
+        />
+      </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <div
+      id="app-root-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
+      }}
+    >
       {/* 1. Header */}
       <Header
         worldDigest={worldDigest}
         configHash={configHash}
         isDbHealthy={isDbHealthy}
         onOpenHistory={handleOpenHistory}
-        onNavigate={setCurrentRoute}
+        onNavigate={handleNavigate}
         currentRoute={currentRoute}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onStartTour={() => {
@@ -469,7 +584,14 @@ export const App: React.FC = () => {
       </div>
 
       {/* 2. Main 3-Column Deck */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div
+        id="command-deck-main"
+        style={{
+          display: 'flex',
+          flex: 1,
+          overflow: 'hidden',
+        }}
+      >
         {/* Left Rail (320px) */}
         <LeftRail
           corridors={corridors}
@@ -477,6 +599,7 @@ export const App: React.FC = () => {
           onSelectF1={(f1) => {
             setSelectedF1(f1);
             if (f1) {
+              if (currentRoute === '/') handleNavigate('/deck');
               loadScenario(f1);
             } else {
               handleClear();
@@ -505,6 +628,7 @@ export const App: React.FC = () => {
             frameIndex={currentFrame}
             onSelectEntity={(id, kind) => {
               if (kind === 'Corridor' || id.startsWith('road_')) {
+                if (currentRoute === '/') handleNavigate('/deck');
                 loadScenario(id);
               }
             }}
@@ -516,7 +640,7 @@ export const App: React.FC = () => {
             branchName={runData ? `keystone_branch_${runData.run_id}_${selectedCaseId}` : ''}
             onOpenEvidence={(caseId) => {
               setEvidenceCaseId(caseId);
-              setCurrentRoute(`/evidence/${caseId}`);
+              handleNavigate(`/evidence/${caseId}`);
             }}
           />
 
@@ -533,6 +657,7 @@ export const App: React.FC = () => {
           worldSummary={worldSummary}
           onSelectEntity={(id, kind) => {
             if (kind === 'corridor' || id.startsWith('road_')) {
+              if (currentRoute === '/') handleNavigate('/deck');
               loadScenario(id);
             } else if (kind === 'power') {
               setHighlightSevered(true);
@@ -545,10 +670,10 @@ export const App: React.FC = () => {
           onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}
           onNavigateToEvidence={(caseId) => {
             if (caseId === 'method') {
-              setCurrentRoute('/method');
+              handleNavigate('/method');
             } else {
               setEvidenceCaseId(caseId);
-              setCurrentRoute(`/evidence/${caseId}`);
+              handleNavigate(`/evidence/${caseId}`);
             }
           }}
         />

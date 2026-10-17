@@ -124,6 +124,44 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <StatusBadge status="SYNTHETIC" label="REFERENCE + SYNTHETIC ▸" />
         </span>
+
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }} aria-label="Deck and Landing Navigation">
+          <button
+            id="nav-landing-btn"
+            onClick={() => onNavigate('/')}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '2px 8px',
+              fontSize: 'var(--fs-micro)',
+              fontWeight: 700,
+              color: currentRoute === '/' ? 'var(--accent)' : 'var(--ink-mid)',
+              cursor: 'pointer',
+              borderRadius: 'var(--r-ctl)',
+            }}
+            title="KEYSTONE Landing Page"
+          >
+            Landing
+          </button>
+          <span style={{ color: 'var(--line-hair)' }}>/</span>
+          <button
+            id="nav-deck-btn"
+            onClick={() => onNavigate('/deck')}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '2px 8px',
+              fontSize: 'var(--fs-micro)',
+              fontWeight: 700,
+              color: currentRoute === '/deck' ? 'var(--accent)' : 'var(--ink-mid)',
+              cursor: 'pointer',
+              borderRadius: 'var(--r-ctl)',
+            }}
+            title="Incident Command Deck"
+          >
+            Command Deck
+          </button>
+        </nav>
       </div>
 
       {/* Center meta badges */}

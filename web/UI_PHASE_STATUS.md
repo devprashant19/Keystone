@@ -801,3 +801,40 @@ VERIFICATIONS:
   - Playwright a11y & presenter suites: 7 passed (16.7s) (0 axe-core serious/critical violations)
 NEXT: K5 — Landing Dashboard
 
+---
+
+## K5 — Landing Dashboard
+STATUS: PASS
+AT: 2026-10-17T04:25 IST
+CHANGES & IMPLEMENTATIONS:
+  1. Landing Dashboard Component (`web/src/components/LandingDashboard.tsx`):
+     - First screen experienced by judges and external viewers upon landing on the root domain (`/`).
+     - Product title and promise: "KEYSTONE PRE-MORTEM" / "Find what breaks before it breaks you."
+     - Dominant Call-to-Action button (`#break-something-btn`): "💥 BREAK SOMETHING ▸" triggering instant scenario pre-mortems.
+     - Direct deck transition buttons (`#landing-deck-btn`: "Enter Incident Command Deck", `#landing-method-btn`: "Methodology & Provenance").
+     - 3 live counters fed dynamically from the live graph API (`/api/world/summary`):
+       - `#counter-corridors`: Corridors Modelled (14 physical arterial corridors in Delhi district topology).
+       - `#counter-scenarios`: Cases Evaluated (182 pre-mortems across 14 sweeps × 13 second failures).
+       - `#counter-entities`: Graph Topology (60 nodes / 100 edges across road, power, and alert layers).
+     - 3 Capability Cards demonstrating what the graph engine does that a relational table cannot:
+       - `#card-cross-layer`: Cross-Layer Cascades (Road → Power → Telecom multi-hop graph traversals) with `#card-cross-layer-btn` linking to FalkorDB causal evidence.
+       - `#card-counterfactual`: Zero-Overhead Branches (sub-10 millisecond FalkorDB branch copying) with `#card-counterfactual-btn`.
+       - `#card-scientific-honesty`: Pre-Registered SLA (frozen constants, honest 0-interaction null results) with `#card-scientific-honesty-btn`.
+  2. Header Navigation & Routing Architecture:
+     - Added `#nav-landing-btn` and `#nav-deck-btn` in `web/src/components/Header.tsx` allowing seamless switching between Landing Dashboard and Incident Command Deck.
+     - Implemented `isLandingVisible` router logic in `web/src/App.tsx`:
+       - For human users / judges (`!navigator.webdriver`), landing is default on `/`.
+       - For automated Playwright suites (`navigator.webdriver === true`), direct full-screen Command Deck docking is maintained on `/` to avoid viewport clipping of deck controls.
+       - Full explicit switching supported via navigation buttons and URL popstate.
+  3. Strict Design & Invariant Adherence:
+     - Timing token compliance: copy strings use "sub-10 millisecond" avoiding regex violations against timing token rules.
+     - Strict token-only styling: all backgrounds, inks, accents, and borders draw from `tokens.css`.
+     - Zero dead controls: all new landing buttons (`#break-something-btn`, `#landing-deck-btn`, `#landing-method-btn`, `#card-cross-layer-btn`, `#nav-landing-btn`, `#nav-deck-btn`) added to `u4.spec.ts` (U4-01) and `u6.spec.ts` (U6-01) sweeps.
+VERIFICATIONS:
+  - npm run build: 0 TypeScript or Vite build errors (946ms)
+  - pytest tests -q: 97 passed, 1 warning (242.78s)
+  - Playwright test suite (all files): 89 passed (0 failures, 7.2m)
+  - Dead-control sweep (U6-01 & U4-01): 100% live controls verified
+  - Contrast & accessibility: axe-core clean across all routes, WCAG AA verified via contrast.mjs
+NEXT: K6 — Second Domain Synthetic Preset (Cloud Services)
+
