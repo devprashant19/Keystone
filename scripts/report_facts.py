@@ -85,7 +85,7 @@ def get_report_facts():
         "falkordb_version": falkordb_version,
         "decomposition": decomposition,
         "pytest_count": 97,
-        "playwright_count": 89,
+        "playwright_count": 94,
     }
     return facts
 
