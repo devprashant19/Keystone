@@ -17,6 +17,48 @@
 
 KEYSTONE is not a predictive weather dashboard, nor does it claim to calculate real-world emergency dispatch probabilities. It is a deterministic, graph-native pre-mortem decision engine. By evaluating **conditional $N-1$ contingencies** on isolated graph clones (`GRAPH.COPY`), KEYSTONE solves the cascading failure problem that static tabular heuristics cannot see.
 
+### Runtime Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client["Client Interface"]
+        UI["Browser UI<br/>(React 18 / Command Deck)"]
+    end
+
+    subgraph API["Service Layer (FastAPI :8000)"]
+        Endpoints["REST Endpoints<br/>(/api/run, /api/scenario, /api/health)"]
+        Orchestrator["Branch Orchestrator<br/>(BranchOrchestrator)"]
+        Evaluator["Shared Evaluator<br/>(Dijkstra & Bounded BFS)"]
+    end
+
+    subgraph AgentBranch["Optional Copilot Agent (Decoupled)"]
+        Agent["JaalAgent<br/>(Autonomous Copilot)"]
+        T1["get_corridor_inventory"]
+        T2["evaluate_contingency"]
+        T3["get_case_evidence"]
+        T4["record_commander_decision"]
+        Agent --> T1 & T2 & T3 & T4
+    end
+
+    subgraph Database["FalkorDB 6.0.2 (:6379)"]
+        World[("keystone_world<br/>(Immutable Base Graph)")]
+        Branches[("keystone_branch_{run}_{case}<br/>(GRAPH.COPY Clones)")]
+        Memory[("keystone_memory<br/>(Audit Ledger & Decisions)")]
+    end
+
+    UI -->|HTTP / JSON| Endpoints
+    Endpoints --> Orchestrator
+    Endpoints -.->|Optional Tool Calls| Agent
+    T1 & T2 & T3 & T4 --> Orchestrator
+    Orchestrator -->|Read Base| World
+    Orchestrator -->|GRAPH.COPY / Mutations| Branches
+    Branches --> Evaluator
+    Evaluator --> Orchestrator
+    Orchestrator -->|Commit Decisions & Ledgers| Memory
+```
+
+> **Architecture Proof:** This diagram proves the decoupled runtime architecture where the primary Command Deck operates deterministically via isolated FalkorDB branches (`GRAPH.COPY`) completely independently of the optional copilot agent (the Command Deck operates with 100% functionality with the agent disabled).
+
 ---
 
 ## What it looks like
@@ -28,7 +70,7 @@ KEYSTONE is not a predictive weather dashboard, nor does it claim to calculate r
 | ![ABSTAIN with real reason code](web/verification/demo/scene2_abstention.png) | ![The honest null finding](web/verification/demo/scene3_null_result.png) |
 | **ABSTAIN with real reason code.** Honest refusal when no candidate action prevents all SLA breaches across every second-failure contingency. | **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold; reported openly on the primary path. |
 
-- **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:26) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
+- **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:33) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
 - **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` (e.g., `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
 
 ---
@@ -62,48 +104,53 @@ KEYSTONE maintains three distinct graph namespaces in FalkorDB:
 - `keystone_branch_{run}_{case}`: Disposable counterfactual branch copies (created via `GRAPH.COPY`, deleted in `finally:` blocks).
 - `keystone_memory`: Append-only audit log storing runs, scenario mutation ledgers, and commander decisions.
 
+```mermaid
+graph TD
+    classDef real fill:#e8f4fc,stroke:#2b6cb0,stroke-width:2px,color:#1a365d;
+    classDef synth fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f;
+    classDef hazard fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d;
+
+    HazardZone["HazardZone<br/>(Yamuna River Flood)"]:::hazard
+    Intersection["Intersection<br/>(Delhi Arterial OSM)"]:::real
+    Facility["Facility<br/>(Hospitals & Triage)"]:::real
+    Depot["Depot<br/>(Ambulance & Fire HQ)"]:::synth
+    Responder["Responder<br/>(Stationed Fleet)"]:::synth
+    PowerFeeder["PowerFeeder<br/>(Corridor-Carried Feeders)"]:::synth
+    Tower["Tower<br/>(Cellular / Microwave)"]:::synth
+    RelayContact["RelayContact<br/>(Triage Coverage Hubs)"]:::synth
+
+    HazardZone -.->|INUNDATES| Intersection
+    Intersection -->|ROAD_ARC| Intersection
+    Facility -->|ACCESS_VIA| Intersection
+    Depot -->|DEPOT_AT| Intersection
+    Responder -->|STATIONED_AT| Depot
+    PowerFeeder -->|FEEDS_TOWER| Tower
+    Tower -->|ALERT_ARC| Tower
+    Tower -->|ALERT_ARC| RelayContact
+    RelayContact -->|COVERS| Facility
 ```
-                  ┌────────────────────────┐
-                  │      HazardZone        │
-                  │ (Yamuna River Flood)   │
-                  └───────────┬────────────┘
-                              │ INUNDATES
-                              ▼
-┌──────────────┐         ROAD_ARC (x2)        ┌──────────────┐
-│ Intersection │◄────────────────────────────►│ Intersection │
-└──────┬───────┘                              └───────▲──────┘
-       │                                              │
-       │ ACCESS_VIA (with offset_km)                  │ DEPOT_AT
-       ▼                                              │
-┌──────────────┐                              ┌───────┴──────┐
-│   Facility   │                              │    Depot     │
-│ (LNJP / Triage)                             │(Ambulance HQ)│
-└──────▲───────┘                              └──────────────┘
-       │
-       │ COVERS
-┌──────┴───────┐         ALERT_ARC            ┌──────────────┐
-│ RelayContact │◄─────────────────────────────│    Tower     │
-└──────────────┘                              └───────▲──────┘
-                                                      │ FEEDS_TOWER
-                                              ┌───────┴──────┐
-                                              │ PowerFeeder  │
-                                              └──────────────┘
-```
+
+> **Schema Proof:** This diagram proves the multi-layer topological graph schema connecting real-world Delhi arterial roads to synthetic power grids, telecom relay networks, and emergency hospital access routes.
 
 ### Node Labels
 - `Intersection`: 13 arterial junctions derived from Delhi OpenStreetMap data (`id`, `name`, `lon`, `lat`, `data_origin`).
-- `Facility`: Critical emergency endpoints (`hosp_lnjp`, `hosp_sushruta`).
-- `Depot`: Emergency response dispatch bases (`depot_north`, `depot_south`).
-- `PowerFeeder`: Grid feeders carried along specific road corridors.
-- `Tower`: Cellular / microwave relay towers.
-- `RelayContact`: Emergency contact hubs covering critical facilities.
+- `Facility`: 10 critical emergency endpoints (`hosp_lnjp`, `hosp_sushruta`, `wtp_wazirabad`, etc.).
+- `Depot`: 2 emergency response dispatch bases (`depot_north`, `depot_south`).
+- `Responder`: Emergency response units stationed at depots.
+- `PowerFeeder`: 7 electrical grid feeders carried along specific road corridors.
+- `Tower`: 8 cellular / microwave communication relay towers.
+- `RelayContact`: 12 emergency contact hubs covering critical facilities.
+- `HazardZone`: 6 riverine flood inundation zones derived from Delhi July 2023 flood contours.
 
 ### Relationship Types
-- `ROAD_ARC`: Two directed arcs per physical corridor sharing `corridor_id`.
-- `ACCESS_VIA`: Connects facilities to road intersections with explicit `access_offset_km`.
-- `FEEDS_TOWER`: Electrical feeder powering a telecom tower.
-- `ALERT_ARC`: Microwave / mesh communication link with explicit `latency_min`.
-- `COVERS`: Associates a relay contact hub with a hospital facility.
+- `ROAD_ARC`: Directed road segments connecting intersections with `length_km` and `travel_cost_min`.
+- `ACCESS_VIA`: Connects facilities to road intersections with explicit `offset_km`.
+- `DEPOT_AT`: Associates dispatch depots with road intersections.
+- `STATIONED_AT`: Stations emergency responders at dispatch depots.
+- `FEEDS_TOWER`: Electrical feeder powering a telecom tower (`carrier_corridor_id`).
+- `ALERT_ARC`: Microwave / mesh communication link with explicit `latency_min` and `carrier_corridor_id`.
+- `COVERS`: Associates an alert relay contact hub with a hospital facility.
+- `INUNDATES`: Models spatial intersection of flood hazard zones with road corridors during scenario evaluation.
 
 ---
 
