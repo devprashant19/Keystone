@@ -103,7 +103,11 @@ thirty seconds of it in the demo. Move the cursor slowly — the judge has to fo
 > and on every one of them the panel reports zero."
 
 **On screen:** the power band reads `0 / 7 feeders dark` with "no feeder carried on this
-corridor". The golden corridor carries exactly one feeder, `pf_chandrawal`.
+corridor".
+
+> Note: loading a scenario auto-selects the first case, so the deck opens showing f1 **and**
+> f2 together. On the golden case that is `2 / 14 corridors severed` and `2 / 7 feeders dark`
+> (`pf_chandrawal` + `pf_cp`). Read the counts off the screen rather than from this document.
 
 **Why this scores:** almost nobody else will have this beat. You volunteer a case where your
 own product has nothing to show, and demonstrate that it invents nothing to fill the space.

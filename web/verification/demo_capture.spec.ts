@@ -105,6 +105,34 @@ test.describe('Demo Scenes & Storyboard Capture (Live API)', () => {
     await page.screenshot({ path: path.join(demoDir, 'still_503_unavailable.png') });
     await page.unroute('/api/health');
 
+    // --- Scene 4: Agent tool-selection trace (Track 01 evidence) ---
+    // The copilot is the Track 01 centrepiece: a plain-language question resolved to a
+    // typed graph tool, with the tool and its arguments shown, and a grounding badge that
+    // asserts every figure in the answer came back from a tool result. The README had no
+    // image of it, so a reader never saw the thing the track is judged on.
+    await page.goto('/');
+    // Select the corridor FIRST. Opening the copilot from a bare load leaves #corridor-select
+    // empty, so the blast radius has no corridor to resolve and Layer 2 reads
+    // "0 / 7 feeders dark" beside a ROOT FAILURE that does carry a feeder - a contradictory
+    // frame. Selecting first auto-loads the precomputed scenario (App.tsx useEffect on
+    // selectedF1) so the panel is captured over a coherent deck.
+    await page.waitForSelector('#corridor-select', { timeout: 15000 });
+    await page.locator('#corridor-select').selectOption('road_ring_monastery_chandgiram');
+    await page.waitForSelector('#sweep-complete-badge', { timeout: 120000 });
+    // Loading a scenario auto-selects the first case, so the blast radius reflects f1+f2:
+    // both road_ring_monastery_chandgiram (pf_chandrawal) and road_barakhamba_cp_mandihouse
+    // (pf_cp) carry a feeder, hence 2 of 7.
+    await expect(page.locator('#blast-band-power')).toContainText('2 / 7 feeders dark');
+    await page.locator('#toggle-agent-panel').click();
+    await page.waitForSelector('#agent-query-input', { timeout: 15000 });
+    await page.locator('#agent-query-input').fill('What fails if monastery_chandgiram floods?');
+    await page.locator('#agent-submit-btn').click();
+    await page.waitForSelector('#agent-tool-trace', { timeout: 120000 });
+    await expect(page.locator('#agent-grounded-badge')).toBeVisible();
+    await expect(page.locator('#agent-answer-text')).toBeVisible();
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: path.join(demoDir, 'scene4_agent_trace.png') });
+
     // --- Still: Method & Architecture Provenance (Live API) ---
     await page.goto('/method');
     await page.waitForSelector('h1', { timeout: 15000 });
