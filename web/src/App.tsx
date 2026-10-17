@@ -157,30 +157,50 @@ export const App: React.FC = () => {
       })
       .catch((err) => console.error('Failed to load world summary', err));
 
+    let isCancelled = false;
     fetch('/api/runs?limit=1')
       .then((res) => res.json())
       .then(async (runsData) => {
+        if (isCancelled) return;
         if (runsData.runs && runsData.runs.length > 0) {
           const rId = runsData.runs[0].run_id;
           const runRes = await fetch(`/api/run/${rId}`);
-          if (runRes.ok) {
+          if (runRes.ok && !isCancelled) {
             const data = await runRes.json();
             if (data && data.recommendation && data.policies) {
-              setRunData(data);
-              setSelectedF1(data.f1_corridor_id);
-              if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
-              setCurrentFrame(4);
+              setSelectedF1((currentF1) => {
+                if (currentF1) return currentF1;
+                setRunData(data);
+                if (data.cases?.length) setSelectedCaseId(data.cases[0].case_id);
+                setCurrentFrame(4);
+                return data.f1_corridor_id;
+              });
               return;
             }
           }
         } else if (runsData.runs && runsData.runs.length === 0) {
           return;
         }
-        loadScenario('road_ring_monastery_chandgiram');
+        if (!isCancelled) {
+          setSelectedF1((currentF1) => {
+            if (currentF1) return currentF1;
+            loadScenario('road_ring_monastery_chandgiram');
+            return 'road_ring_monastery_chandgiram';
+          });
+        }
       })
       .catch(() => {
-        loadScenario('road_ring_monastery_chandgiram');
+        if (!isCancelled) {
+          setSelectedF1((currentF1) => {
+            if (currentF1) return currentF1;
+            loadScenario('road_ring_monastery_chandgiram');
+            return 'road_ring_monastery_chandgiram';
+          });
+        }
       });
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // K1: Instant Scenario Loader

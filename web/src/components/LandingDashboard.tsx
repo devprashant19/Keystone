@@ -1,5 +1,6 @@
 import React from 'react';
 import { WorldSummary } from '../graph/types';
+import { IconPowerFeeder, IconBranch, IconEvidence } from './icons';
 
 interface LandingDashboardProps {
   worldSummary: WorldSummary | null;
@@ -37,29 +38,43 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
         alignItems: 'center',
         width: '100%',
         boxSizing: 'border-box',
-        padding: 'var(--s4) var(--s5) var(--s3) var(--s5)',
+        padding: 'clamp(12px, 2vh, 24px) clamp(16px, 3vw, 40px) 12px clamp(16px, 3vw, 40px)',
         minHeight: 0,
+        height: '100%',
+        overflow: 'hidden',
       }}
       aria-label="KEYSTONE Pre-Mortem Landing"
     >
-      <div style={{ maxWidth: '1080px', width: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--s3)', margin: 'auto 0' }}>
+      <div
+        style={{
+          maxWidth: '1140px',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          flex: 1,
+          minHeight: 0,
+          gap: 'clamp(10px, 1.8vh, 22px)',
+        }}
+      >
         {/* 1. Hero Eyebrow, Wordmark, and Promise */}
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'clamp(4px, 1vh, 16px)' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 'var(--s1)',
-              padding: '2px 10px',
+              gap: '6px',
+              padding: '4px 14px',
               backgroundColor: 'var(--bg-panel)',
               border: '1px solid var(--line-hair)',
-              borderRadius: 'var(--r-chip)',
+              borderRadius: 'var(--r-pill)',
               fontSize: 'var(--fs-micro)',
               fontWeight: 700,
-              letterSpacing: '0.08em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: 'var(--accent)',
-              marginBottom: 'var(--s2)',
+              marginBottom: 'clamp(6px, 1vh, 12px)',
+              boxShadow: 'var(--sh-1)',
             }}
           >
             <span>◈</span>
@@ -67,12 +82,15 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           </div>
 
           <h1
+            id="landing-heading"
             style={{
-              fontSize: 'var(--fs-h1)',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              margin: '0 0 var(--s2) 0',
-              lineHeight: 'var(--lh-tight)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.4rem, 4.6vw, 3.8rem)',
+              textTransform: 'uppercase',
+              fontWeight: 400,
+              letterSpacing: '0.01em',
+              margin: '0 0 clamp(6px, 1vh, 12px) 0',
+              lineHeight: 1.02,
               color: 'var(--ink-hi)',
             }}
           >
@@ -81,10 +99,10 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
 
           <p
             style={{
-              fontSize: 'var(--fs-body)',
+              fontSize: 'clamp(13px, 1vw + 10px, 15px)',
               color: 'var(--ink-mid)',
-              maxWidth: '680px',
-              margin: '0 0 var(--s4) 0',
+              maxWidth: '720px',
+              margin: '0 0 clamp(10px, 1.6vh, 20px) 0',
               lineHeight: 'var(--lh-prose)',
             }}
           >
@@ -98,16 +116,18 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               id="break-something-btn"
               onClick={onBreakSomething}
               style={{
-                backgroundColor: 'var(--fail)',
-                color: 'var(--bg-void)',
-                border: '2px solid var(--line-firm)',
+                background: 'linear-gradient(180deg, #c8173f 0%, #9c0d2f 100%)',
+                color: '#ffffff',
+                border: '1px solid rgba(0, 0, 0, 0.15)',
                 borderRadius: 'var(--r-ctl)',
-                padding: 'var(--s2) var(--s5)',
+                padding: '10px 24px',
                 fontSize: 'var(--fs-ui)',
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
+                boxShadow: '0 6px 18px -4px rgba(156, 13, 47, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+                transition: 'transform 160ms var(--ease-out), box-shadow 160ms',
               }}
               aria-label="Break something: launch incident command deck on golden scenario"
             >
@@ -122,10 +142,12 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
                 color: 'var(--ink-hi)',
                 border: '1px solid var(--line-hair)',
                 borderRadius: 'var(--r-ctl)',
-                padding: 'var(--s2) var(--s4)',
+                padding: '10px 20px',
                 fontSize: 'var(--fs-cap)',
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: 'pointer',
+                boxShadow: 'var(--sh-1)',
+                transition: 'background-color 160ms, border-color 160ms',
               }}
             >
               Enter Incident Command Deck
@@ -137,12 +159,13 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               style={{
                 backgroundColor: 'transparent',
                 color: 'var(--accent)',
-                border: '1px solid var(--accent)',
+                border: '1px solid var(--line-hair)',
                 borderRadius: 'var(--r-ctl)',
-                padding: 'var(--s2) var(--s4)',
+                padding: '10px 20px',
                 fontSize: 'var(--fs-cap)',
                 fontWeight: 600,
                 cursor: 'pointer',
+                transition: 'border-color 160ms, background-color 160ms',
               }}
             >
               Methodology & Provenance
@@ -157,7 +180,6 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: 'var(--s3)',
-            marginTop: 'var(--s2)',
           }}
           role="region"
           aria-label="Live System Counters"
@@ -167,18 +189,19 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             id="counter-corridors"
             style={{
               backgroundColor: 'var(--bg-panel)',
-              border: '2px solid var(--line-firm)',
+              border: '1px solid var(--line-hair)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s3) var(--s4)',
+              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
               Corridors Modelled
             </span>
-            <div className="mono" style={{ fontSize: 'var(--fs-metric)', fontWeight: 800, color: 'var(--accent)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--accent)', lineHeight: 1 }}>
               {corridorsCount}
             </div>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
@@ -191,18 +214,19 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             id="counter-scenarios"
             style={{
               backgroundColor: 'var(--bg-panel)',
-              border: '2px solid var(--line-firm)',
+              border: '1px solid var(--line-hair)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s3) var(--s4)',
+              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
               Cases Evaluated
             </span>
-            <div className="mono" style={{ fontSize: 'var(--fs-metric)', fontWeight: 800, color: 'var(--branch)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--branch)', lineHeight: 1 }}>
               {totalCases}
             </div>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
@@ -215,18 +239,19 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             id="counter-entities"
             style={{
               backgroundColor: 'var(--bg-panel)',
-              border: '2px solid var(--line-firm)',
+              border: '1px solid var(--line-hair)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s3) var(--s4)',
+              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
               Graph Topology
             </span>
-            <div className="mono" style={{ fontSize: 'var(--fs-metric)', fontWeight: 800, color: 'var(--ok)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--ok)', lineHeight: 1 }}>
               {nodesCount} / {edgesCount}
             </div>
             <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
@@ -235,14 +260,13 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           </div>
         </div>
 
-        {/* 3. Three Cards: What the graph does that a table cannot */}
+        {/* 3. Three Capability Cards: What the graph does that a table cannot */}
         <div
           id="landing-graph-cards"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 'var(--s3)',
-            marginTop: 'var(--s2)',
           }}
           role="region"
           aria-label="Capabilities of Graph-Native Architecture"
@@ -251,20 +275,73 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="card-cross-layer"
             style={{
+              position: 'relative',
+              overflow: 'hidden',
               backgroundColor: 'var(--bg-panel)',
               border: '1px solid var(--line-hair)',
-              borderTop: '4px solid var(--fail)',
+              borderTop: '3px solid var(--fail)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s4)',
+              padding: 'clamp(14px, 2vh, 22px)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <div>
-              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--fail)', letterSpacing: '0.04em', marginBottom: 'var(--s1)' }}>
+            {/* Ghost Numeral */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '-4px',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                lineHeight: 1,
+                color: 'var(--line-hair)',
+                opacity: 0.6,
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: 0,
+              }}
+            >
+              01
+            </div>
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {/* Icon Chip */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--r-chip)',
+                  backgroundColor: 'var(--fail-wash)',
+                  color: 'var(--fail)',
+                  marginBottom: 'var(--s2)',
+                  border: '1px solid var(--line-hair)',
+                }}
+              >
+                <IconPowerFeeder size={16} />
+              </div>
+
+              {/* Eyebrow */}
+              <div
+                className="eyebrow"
+                style={{
+                  fontSize: 'var(--fs-micro)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  color: 'var(--fail)',
+                  letterSpacing: '0.10em',
+                  marginBottom: 'var(--s1)',
+                }}
+              >
                 01 · Cross-Layer Cascades
               </div>
+
               <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
                 Road → Power → Telecom
               </h3>
@@ -276,6 +353,8 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               id="card-cross-layer-btn"
               onClick={() => onNavigate('/evidence/road_ring_monastery_chandgiram__road_ring_kashmere_monastery')}
               style={{
+                position: 'relative',
+                zIndex: 1,
                 background: 'none',
                 border: 'none',
                 color: 'var(--accent)',
@@ -294,20 +373,73 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="card-counterfactual"
             style={{
+              position: 'relative',
+              overflow: 'hidden',
               backgroundColor: 'var(--bg-panel)',
               border: '1px solid var(--line-hair)',
-              borderTop: '4px solid var(--branch)',
+              borderTop: '3px solid var(--branch)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s4)',
+              padding: 'clamp(14px, 2vh, 22px)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <div>
-              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--branch)', letterSpacing: '0.04em', marginBottom: 'var(--s1)' }}>
+            {/* Ghost Numeral */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '-4px',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                lineHeight: 1,
+                color: 'var(--line-hair)',
+                opacity: 0.6,
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: 0,
+              }}
+            >
+              02
+            </div>
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {/* Icon Chip */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--r-chip)',
+                  backgroundColor: 'var(--branch-wash)',
+                  color: 'var(--branch)',
+                  marginBottom: 'var(--s2)',
+                  border: '1px solid var(--line-hair)',
+                }}
+              >
+                <IconBranch size={16} />
+              </div>
+
+              {/* Eyebrow */}
+              <div
+                className="eyebrow"
+                style={{
+                  fontSize: 'var(--fs-micro)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  color: 'var(--branch)',
+                  letterSpacing: '0.10em',
+                  marginBottom: 'var(--s1)',
+                }}
+              >
                 02 · Branch-Isolated Forking
               </div>
+
               <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
                 Zero-Overhead Branches
               </h3>
@@ -319,6 +451,8 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               id="card-counterfactual-btn"
               onClick={() => onNavigate('/deck')}
               style={{
+                position: 'relative',
+                zIndex: 1,
                 background: 'none',
                 border: 'none',
                 color: 'var(--accent)',
@@ -337,20 +471,73 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="card-scientific-honesty"
             style={{
+              position: 'relative',
+              overflow: 'hidden',
               backgroundColor: 'var(--bg-panel)',
               border: '1px solid var(--line-hair)',
-              borderTop: '4px solid var(--ok)',
+              borderTop: '3px solid var(--ok)',
               borderRadius: 'var(--r-panel)',
-              padding: 'var(--s4)',
+              padding: 'clamp(14px, 2vh, 22px)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              boxShadow: 'var(--sh-1)',
             }}
           >
-            <div>
-              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ok)', letterSpacing: '0.04em', marginBottom: 'var(--s1)' }}>
+            {/* Ghost Numeral */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '-4px',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                lineHeight: 1,
+                color: 'var(--line-hair)',
+                opacity: 0.6,
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: 0,
+              }}
+            >
+              03
+            </div>
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {/* Icon Chip */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--r-chip)',
+                  backgroundColor: 'var(--ok-wash)',
+                  color: 'var(--ok)',
+                  marginBottom: 'var(--s2)',
+                  border: '1px solid var(--line-hair)',
+                }}
+              >
+                <IconEvidence size={16} />
+              </div>
+
+              {/* Eyebrow */}
+              <div
+                className="eyebrow"
+                style={{
+                  fontSize: 'var(--fs-micro)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  color: 'var(--ok)',
+                  letterSpacing: '0.10em',
+                  marginBottom: 'var(--s1)',
+                }}
+              >
                 03 · Pre-Registered SLA
               </div>
+
               <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
                 Scientific Honesty
               </h3>
@@ -362,6 +549,8 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
               id="card-scientific-honesty-btn"
               onClick={() => onNavigate('/method')}
               style={{
+                position: 'relative',
+                zIndex: 1,
                 background: 'none',
                 border: 'none',
                 color: 'var(--accent)',
@@ -382,10 +571,11 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
       <div
         id="landing-provenance-strip"
         style={{
-          maxWidth: '1080px',
+          maxWidth: '1140px',
           width: '100%',
           borderTop: '1px solid var(--line-hair)',
-          paddingTop: 'var(--s2)',
+          paddingTop: '10px',
+          paddingBottom: '2px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -394,6 +584,7 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           flexWrap: 'wrap',
           gap: 'var(--s2)',
           boxSizing: 'border-box',
+          marginTop: 'clamp(8px, 1.4vh, 16px)',
         }}
       >
         <span>Real Delhi arterial geometry, MIT-licensed. Power and telecom layers synthetic and labelled.</span>

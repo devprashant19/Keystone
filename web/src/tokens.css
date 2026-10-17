@@ -41,9 +41,8 @@
   --warn:       #6b5000;   /* watch / degraded: deep yellow-amber */
   --warn-wash:  #fff4c7;
   --fail:       #9c0d2f;   /* critical / breach / abstain: crimson */
-  --fail-wash:  #ffdfe6;
-  --synthetic:  #557089;   /* steel muted */
-  --synthetic-wash: #e8f2f9;
+  --synthetic:  #284560;   /* slate-navy mid ink (>=4.5:1 AA on surfaces & washes) */
+  --synthetic-wash: #e2f1fb;
 
   /* Typography */
   --font-display: 'Anton', -apple-system, BlinkMacSystemFont, sans-serif;

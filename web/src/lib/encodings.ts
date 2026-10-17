@@ -97,6 +97,7 @@ export function getStatusEncoding(status: string): EncodingStyle {
       return {
         concept: 'Synthetic provenance',
         colorVar: 'var(--synthetic)',
+        washVar: 'var(--synthetic-wash)',
         badgeText: 'SYNTHETIC',
         strokeWidth: 1,
         strokeDasharray: '2 2',
@@ -109,6 +110,7 @@ export function getStatusEncoding(status: string): EncodingStyle {
       return {
         concept: 'Assumed adjacency',
         colorVar: 'var(--synthetic)',
+        washVar: 'var(--synthetic-wash)',
         badgeText: 'ASSUMED',
         strokeWidth: 1,
         strokeDasharray: '2 2',
