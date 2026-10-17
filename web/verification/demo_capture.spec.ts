@@ -53,6 +53,15 @@ test.describe('Demo Scenes & Storyboard Capture (Live API)', () => {
     await page.locator('#run-sweep-btn').click();
     await page.waitForSelector('.case-row', { timeout: 60000 });
 
+    // Wait for the run to SETTLE before capturing. Case rows stream in while the sweep is
+    // still running, so waiting on .case-row alone caught a mid-run frame: the left rail
+    // read "EVALUATING 13 SCENARIO BRANCHES..." with a CANCEL RUN button while the list
+    // beside it was already fully populated. That still is embedded in the README, so a
+    // judge's first impression was an app contradicting itself. #cancel-run-btn renders
+    // only while isRunning, and #sweep-complete-badge only once the sweep is complete.
+    await page.locator('#sweep-complete-badge').waitFor({ state: 'visible', timeout: 120000 });
+    await expect(page.locator('#cancel-run-btn')).toBeHidden();
+
     const breachRow = page.locator('.case-row:has-text("BREACH")').first();
     await expect(breachRow).toBeVisible();
     await breachRow.click();

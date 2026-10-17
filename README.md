@@ -444,11 +444,3 @@ KEYSTONE includes an operational Track 01 Incident Copilot Agent that acts on co
 - **Presenter Deck Independence:** The main deck UI operates 100% independently; opening or closing the Agent Panel has zero impact on core visual sweep inspection.
 
 ---
-
-## 16. Submission Schedule, Team & Administrative Status
-
-- **Submission Window:** Submissions **OPEN 17 Oct 2026 01:03 IST** and **CLOSE 18 Oct 2026 23:59 IST**.
-- **Team Immutability:** Hackathon rules dictate that the team composition cannot be changed after submitting.
-- **Team Profile:** Team `codeXHW9QQ` ("Parser") is currently a solo entry (1 of 4 seats utilized).
-- **Submission Buffer Policy:** Submissions will be finalized with adequate buffer prior to the 23:59 IST close to prevent portal congestion or last-minute verification failures.
-
