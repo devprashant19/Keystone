@@ -887,3 +887,36 @@ CHANGES & VERIFICATIONS:
      - All claim numbers exactly match live artifacts and `scripts/report_facts.py`.
 NEXT: K8 — Re-record the Demo
 
+---
+
+## K8 — Re-record the Demo Walkthrough
+STATUS: PASS
+AT: 2026-10-17T05:20 IST
+SUMMARY:
+  - Recorded deterministic demo walkthrough in one continuous take at 1440x900 resolution (`web/verification/record_demo.ts`).
+  - Covers all 8 scripted beats:
+    - Beat 1 (0:00–0:20): Landing Dashboard & live counters (14 corridors, 182 scenarios, 60 entities) + capability card hovers.
+    - Beat 2 (0:20–0:40): One-click "BREAK SOMETHING IN DELHI" transition to Command Deck on the golden case (`road_ring_monastery_chandgiram`). Captured fresh `scene1_golden_case.png`.
+    - Beat 3 (0:40–1:10): Rapid multi-corridor exploration across `road_barakhamba_cp_mandihouse`, `road_delhigate_connector`, and back to the golden case with sub-10ms scenario switching.
+    - Beat 4 (1:10–1:40): Blast radius cascade visual demonstration: clicking center core, road band, power feeder band, alert link band, and metric badge hover.
+    - Beat 5 (1:40–2:10): Causal evidence chain inspection (`/evidence/road_ring_monastery_chandgiram__road_barakhamba_cp_mandihouse`) and return to deck.
+    - Beat 6 (2:10–2:40): Policy comparison hover and honest null result inspection. Captured fresh `scene3_null_result.png`.
+    - Beat 7 (2:40–3:00): Canonical abstention scenario (`road_ring_kashmere_monastery`), showing `ABSTAIN — NO ROBUST PLAN` with reason code `NO_PLAN_PRESERVES_ALL_CRITICAL_REQUIREMENTS`. Captured fresh `scene2_abstention.png`. Opened Decision Modal and recorded Commander REJECT decision into `keystone_memory`.
+    - Beat 8 (3:00–3:30): Clicked `#provenance-badge` to navigate to `/method`, inspected deadline sweep table with smooth scroll and verified provenance.
+  - Video Artifacts Generated & Verified on Disk:
+    - Raw WebM capture: `web/verification/demo/demo_1440x900.webm` (33.5 MB, 03:33 duration, 1440x900, 25 fps).
+    - High-efficiency H.264 MP4: `web/verification/demo/demo_1440x900.mp4` (4.11 MB, 1440x900, yuv420p, faststart enabled for streaming).
+    - Both artifacts exceed the > 1 MB threshold requirement.
+  - Recaptured Scene Stills Verified:
+    - `scene1_golden_case.png` (258,169 bytes)
+    - `scene2_abstention.png` (266,508 bytes)
+    - `scene3_null_result.png` (266,824 bytes)
+  - Backend & API Hardening:
+    - Fixed `get_run(run_id)` and `record_decision` in `src/jaal/api/app.py` to synchronize decision state with FalkorDB `keystone_memory` and support precomputed runs without in-memory cache drift.
+  - Verification Battery Status:
+    - `npm run build`: 0 TypeScript or Vite build errors (clean).
+    - `pytest tests -q`: 97 passed, 1 warning (100% green).
+    - Playwright test suite: 89 passed across all verification batteries.
+    - System invariants: Seed content digest `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a`, decomposition `104/48/30/0` (182 scenarios).
+ALL KEYSTONE STAGES (K0 through K8) ARE COMPLETE AND VERIFIED.
+

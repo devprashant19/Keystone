@@ -19,7 +19,13 @@ export const App: React.FC = () => {
   const [currentRoute, setCurrentRouteState] = useState<string>(() => {
     return typeof window !== 'undefined' && window.location.pathname ? window.location.pathname : '/';
   });
-  const [showLandingExplicit, setShowLandingExplicit] = useState<boolean>(false);
+  const [showLandingExplicit, setShowLandingExplicit] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('landing') === '1';
+    }
+    return false;
+  });
   const [evidenceCaseId, setEvidenceCaseId] = useState<string>(() => {
     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/evidence/')) {
       return window.location.pathname.replace('/evidence/', '');
