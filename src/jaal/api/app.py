@@ -796,19 +796,51 @@ def list_runs(limit: int = 25):
 @app.get("/api/run/{run_id}")
 def get_run(run_id: str):
     """Retrieves existing run by ID."""
-    if run_id in RUN_CACHE:
-        return RUN_CACHE[run_id]
-
     demo_cache_dir = Path(__file__).resolve().parents[3] / "data" / "demo_cache"
     cache_file = demo_cache_dir / f"{run_id}.json"
+    if not cache_file.exists() and run_id.startswith("pre_"):
+        corr_id = run_id[4:]
+        pre_f = demo_cache_dir / "precomputed" / f"{corr_id}.json"
+        if pre_f.exists():
+            cache_file = pre_f
+
+    data = None
     if cache_file.exists():
         try:
             with open(cache_file, "r", encoding="utf-8") as cf:
                 data = json.load(cf)
-            RUN_CACHE[run_id] = data
-            return data
         except Exception:
             pass
+
+    if data is None and run_id in RUN_CACHE:
+        data = RUN_CACHE[run_id]
+
+    if data is not None:
+        try:
+            client = get_graph_client()
+            mem = client.select_graph("keystone_memory")
+            d_res = mem.query(
+                "MATCH (d:Decision {run_id: $rid}) RETURN d.decision_id, d.verdict, d.rationale, d.actor, d.at",
+                {"rid": run_id}
+            )
+            if d_res.result_set:
+                row = d_res.result_set[0]
+                raw_v = str(row[1]).lower()
+                verd = "approved" if "approve" in raw_v else ("rejected" if "reject" in raw_v else raw_v)
+                data["decision"] = {
+                    "decision_id": row[0],
+                    "verdict": verd.upper(),
+                    "rationale": row[2] or "",
+                    "actor": row[3] or "system",
+                    "recorded_at": row[4] or datetime.now(timezone.utc).isoformat()
+                }
+            else:
+                data["decision"] = None
+        except Exception:
+            pass
+        RUN_CACHE[run_id] = data
+        return data
+
     try:
         client = get_graph_client()
         mem = client.select_graph("keystone_memory")
