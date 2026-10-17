@@ -838,3 +838,52 @@ VERIFICATIONS:
   - Contrast & accessibility: axe-core clean across all routes, WCAG AA verified via contrast.mjs
 NEXT: K6 — Second Domain Synthetic Preset (Cloud Services)
 
+---
+
+## K6 — Second Domain Preset
+STATUS: CUT (PER EXPLICIT SPECIFICATION)
+RATIONALE:
+  - In `W1_WOW_IMPLEMENTATION_PLAN.md` (§3 & §5), K6 / W6 is explicitly designated "(cut second)" under the pre-registered time-management rule:
+    "If you only have six hours: W1 + W2 + W3 + W7 + W8. That is a renamed, light, instantly-interactive product with fresh artifacts... And the real risk is not failing to add wow, it is breaking a verified submission on the last day."
+  - Replacing or overloading `keystone_world` with synthetic cloud nodes would invalidate the frozen seed digest (`455712e8...`), Delhi topology counts (13/10/14), and 97 pytest invariants.
+  - Per the explicit cut rule, K6 was bypassed to protect the verified submission and proceed directly to K7 and K8.
+NEXT: K7 — Re-verify Everything
+
+---
+
+## K7 — Re-Verify Everything
+STATUS: PASS
+AT: 2026-10-17T04:30 IST
+CHANGES & VERIFICATIONS:
+  1. Full Battery Execution:
+     - `pytest tests -q`: 97 passed (94 baseline + 3 K1 instant scenario engine tests).
+     - `npx playwright test`: 89 passed across all verification test suites.
+     - `npm run build`: Clean build (0 TypeScript or Vite build errors).
+  2. Contrast Matrix (contrast.mjs):
+     - Executed across both Light (default on) and Dark themes.
+     - All 20 color pairs pass with real measured ratios:
+       - Ink-hi on bg-void: 18.78:1 (light), 16.92:1 (dark) [Target >= 4.5:1]
+       - Ink-mid on bg-void: 9.34:1 (light), 8.90:1 (dark) [Target >= 4.5:1]
+       - Ink-lo on bg-void: 6.91:1 (light), 4.79:1 (dark) [Target >= 3.0:1]
+       - Accent on bg-panel: 5.84:1 (light), 8.35:1 (dark) [Target >= 3.0:1]
+       - Focus ring on bg-void: 5.31:1 (light), 8.69:1 (dark) [Target >= 3.0:1]
+  3. Screenshot & Demo Artifact Regeneration:
+     - All demo scene artifacts, presenter walkthrough steps, schematic views, and greyscale views refreshed against the live API in the new light theme:
+       - `scene1_golden_case.png`, `scene2_abstention.png`, `scene3_null_result.png`, `still_503_unavailable.png`, `still_method_provenance.png`.
+       - Presenter tour steps (`step_1.png` through `step_7.png` and reduced-motion counterparts).
+       - Canvas captures (`geographic_view.png`, `schematic_view.png`, `greyscale_severed.png`).
+     - U6-12 staleness guard verified clean.
+  4. Dead-Control Inventory Sweep:
+     - All controls verified active in `u4.spec.ts` (U4-01) and `u6.spec.ts` (U6-01): Theme toggle, corridor click, Recompute live, Clear, `#break-something-btn`, `#landing-deck-btn`, `#landing-method-btn`, `#card-cross-layer-btn`, `#nav-landing-btn`, `#nav-deck-btn`.
+  5. Canonical System Facts (scripts/report_facts.py):
+     - Content Digest: `455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a`
+     - Config Hash: `ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35`
+     - Entity Counts: 13 Intersections, 10 Facilities, 14 Corridors, 7 Power Feeders, 8 Towers, 12 Relays, 2 Depots, 6 Hazard Zones, 36 Alert Links, 10 Feeds-Tower Links.
+     - Decomposition (6.8 km SLA): 104 f1-alone / 48 f2-alone / 30 unstressed / 0 interaction-only (182 total).
+     - Test Counts: 97 Pytest, 89 Playwright.
+  6. Documentation Integrity (README.md):
+     - Updated all remaining "Jaal" references to "KEYSTONE".
+     - Upgraded visual preview to a 2x2 grid featuring Scene 1 (Golden Case with Blast Radius), Schematic View, Scene 2 (Abstention), and Scene 3 (Null Result).
+     - All claim numbers exactly match live artifacts and `scripts/report_facts.py`.
+NEXT: K8 — Re-record the Demo
+
