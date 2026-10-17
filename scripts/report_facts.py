@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 
+
 def get_report_facts():
     # 1. Query live API (or fallback to in-process TestClient if standalone server is not running)
     health = None
@@ -84,8 +85,6 @@ def get_report_facts():
         "config_hash": config_hash,
         "falkordb_version": falkordb_version,
         "decomposition": decomposition,
-        "pytest_count": 97,
-        "playwright_count": 94,
     }
     return facts
 
@@ -116,10 +115,9 @@ def print_canonical_markdown(facts):
   - f2-alone: {d['f2_alone']}
   - unstressed: {d['unstressed']}
   - interaction-only: {d['interaction_only']}
-  - total scenarios: {d['total']} (104 + 48 + 30 + 0 = 182)
-- **Verification Battery Test Counts:**
-  - Pytest Core Suite: {facts['pytest_count']} tests passed
-  - Playwright UI/E2E Suite: {facts['playwright_count']} tests passed
+  - total scenarios: {d['total']} ({d['f1_alone']} + {d['f2_alone']} + {d['unstressed']} + {d['interaction_only']} = {d['total']})
+- **Verification Batteries:** this script does not run the suites and makes no claim about
+  them. Establish the counts yourself: `pytest tests -q` and `npx playwright test`.
 """
     print(md.strip())
     return md
