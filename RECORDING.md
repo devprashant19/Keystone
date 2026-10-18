@@ -29,7 +29,7 @@ Perform each step in order before beginning a recording take:
      cd web && npm run dev
      ```
 4. **Hard-Reload and Verify State Freshness**:
-   - Open Chrome at `http://localhost:5173/?landing=1` or `http://localhost:5173/`.
+   - Open Chrome at `http://localhost:5173/?landing=1` or `http://localhost:5173/` (or the live deployment at `https://keystone-iota-three.vercel.app/`).
    - Perform a hard reload (`Ctrl+F5` / `Cmd+Shift+R`).
    - Confirm **NO** "results stale" or "DATABASE UNAVAILABLE" warning banner is displayed.
 5. **Verify Action Write-Gating**:

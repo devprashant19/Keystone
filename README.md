@@ -6,6 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18-cyan.svg)](https://react.dev)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black.svg?logo=vercel)](https://keystone-iota-three.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -75,8 +76,9 @@ flowchart TD
 | ![The honest null finding](web/verification/demo/scene3_null_result.png) | ![Methodology and provenance](web/verification/demo/still_method_provenance.png) |
 | **The honest null finding.** 0 interaction-only cases at the frozen 6.8 km threshold, reported openly on the primary path rather than buried. | **Methodology and provenance.** One page carrying the data sources, the frozen configuration, all three denominators, the threshold sweep, and the limits. |
 
+- **Live Deployment:** [https://keystone-iota-three.vercel.app/](https://keystone-iota-three.vercel.app/)
 - **Demo video:** [`web/verification/demo/demo_1440x900.mp4`](web/verification/demo/demo_1440x900.mp4) (03:33) — walks through scenario selection, branch evaluation, cross-layer severance, honest abstention, and commander decision persistence.
-- **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` (e.g., `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
+- **Guided tour:** Presenter mode is deep-linkable via `?tour=1&step=N` ([Live Demo: ?tour=1&step=1](https://keystone-iota-three.vercel.app/?tour=1&step=1) or locally `http://localhost:5173/?tour=1&step=1`) to guide judges through the core findings.
 
 ---
 
@@ -320,6 +322,9 @@ Built with **Vite, React, and TypeScript** using plain SVG rendering (zero WebGL
 ---
 
 ## 12. Clean-Clone Reproduction Guide
+
+> **Live Web Deployment:** [https://keystone-iota-three.vercel.app/](https://keystone-iota-three.vercel.app/)  
+> If you prefer not to spin up local containers, the complete web interface is deployed live on Vercel with precomputed sweeps, interactive graph canvas, and methodology verification.
 
 ### Prerequisites
 - Docker & Docker Compose

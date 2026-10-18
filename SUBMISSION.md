@@ -80,12 +80,10 @@ Film with [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md); pre-flight in [`RECORDING.md`](REC
 ## 6. Live demo or deployment (optional field)
 
 ```
-<your Vercel URL, or leave blank>
+https://keystone-iota-three.vercel.app/
 ```
 
-Rule 10 accepts "a live deployment, **or** complete local setup instructions if it cannot
-be deployed." README §12 is a clean-clone reproduction guide, so leaving this blank is
-compliant. Do not risk the submission on a last-minute deploy.
+Live deployment on Vercel with complete Command Deck, precomputed sweeps, methodology verification, and tour presenter modes. README §12 also provides a clean-clone local reproduction guide.
 
 ---
 
@@ -216,6 +214,6 @@ a day.
 | README with setup instructions and graph data model | Done — §4 Graph Model & Schema, §12 Clean-Clone Reproduction |
 | The Cypher queries / graph algorithms the product depends on | Done — §5 Production Cypher Queries (Q1–Q3) |
 | Demo video showing the working project | **Not yet recorded** — use DEMO_SCRIPT.md |
-| Live deployment, or complete local setup instructions | Done — §12 satisfies this; Vercel optional |
+| Live deployment, or complete local setup instructions | Done — https://keystone-iota-three.vercel.app/ (plus §12 local reproduction guide) |
 | The track you are entering | Track 01 |
 | Rule 11 AI-assistant disclosure | Done — §14 and AI_DISCLOSURE.md |

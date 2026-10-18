@@ -14,7 +14,7 @@ Every figure below was measured on the live system. If the screen disagrees, say
       What fails if monastery_chandgiram floods?
       Inspect the causal chain for monastery_chandgiram
    Each must show GROUNDED (DETERMINISTIC). Then reload.
-3. API on :8000, web on :5173
+3. API on :8000, web on :5173 (or live deployment at https://keystone-iota-three.vercel.app/)
 4. Hard-reload. No "results stale" banner, no "DATABASE UNAVAILABLE"
 5. 1440x900 exactly. Tabs closed, bookmarks hidden, notifications off
 6. Land on the landing page. Mouse still.
