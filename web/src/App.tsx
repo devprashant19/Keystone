@@ -47,6 +47,10 @@ export const App: React.FC = () => {
       setShowLandingExplicit(true);
     } else {
       setShowLandingExplicit(false);
+      if ((route === '/deck' || route === '') && !selectedF1) {
+        setSelectedF1('road_ring_monastery_chandgiram');
+        loadScenario('road_ring_monastery_chandgiram');
+      }
     }
     setCurrentRoute(route);
   };
@@ -178,25 +182,10 @@ export const App: React.FC = () => {
               return;
             }
           }
-        } else if (runsData.runs && runsData.runs.length === 0) {
-          return;
-        }
-        if (!isCancelled) {
-          setSelectedF1((currentF1) => {
-            if (currentF1) return currentF1;
-            loadScenario('road_ring_monastery_chandgiram');
-            return 'road_ring_monastery_chandgiram';
-          });
         }
       })
       .catch(() => {
-        if (!isCancelled) {
-          setSelectedF1((currentF1) => {
-            if (currentF1) return currentF1;
-            loadScenario('road_ring_monastery_chandgiram');
-            return 'road_ring_monastery_chandgiram';
-          });
-        }
+        // network or server error, remain idle
       });
     return () => {
       isCancelled = true;

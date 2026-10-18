@@ -1,6 +1,7 @@
 import React from 'react';
 import { WorldSummary } from '../graph/types';
 import { IconPowerFeeder, IconBranch, IconEvidence } from './icons';
+import { Valley } from './Valley';
 
 interface LandingDashboardProps {
   worldSummary: WorldSummary | null;
@@ -22,15 +23,19 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
   const nodesCount = worldSummary?.node_count || 60;
   const edgesCount = worldSummary?.edge_count || 100;
   const totalCases = 182; // 14 sweeps x 13 second failures = 182 cases
-  const effectiveDigest = contentDigest || worldSummary?.world_content_digest || '455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a';
+  const effectiveDigest =
+    contentDigest ||
+    worldSummary?.world_content_digest ||
+    '455712e82d224a2590060fd35d83abb4acb6cfafd633b12d275aa43337cd013a';
 
   return (
     <section
       id="landing-dashboard"
       className="landing-dashboard"
       style={{
-        backgroundColor: 'var(--bg-void)',
-        color: 'var(--ink-hi)',
+        position: 'relative',
+        backgroundColor: '#06111f',
+        color: '#eaf4fb',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -38,132 +43,269 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
         alignItems: 'center',
         width: '100%',
         boxSizing: 'border-box',
-        padding: 'clamp(12px, 2vh, 24px) clamp(16px, 3vw, 40px) 12px clamp(16px, 3vw, 40px)',
+        padding: 'clamp(8px, 1.6vh, 20px) clamp(16px, 3vw, 40px) 8px clamp(16px, 3vw, 40px)',
         minHeight: 0,
         height: '100%',
         overflow: 'hidden',
       }}
       aria-label="KEYSTONE Pre-Mortem Landing"
     >
+      {/* 0. Pukaar Layered Himalayan Night Valley Background */}
+      <Valley />
+
       <div
         style={{
-          maxWidth: '1140px',
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '1240px',
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           flex: 1,
           minHeight: 0,
-          gap: 'clamp(10px, 1.8vh, 22px)',
+          gap: 'clamp(8px, 1.4vh, 16px)',
         }}
       >
-        {/* 1. Hero Eyebrow, Wordmark, and Promise */}
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 'clamp(4px, 1vh, 16px)' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 14px',
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
-              borderRadius: 'var(--r-pill)',
-              fontSize: 'var(--fs-micro)',
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--accent)',
-              marginBottom: 'clamp(6px, 1vh, 12px)',
-            }}
-          >
-            <span>◈</span>
-            <span>GRAPH-NATIVE PRE-MORTEM DECISION ENGINE</span>
+        {/* 1. Pukaar Asymmetric Hero Grid: Left Copy & Right Floating Cards */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 0.85fr)',
+            gap: 'clamp(16px, 3vw, 36px)',
+            alignItems: 'center',
+            marginTop: 'clamp(2px, 0.8vh, 10px)',
+          }}
+        >
+          {/* Left Column: Eyebrow, Anton Title, Lead & Pukaar CTAs */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 14px',
+                backgroundColor: 'rgba(79, 179, 255, 0.12)',
+                border: '1px solid rgba(79, 179, 255, 0.35)',
+                borderRadius: 'var(--r-pill)',
+                fontSize: 'var(--fs-micro)',
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: '#8ad0ff',
+                marginBottom: 'clamp(6px, 1vh, 10px)',
+              }}
+            >
+              <span>◈</span>
+              <span>GRAPH-NATIVE PRE-MORTEM DECISION ENGINE</span>
+            </div>
+
+            <h1
+              id="landing-heading"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(2.2rem, 4.4vw, 3.8rem)',
+                textTransform: 'uppercase',
+                fontWeight: 400,
+                letterSpacing: '0.01em',
+                margin: '0 0 clamp(6px, 1vh, 10px) 0',
+                lineHeight: 0.98,
+                color: '#ffffff',
+                textShadow: '0 4px 24px rgba(79, 179, 255, 0.25)',
+              }}
+            >
+              Find what breaks before it breaks you.
+            </h1>
+
+            <p
+              style={{
+                fontSize: 'clamp(12.5px, 0.95vw + 8px, 14.5px)',
+                color: '#c3dbee',
+                maxWidth: '620px',
+                margin: '0 0 clamp(10px, 1.4vh, 16px) 0',
+                lineHeight: 1.45,
+              }}
+            >
+              When an arterial corridor floods in Delhi, KEYSTONE evaluates every secondary contingency on isolated FalkorDB clones (<span className="mono" style={{ color: '#8ad0ff' }}>GRAPH.COPY</span>), uncovering cross-layer hospital isolation before disaster strikes.
+            </p>
+
+            {/* Pukaar Action CTAs & Live Status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', flexWrap: 'wrap', marginBottom: 'clamp(6px, 1vh, 10px)' }}>
+              <button
+                id="break-something-btn"
+                onClick={onBreakSomething}
+                style={{
+                  backgroundColor: '#b3122a',
+                  color: '#ffffff',
+                  border: '1px solid #ff4d6d',
+                  borderRadius: 'var(--r-ctl)',
+                  padding: '9px 22px',
+                  fontSize: 'var(--fs-ui)',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 16px rgba(179, 18, 42, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4)',
+                }}
+                aria-label="Break something: launch incident command deck on golden scenario"
+              >
+                💥 BREAK SOMETHING ▸
+              </button>
+
+              <button
+                id="landing-deck-btn"
+                onClick={() => onNavigate('/deck')}
+                style={{
+                  backgroundColor: 'rgba(12, 33, 54, 0.85)',
+                  color: '#eaf4fb',
+                  border: '1px solid rgba(79, 179, 255, 0.35)',
+                  borderRadius: 'var(--r-ctl)',
+                  padding: '9px 18px',
+                  fontSize: 'var(--fs-cap)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                Incident Command Deck ↗
+              </button>
+
+              <button
+                id="landing-method-btn"
+                onClick={() => onNavigate('/method')}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#8ad0ff',
+                  border: '1px solid rgba(138, 208, 255, 0.25)',
+                  borderRadius: 'var(--r-ctl)',
+                  padding: '9px 18px',
+                  fontSize: 'var(--fs-cap)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Methodology & Provenance ↗
+              </button>
+            </div>
+
+            {/* Live Status Pill with Pinging Dot */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 12px',
+                borderRadius: 'var(--r-pill)',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                fontSize: 'var(--fs-micro)',
+                color: '#8fb0cb',
+              }}
+            >
+              <span className="live-ping-dot" style={{ backgroundColor: '#3cc68f' }} />
+              <span>
+                FalkorDB {falkordbVersion || '6.0.2'} Active • 182 Cases Precomputed • Multi-hop Cross-layer
+              </span>
+            </div>
           </div>
 
-          <h1
-            id="landing-heading"
+          {/* Right Column: Pukaar Floating Depth Cards */}
+          <div
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.4rem, 4.6vw, 3.8rem)',
-              textTransform: 'uppercase',
-              fontWeight: 400,
-              letterSpacing: '0.01em',
-              margin: '0 0 clamp(6px, 1vh, 12px) 0',
-              lineHeight: 1.02,
-              color: 'var(--ink-hi)',
+              position: 'relative',
+              height: 'clamp(180px, 24vh, 230px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
+            aria-hidden="true"
           >
-            Find what breaks before it breaks you.
-          </h1>
-
-          <p
-            style={{
-              fontSize: 'clamp(13px, 1vw + 10px, 15px)',
-              color: 'var(--ink-mid)',
-              maxWidth: '720px',
-              margin: '0 0 clamp(10px, 1.6vh, 20px) 0',
-              lineHeight: 'var(--lh-prose)',
-            }}
-          >
-            KEYSTONE evaluates complex cross-layer infrastructure failures on isolated FalkorDB branches, with every corridor sweep precomputed and digest-validated.
-            Explore cascading consequences across road, power, and telecom layers before disaster strikes.
-          </p>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button
-              id="break-something-btn"
-              onClick={onBreakSomething}
+            {/* Card 1: Gold Pill Card */}
+            <div
+              className="hf-bob-1"
               style={{
-                backgroundColor: 'var(--fail)',
-                color: 'var(--bg-void)',
-                border: '1px solid var(--fail)',
-                borderRadius: 'var(--r-ctl)',
-                padding: '10px 24px',
-                fontSize: 'var(--fs-ui)',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-              }}
-              aria-label="Break something: launch incident command deck on golden scenario"
-            >
-              💥 BREAK SOMETHING ▸
-            </button>
-
-            <button
-              id="landing-deck-btn"
-              onClick={() => onNavigate('/deck')}
-              style={{
-                backgroundColor: 'var(--bg-raised)',
-                color: 'var(--ink-hi)',
-                border: '1px solid var(--line-hair)',
-                borderRadius: 'var(--r-ctl)',
-                padding: '10px 20px',
-                fontSize: 'var(--fs-cap)',
-                fontWeight: 600,
-                cursor: 'pointer',
+                position: 'absolute',
+                left: '4%',
+                top: '6%',
+                width: '180px',
+                backgroundColor: '#4fb3ff',
+                color: '#06111f',
+                borderRadius: '16px',
+                padding: '12px 16px',
+                boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.6)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
               }}
             >
-              Enter Incident Command Deck
-            </button>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', lineHeight: 0.9 }}>
+                {totalCases}
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1.2 }}>
+                CASES EVALUATED<br />N-1 SWEEPS
+              </span>
+            </div>
 
-            <button
-              id="landing-method-btn"
-              onClick={() => onNavigate('/method')}
+            {/* Card 2: Frosted Glass Real Scenario Ticket */}
+            <div
+              className="hf-bob-2"
               style={{
-                backgroundColor: 'transparent',
-                color: 'var(--accent)',
-                border: '1px solid var(--line-hair)',
-                borderRadius: 'var(--r-ctl)',
-                padding: '10px 20px',
-                fontSize: 'var(--fs-cap)',
-                fontWeight: 600,
-                cursor: 'pointer',
+                position: 'absolute',
+                right: '2%',
+                top: '28%',
+                width: 'min(310px, 92%)',
+                backgroundColor: 'rgba(12, 33, 54, 0.88)',
+                border: '1px solid rgba(79, 179, 255, 0.35)',
+                borderRadius: '16px',
+                padding: '12px 16px',
+                color: '#eef6fb',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
               }}
             >
-              Methodology & Provenance
-            </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8ad0ff' }}>
+                <span className="live-ping-dot" style={{ backgroundColor: '#ff4d6d' }} />
+                <span>ISOLATED FALKORDB BRANCH</span>
+              </div>
+              <div style={{ fontSize: '12px', lineHeight: 1.35, color: '#eef6fb', borderLeft: '2px solid #8ad0ff', paddingLeft: '8px' }}>
+                <strong>Ring Road (Monastery):</strong> 2nd failure at Kashmere Gate isolates LNJP Hospital alert relays.
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px', fontSize: '11px', color: '#8fb0cb' }}>
+                <span className="mono" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', padding: '2px 6px', borderRadius: '4px' }}>
+                  GRAPH.COPY (ISOLATED)
+                </span>
+                <span style={{ color: '#5fd6a4', fontWeight: 700 }}>✓ ABSTAIN LOGGED</span>
+              </div>
+            </div>
+
+            {/* Card 3: Cream Base Topology Card */}
+            <div
+              className="hf-bob-3"
+              style={{
+                position: 'absolute',
+                left: '12%',
+                bottom: '4%',
+                width: '160px',
+                backgroundColor: '#eef6fb',
+                color: '#06111f',
+                borderRadius: '14px',
+                padding: '10px 14px',
+                boxShadow: '0 16px 32px -8px rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.1rem', lineHeight: 0.9 }}>
+                {corridorsCount}
+              </span>
+              <span style={{ fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                DELHI CORRIDORS
+              </span>
+            </div>
           </div>
         </div>
 
@@ -172,8 +314,8 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           id="landing-live-counters"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 'var(--s3)',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'clamp(8px, 1.4vw, 16px)',
           }}
           role="region"
           aria-label="Live System Counters"
@@ -182,23 +324,24 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="counter-corridors"
             style={{
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(79, 179, 255, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
+              padding: 'clamp(8px, 1.2vh, 12px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px',
+              gap: '2px',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: '#8fb0cb', fontWeight: 700, letterSpacing: '0.08em' }}>
               Corridors Modelled
             </span>
-            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--accent)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 2.8vw, 38px)', fontWeight: 400, color: '#4fb3ff', lineHeight: 1 }}>
               {corridorsCount}
             </div>
-            <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
-              13 arterial intersections in Delhi district topology
+            <div style={{ fontSize: 'var(--fs-micro)', color: '#c3dbee' }}>
+              Primary arterial road corridors in Central/North Delhi
             </div>
           </div>
 
@@ -206,22 +349,23 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="counter-scenarios"
             style={{
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(192, 132, 252, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
+              padding: 'clamp(8px, 1.2vh, 12px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px',
+              gap: '2px',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: '#8fb0cb', fontWeight: 700, letterSpacing: '0.08em' }}>
               Cases Evaluated
             </span>
-            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--branch)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 2.8vw, 38px)', fontWeight: 400, color: '#c084fc', lineHeight: 1 }}>
               {totalCases}
             </div>
-            <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
+            <div style={{ fontSize: 'var(--fs-micro)', color: '#c3dbee' }}>
               14 sweeps · 104 single / 48 second-failure / 30 intact
             </div>
           </div>
@@ -230,130 +374,99 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
           <div
             id="counter-entities"
             style={{
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(95, 214, 164, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(10px, 1.4vh, 16px) var(--s4)',
+              padding: 'clamp(8px, 1.2vh, 12px) var(--s4)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px',
+              gap: '2px',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: '#8fb0cb', fontWeight: 700, letterSpacing: '0.08em' }}>
               Graph Topology
             </span>
-            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 3.2vw, 42px)', fontWeight: 400, color: 'var(--ok)', lineHeight: 1 }}>
+            <div className="mono" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 2.8vw, 38px)', fontWeight: 400, color: '#5fd6a4', lineHeight: 1 }}>
               {nodesCount} / {edgesCount}
             </div>
-            <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
+            <div style={{ fontSize: 'var(--fs-micro)', color: '#c3dbee' }}>
               Nodes & dependency edges across road, power, alert
             </div>
           </div>
         </div>
 
-        {/* 3. Three Capability Cards: What the graph does that a table cannot */}
+        {/* 3. Three Pukaar Step Cards (HOW IT WORKS: 01 FORK, 02 TRAVERSE, 03 ABSTAIN) */}
         <div
-          id="landing-graph-cards"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 'var(--s3)',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'clamp(8px, 1.4vw, 16px)',
           }}
-          role="region"
-          aria-label="Capabilities of Graph-Native Architecture"
         >
           {/* Card 1 */}
           <div
             id="card-cross-layer"
             style={{
               position: 'relative',
-              overflow: 'hidden',
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
-              borderTop: '3px solid var(--fail)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(79, 179, 255, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(14px, 2vh, 22px)',
+              padding: 'clamp(10px, 1.3vh, 16px)',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            {/* Ghost Numeral */}
-            <div
-              aria-hidden="true"
+            {/* Outline 01 */}
+            <span
               style={{
                 position: 'absolute',
-                right: '12px',
+                right: '8px',
                 top: '-4px',
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                fontSize: '4.8rem',
                 lineHeight: 1,
-                color: 'var(--line-hair)',
-                opacity: 0.6,
+                color: 'rgba(79, 179, 255, 0.08)',
                 pointerEvents: 'none',
                 userSelect: 'none',
-                zIndex: 0,
               }}
             >
               01
-            </div>
+            </span>
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Icon Chip */}
+            <div>
               <div
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: 'var(--r-chip)',
-                  backgroundColor: 'var(--fail-wash)',
-                  color: 'var(--fail)',
+                  backgroundColor: 'rgba(79, 179, 255, 0.18)',
+                  color: '#4fb3ff',
                   marginBottom: 'var(--s2)',
-                  border: '1px solid var(--line-hair)',
                 }}
               >
-                <IconPowerFeeder size={16} />
+                <IconPowerFeeder size={15} />
               </div>
-
-              {/* Eyebrow */}
-              <div
-                className="eyebrow"
-                style={{
-                  fontSize: 'var(--fs-micro)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  color: 'var(--fail)',
-                  letterSpacing: '0.10em',
-                  marginBottom: 'var(--s1)',
-                }}
-              >
+              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, textTransform: 'uppercase', color: '#8ad0ff', letterSpacing: '0.10em', marginBottom: '4px' }}>
                 01 · Cross-Layer Cascades
               </div>
-
-              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
+              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 6px 0', color: '#ffffff' }}>
                 Road → Power → Telecom
               </h3>
-              <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', margin: '0 0 var(--s3) 0' }}>
-                A table only records a submerged road. The graph traverses cyber-physical dependencies: corridor flood severs the power feeder, darkens the telecom tower, and isolates hospitals 4 hops away.
+              <p style={{ fontSize: 'var(--fs-cap)', color: '#c3dbee', lineHeight: 1.4, margin: '0 0 var(--s2) 0' }}>
+                Traverses cyber-physical dependencies: corridor flood severs power feeder, darkens telecom tower, and severs alert reachability to hospital trauma centers.
               </p>
             </div>
             <button
               id="card-cross-layer-btn"
               onClick={() => onNavigate('/evidence/road_ring_monastery_chandgiram__road_ring_kashmere_monastery')}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: 'var(--fs-cap)',
-                fontWeight: 700,
-                textAlign: 'left',
-                padding: 0,
-                cursor: 'pointer',
-              }}
+              style={{ background: 'none', border: 'none', color: '#4fb3ff', fontSize: 'var(--fs-cap)', fontWeight: 700, textAlign: 'left', padding: 0, cursor: 'pointer' }}
             >
               Inspect Causal Proof ▸
             </button>
@@ -364,93 +477,64 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             id="card-counterfactual"
             style={{
               position: 'relative',
-              overflow: 'hidden',
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
-              borderTop: '3px solid var(--branch)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(192, 132, 252, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(14px, 2vh, 22px)',
+              padding: 'clamp(10px, 1.3vh, 16px)',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            {/* Ghost Numeral */}
-            <div
-              aria-hidden="true"
+            {/* Outline 02 */}
+            <span
               style={{
                 position: 'absolute',
-                right: '12px',
+                right: '8px',
                 top: '-4px',
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                fontSize: '4.8rem',
                 lineHeight: 1,
-                color: 'var(--line-hair)',
-                opacity: 0.6,
+                color: 'rgba(192, 132, 252, 0.08)',
                 pointerEvents: 'none',
                 userSelect: 'none',
-                zIndex: 0,
               }}
             >
               02
-            </div>
+            </span>
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Icon Chip */}
+            <div>
               <div
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: 'var(--r-chip)',
-                  backgroundColor: 'var(--branch-wash)',
-                  color: 'var(--branch)',
+                  backgroundColor: 'rgba(192, 132, 252, 0.18)',
+                  color: '#c084fc',
                   marginBottom: 'var(--s2)',
-                  border: '1px solid var(--line-hair)',
                 }}
               >
-                <IconBranch size={16} />
+                <IconBranch size={15} />
               </div>
-
-              {/* Eyebrow */}
-              <div
-                className="eyebrow"
-                style={{
-                  fontSize: 'var(--fs-micro)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  color: 'var(--branch)',
-                  letterSpacing: '0.10em',
-                  marginBottom: 'var(--s1)',
-                }}
-              >
+              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, textTransform: 'uppercase', color: '#c084fc', letterSpacing: '0.10em', marginBottom: '4px' }}>
                 02 · Branch-Isolated Forking
               </div>
-
-              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
+              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 6px 0', color: '#ffffff' }}>
                 Zero-Overhead Branches
               </h3>
-              <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', margin: '0 0 var(--s3) 0' }}>
-                Relational tables require full DB copies or complex locks. FalkorDB forks isolated graph memory with GRAPH.COPY per scenario, evaluating mitigation policies across all second failures without locking the base graph.
+              <p style={{ fontSize: 'var(--fs-cap)', color: '#c3dbee', lineHeight: 1.4, margin: '0 0 var(--s2) 0' }}>
+                FalkorDB forks isolated in-memory graph clones with <span className="mono" style={{ color: '#c084fc' }}>GRAPH.COPY</span>, testing every mitigation policy against all second failures without locking base state.
               </p>
             </div>
             <button
               id="card-counterfactual-btn"
               onClick={() => onNavigate('/deck')}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: 'var(--fs-cap)',
-                fontWeight: 700,
-                textAlign: 'left',
-                padding: 0,
-                cursor: 'pointer',
-              }}
+              style={{ background: 'none', border: 'none', color: '#c084fc', fontSize: 'var(--fs-cap)', fontWeight: 700, textAlign: 'left', padding: 0, cursor: 'pointer' }}
             >
               Compare Policies in Deck ▸
             </button>
@@ -461,128 +545,150 @@ export const LandingDashboard: React.FC<LandingDashboardProps> = ({
             id="card-scientific-honesty"
             style={{
               position: 'relative',
-              overflow: 'hidden',
-              backgroundColor: 'var(--bg-panel)',
-              border: '1px solid var(--line-hair)',
-              borderTop: '3px solid var(--ok)',
+              backgroundColor: 'rgba(12, 33, 54, 0.75)',
+              border: '1px solid rgba(95, 214, 164, 0.25)',
               borderRadius: 'var(--r-panel)',
-              padding: 'clamp(14px, 2vh, 22px)',
+              padding: 'clamp(10px, 1.3vh, 16px)',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            {/* Ghost Numeral */}
-            <div
-              aria-hidden="true"
+            {/* Outline 03 */}
+            <span
               style={{
                 position: 'absolute',
-                right: '12px',
+                right: '8px',
                 top: '-4px',
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(4.5rem, 6vw, 6rem)',
+                fontSize: '4.8rem',
                 lineHeight: 1,
-                color: 'var(--line-hair)',
-                opacity: 0.6,
+                color: 'rgba(95, 214, 164, 0.08)',
                 pointerEvents: 'none',
                 userSelect: 'none',
-                zIndex: 0,
               }}
             >
               03
-            </div>
+            </span>
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Icon Chip */}
+            <div>
               <div
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: 'var(--r-chip)',
-                  backgroundColor: 'var(--ok-wash)',
-                  color: 'var(--ok)',
+                  backgroundColor: 'rgba(95, 214, 164, 0.18)',
+                  color: '#5fd6a4',
                   marginBottom: 'var(--s2)',
-                  border: '1px solid var(--line-hair)',
                 }}
               >
-                <IconEvidence size={16} />
+                <IconEvidence size={15} />
               </div>
-
-              {/* Eyebrow */}
-              <div
-                className="eyebrow"
-                style={{
-                  fontSize: 'var(--fs-micro)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  color: 'var(--ok)',
-                  letterSpacing: '0.10em',
-                  marginBottom: 'var(--s1)',
-                }}
-              >
+              <div style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, textTransform: 'uppercase', color: '#5fd6a4', letterSpacing: '0.10em', marginBottom: '4px' }}>
                 03 · Pre-Registered SLA
               </div>
-
-              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 var(--s2) 0', color: 'var(--ink-hi)' }}>
+              <h3 style={{ fontSize: 'var(--fs-ui)', fontWeight: 700, margin: '0 0 6px 0', color: '#ffffff' }}>
                 Scientific Honesty
               </h3>
-              <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', margin: '0 0 var(--s3) 0' }}>
-                Constants and evaluators are frozen before execution. The dignified 0-interaction null result proves when single-failure dynamics explain all breaches, refusing to fabricate spurious complexity.
+              <p style={{ fontSize: 'var(--fs-cap)', color: '#c3dbee', lineHeight: 1.4, margin: '0 0 var(--s2) 0' }}>
+                Evaluators are frozen pre-execution. The dignified 0-interaction null result proves when single failures explain all breaches, refusing to fabricate spurious complexity.
               </p>
             </div>
             <button
               id="card-scientific-honesty-btn"
               onClick={() => onNavigate('/method')}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: 'var(--fs-cap)',
-                fontWeight: 700,
-                textAlign: 'left',
-                padding: 0,
-                cursor: 'pointer',
-              }}
+              style={{ background: 'none', border: 'none', color: '#5fd6a4', fontSize: 'var(--fs-cap)', fontWeight: 700, textAlign: 'left', padding: 0, cursor: 'pointer' }}
             >
               Verify Methodology ▸
             </button>
           </div>
         </div>
-      </div>
 
-      {/* 4. Single Honest Provenance Strip */}
-      <div
-        id="landing-provenance-strip"
-        style={{
-          maxWidth: '1140px',
-          width: '100%',
-          borderTop: '1px solid var(--line-hair)',
-          paddingTop: '10px',
-          paddingBottom: '2px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: 'var(--fs-micro)',
-          color: 'var(--ink-lo)',
-          flexWrap: 'wrap',
-          gap: 'var(--s2)',
-          boxSizing: 'border-box',
-          marginTop: 'clamp(8px, 1.4vh, 16px)',
-        }}
-      >
-        <span>Real Delhi arterial geometry, MIT-licensed. Power and telecom layers synthetic and labelled.</span>
-        <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--s2)' }}>
-          <span>FalkorDB {falkordbVersion || '6.0.2'}</span>
-          <span>•</span>
-          <span title={effectiveDigest}>
-            DIGEST: {effectiveDigest.slice(0, 16)}…
+        {/* 4. Pukaar Sourced Empirical Finding Banner (Crimson Fact Strip) */}
+        <div
+          id="pukaar-empirical-fact"
+          style={{
+            backgroundColor: 'rgba(179, 18, 42, 0.35)',
+            border: '1px solid rgba(255, 128, 152, 0.45)',
+            borderRadius: 'var(--r-panel)',
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 'var(--s3)',
+            fontSize: 'var(--fs-cap)',
+            color: '#ffd9d0',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#ff8098',
+                backgroundColor: 'rgba(179, 18, 42, 0.6)',
+                padding: '2px 8px',
+                borderRadius: 'var(--r-chip)',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              EMPIRICAL FINDING
+            </span>
+            <span style={{ color: '#ffffff', fontWeight: 600 }}>
+              182 Ordered Pairs · Zero Spurious Interactions: 104 explained by 1st failure, 48 by 2nd, 30 intact. Keystone abstains honestly when SLAs cannot be guaranteed.
+            </span>
+          </div>
+          <button
+            onClick={() => onNavigate('/method')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ffd9d0',
+              textDecoration: 'underline',
+              fontSize: '12px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Review Audit →
+          </button>
+        </div>
+
+        {/* 5. Single Honest Provenance Strip */}
+        <div
+          id="landing-provenance-strip"
+          style={{
+            borderTop: '1px solid rgba(79, 179, 255, 0.18)',
+            paddingTop: '8px',
+            paddingBottom: '2px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: 'var(--fs-micro)',
+            color: '#8fb0cb',
+            flexWrap: 'wrap',
+            gap: 'var(--s2)',
+            boxSizing: 'border-box',
+          }}
+        >
+          <span>Real Delhi arterial geometry, MIT-licensed. Power and telecom layers synthetic and labelled.</span>
+          <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--s2)' }}>
+            <span>FalkorDB {falkordbVersion || '6.0.2'}</span>
+            <span>•</span>
+            <span title={effectiveDigest}>
+              DIGEST: {effectiveDigest.slice(0, 16)}…
+            </span>
           </span>
-        </span>
+        </div>
       </div>
     </section>
   );

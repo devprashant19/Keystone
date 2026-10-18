@@ -48,11 +48,11 @@ const darkColors = {
   inkLo: '#8fb0cb',
 
   accent: '#4fb3ff',
-  branch: '#c084fc',
+  branch: '#d8b4fe',
   ok: '#5fd6a4',
   warn: '#f6d95c',
   fail: '#ff8098',
-  synthetic: '#8fb0cb',
+  synthetic: '#b0d2ee',
 
   // Washes with alphas blended on bgPanel (#0c2136)
   accentWash: { r: 79, g: 179, b: 255, a: 0.14 },

@@ -142,3 +142,38 @@
   animation: none !important;
 }
 
+/* Pukaar Valley & Hero Animation Tokens */
+.valley { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; --py: 0; }
+.v-layer { will-change: transform; }
+.v-l1 { transform: translateY(calc(var(--py) * 0.1px)); }
+.v-l2 { transform: translateY(calc(var(--py) * 0.04px)); }
+.v-l3 { transform: translateY(calc(var(--py) * -0.02px)); }
+.v-l4 { transform: translateY(calc(var(--py) * -0.08px)); }
+.v-stars { animation: twinkle 6s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: 0.6; } to { opacity: 1; } }
+.v-lights circle { animation: twinkle 2.8s ease-in-out infinite alternate; }
+.v-river-line { stroke-dasharray: 60 30; animation: flow 6s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -900; } }
+.v-echo path { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.v-echo .echo-l { animation: echo-left 1.8s ease-in-out 0.6s forwards; }
+.v-echo .echo-r { animation: echo-right 1.8s ease-in-out 2.4s forwards; }
+@keyframes echo-left { 0% { opacity: 0.8; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(-520px) scale(2.2); } }
+@keyframes echo-right { 0% { opacity: 0.5; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(520px) scale(2.2); } }
+
+/* Floating Cards Animation */
+@keyframes hf-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes dot-ping { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.8); opacity: 0; } }
+
+.hf-bob-1 { animation: hf-bob 6s ease-in-out infinite; }
+.hf-bob-2 { animation: hf-bob 7.5s ease-in-out 1.2s infinite; }
+.hf-bob-3 { animation: hf-bob 6.8s ease-in-out 2.4s infinite; }
+.live-ping-dot { position: relative; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.live-ping-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: dot-ping 1.8s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v-stars, .v-lights circle, .v-river-line, .v-echo path, .hf-bob-1, .hf-bob-2, .hf-bob-3, .live-ping-dot::after {
+    animation: none !important;
+  }
+}
+
+
