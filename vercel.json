@@ -1,27 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "app": {
-      "root": ".",
-      "framework": "fastapi"
-    },
-    "web": {
-      "root": "web",
-      "framework": "vite"
+  "buildCommand": "cd web && (npm ci || npm install) && npm run build",
+  "outputDirectory": "web/dist",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60
     }
   },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": {
-        "service": "app"
-      }
-    },
-    {
-      "source": "/(.*)",
-      "destination": {
-        "service": "web"
-      }
-    }
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
