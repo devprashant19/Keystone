@@ -39,7 +39,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     >
       <div
         style={{
-          width: '540px',
+          width: 'min(540px, calc(100vw - 32px))',
           maxHeight: '480px',
           backgroundColor: 'var(--bg-panel)',
           border: '1px solid var(--line-hair)',

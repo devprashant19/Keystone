@@ -34,7 +34,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
     >
       <div
         style={{
-          width: '420px',
+          width: 'min(420px, calc(100vw - 32px))',
           backgroundColor: 'var(--bg-panel)',
           border: '1px solid var(--line-hair)',
           borderRadius: 'var(--r-panel)',

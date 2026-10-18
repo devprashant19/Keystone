@@ -18,7 +18,7 @@ function generateStars(n: number) {
 const STARS = generateStars(70);
 
 /**
- * Pukaar-native Valley SVG background.
+ * Keystone Valley SVG background.
  * Layered Himalayan ridges at night with a glowing river, stars, and atmospheric depth.
  */
 export const Valley: React.FC = () => {

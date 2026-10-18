@@ -91,7 +91,7 @@ export const RightRail: React.FC<RightRailProps> = ({
       <aside
         className="right-rail"
         style={{
-          width: 'var(--w-rail-r)',
+          width: '100%',
           backgroundColor: 'var(--bg-panel)',
           borderLeft: '1px solid var(--line-hair)',
           padding: 'var(--s5)',
@@ -101,7 +101,7 @@ export const RightRail: React.FC<RightRailProps> = ({
           justifyContent: 'center',
           textAlign: 'center',
           color: 'var(--ink-lo)',
-          height: 'calc(100vh - var(--h-header) - var(--h-framebar))',
+          height: '100%',
         }}
         role="region"
         aria-label="Policy Comparison"
@@ -126,12 +126,12 @@ export const RightRail: React.FC<RightRailProps> = ({
     <aside
       className="right-rail"
       style={{
-        width: 'var(--w-rail-r)',
+        width: '100%',
         backgroundColor: 'var(--bg-panel)',
         borderLeft: '1px solid var(--line-hair)',
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - var(--h-header) - var(--h-framebar))',
+        height: '100%',
         overflow: 'hidden',
       }}
       role="region"
@@ -655,34 +655,38 @@ export const RightRail: React.FC<RightRailProps> = ({
       </div>
     </div>
 
-      {/* Pinned Decision and Evidence Block (Guaranteed visible at 1440x900 and 1280x800) */}
+      {/* Pinned Decision and Evidence Block */}
       <div
         id="decision-action-block"
         style={{
           borderTop: '1px solid var(--line-hair)',
           backgroundColor: 'var(--bg-panel)',
-          padding: 'var(--s4)',
+          padding: '14px 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--s3)',
+          gap: '10px',
           zIndex: 5,
           flexShrink: 0,
         }}
       >
-        <div style={{ display: 'flex', gap: 'var(--s3)' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <button
             onClick={() => onOpenDecisionModal('APPROVE')}
             disabled={isAbstained || isDecided || isStale || isReadOnly}
             style={{
               flex: 1,
-              padding: 'var(--s2)',
-              borderRadius: 'var(--r-ctl)',
-              backgroundColor: isAbstained || isDecided || isStale || isReadOnly ? 'var(--line-hair)' : 'var(--ok)',
-              color: isAbstained || isDecided || isStale || isReadOnly ? 'var(--ink-lo)' : 'var(--bg-void)',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              backgroundColor: isAbstained || isDecided || isStale || isReadOnly ? 'var(--bg-sunken)' : '#16a34a',
+              backgroundImage: isAbstained || isDecided || isStale || isReadOnly ? 'none' : 'linear-gradient(135deg, #16a34a, #15803d)',
+              color: isAbstained || isDecided || isStale || isReadOnly ? 'var(--ink-lo)' : '#ffffff',
               fontWeight: 700,
-              border: 'none',
+              border: isAbstained || isDecided || isStale || isReadOnly ? '1px solid var(--line-hair)' : 'none',
               cursor: isAbstained || isDecided || isStale || isReadOnly ? 'not-allowed' : 'pointer',
-              fontSize: 'var(--fs-cap)',
+              fontSize: '12px',
+              letterSpacing: '0.03em',
+              boxShadow: isAbstained || isDecided || isStale || isReadOnly ? 'none' : '0 2px 8px rgba(22, 163, 74, 0.25)',
+              transition: 'all 0.15s ease',
             }}
             id="approve-action-btn"
           >
@@ -693,14 +697,16 @@ export const RightRail: React.FC<RightRailProps> = ({
             disabled={isDecided || isReadOnly}
             style={{
               flex: 1,
-              padding: 'var(--s2)',
-              borderRadius: 'var(--r-ctl)',
-              backgroundColor: isDecided || isReadOnly ? 'var(--line-hair)' : 'var(--bg-raised)',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              backgroundColor: isDecided || isReadOnly ? 'var(--bg-sunken)' : 'var(--bg-raised)',
               color: isDecided || isReadOnly ? 'var(--ink-lo)' : 'var(--fail)',
-              border: '1px solid var(--line-hair)',
+              border: isDecided || isReadOnly ? '1px solid var(--line-hair)' : '1px solid rgba(220, 38, 38, 0.3)',
               fontWeight: 700,
               cursor: isDecided || isReadOnly ? 'not-allowed' : 'pointer',
-              fontSize: 'var(--fs-cap)',
+              fontSize: '12px',
+              letterSpacing: '0.03em',
+              transition: 'all 0.15s ease',
             }}
             id="reject-action-btn"
           >
@@ -714,14 +720,19 @@ export const RightRail: React.FC<RightRailProps> = ({
           disabled={!selectedCaseId}
           style={{
             width: '100%',
-            padding: 'var(--s2)',
-            backgroundColor: 'var(--bg-raised)',
+            padding: '10px 14px',
+            backgroundColor: 'var(--accent-wash)',
             border: '1px solid var(--accent-edge)',
             color: 'var(--accent)',
-            borderRadius: 'var(--r-ctl)',
-            fontSize: 'var(--fs-cap)',
+            borderRadius: '8px',
+            fontSize: '12px',
             fontWeight: 600,
             cursor: !selectedCaseId ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            transition: 'all 0.15s ease',
           }}
         >
           {selectedCaseId ? `Open Evidence for ${selectedCaseId.replace('__', ' + ')} ▸` : 'Select a Case to Inspect Evidence'}

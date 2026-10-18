@@ -52,7 +52,7 @@ export const DecisionModal: React.FC<DecisionModalProps> = ({
     >
       <div
         style={{
-          width: '460px',
+          width: 'min(460px, calc(100vw - 32px))',
           backgroundColor: 'var(--bg-panel)',
           border: '1px solid var(--line-hair)',
           borderRadius: 'var(--r-panel)',

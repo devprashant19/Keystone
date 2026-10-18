@@ -89,9 +89,104 @@ export const App: React.FC = () => {
   const [currentFrame, setCurrentFrame] = useState<number>(0);
 
   // Deck view state
+  const [mobileDeckTab, setMobileDeckTab] = useState<'left' | 'center' | 'right'>('center');
   const [viewMode, setViewMode] = useState<'map' | 'topology'>('map');
   const [highlightSynthetic, setHighlightSynthetic] = useState<boolean>(false);
   const [highlightSevered, setHighlightSevered] = useState<boolean>(false);
+
+  // Flexible / Resizable Rail Widths state
+  const [leftRailWidth, setLeftRailWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('keystone_left_rail_w');
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 220 && val <= 550) return val;
+      }
+    } catch {}
+    return 320;
+  });
+
+  const [rightRailWidth, setRightRailWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('keystone_right_rail_w');
+      if (saved) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val) && val >= 280 && val <= 650) return val;
+      }
+    } catch {}
+    return 390;
+  });
+
+  const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+  const [isDraggingRight, setIsDraggingRight] = useState(false);
+
+  const startResizeLeft = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsDraggingLeft(true);
+    const startX = 'clientX' in e ? e.clientX : e.touches[0].clientX;
+    const startW = leftRailWidth;
+
+    const handlePointerMove = (evt: MouseEvent | TouchEvent) => {
+      const currentX = 'clientX' in evt ? evt.clientX : evt.touches[0].clientX;
+      const delta = currentX - startX;
+      const newW = Math.max(220, Math.min(550, startW + delta));
+      setLeftRailWidth(newW);
+      try {
+        localStorage.setItem('keystone_left_rail_w', String(newW));
+      } catch {}
+    };
+
+    const handlePointerUp = () => {
+      setIsDraggingLeft(false);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('touchend', handlePointerUp);
+  }, [leftRailWidth]);
+
+  const startResizeRight = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsDraggingRight(true);
+    const startX = 'clientX' in e ? e.clientX : e.touches[0].clientX;
+    const startW = rightRailWidth;
+
+    const handlePointerMove = (evt: MouseEvent | TouchEvent) => {
+      const currentX = 'clientX' in evt ? evt.clientX : evt.touches[0].clientX;
+      const delta = startX - currentX;
+      const newW = Math.max(280, Math.min(650, startW + delta));
+      setRightRailWidth(newW);
+      try {
+        localStorage.setItem('keystone_right_rail_w', String(newW));
+      } catch {}
+    };
+
+    const handlePointerUp = () => {
+      setIsDraggingRight(false);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('touchend', handlePointerUp);
+  }, [rightRailWidth]);
 
   // Modals state
   const [isAgentOpen, setIsAgentOpen] = useState<boolean>(false);
@@ -509,6 +604,8 @@ export const App: React.FC = () => {
           color: 'var(--ink-hi)',
           overflowY: 'auto',
           overflowX: 'hidden',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
         }}
       >
         <Header
@@ -589,58 +686,102 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Small Screen Notice (<900px) */}
-      <div
-        id="small-screen-notice"
-        className="small-screen-notice"
-        style={{
-          backgroundColor: 'var(--bg-sunken)',
-          color: 'var(--ink-mid)',
-          borderBottom: '1px solid var(--line-hair)',
-          padding: 'var(--s2) var(--s4)',
-          fontSize: 'var(--fs-micro)',
-          textAlign: 'center',
-        }}
-      >
-        Dense command deck — use a wider screen for full 3-column analysis.
+      {/* Responsive Mobile Tabs Switcher for small viewports (<960px) */}
+      <div className="deck-mobile-tabs" role="tablist" aria-label="Command Deck Mobile Tabs">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileDeckTab === 'left'}
+          className={`deck-mobile-tab-btn ${mobileDeckTab === 'left' ? 'active' : ''}`}
+          onClick={() => setMobileDeckTab('left')}
+        >
+          <span>📋</span>
+          <span className="tab-label-full">Corridors ({corridors.length})</span>
+          <span className="tab-label-short">Corridors</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileDeckTab === 'center'}
+          className={`deck-mobile-tab-btn ${mobileDeckTab === 'center' ? 'active' : ''}`}
+          onClick={() => setMobileDeckTab('center')}
+        >
+          <span>🗺️</span>
+          <span className="tab-label-full">Map & Graph</span>
+          <span className="tab-label-short">Map</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileDeckTab === 'right'}
+          className={`deck-mobile-tab-btn ${mobileDeckTab === 'right' ? 'active' : ''}`}
+          onClick={() => setMobileDeckTab('right')}
+        >
+          <span>📊</span>
+          <span className="tab-label-full">Cascades & SLA</span>
+          <span className="tab-label-short">Cascades</span>
+        </button>
       </div>
 
-      {/* 2. Main 3-Column Deck */}
+      {/* 2. Main 3-Column Deck with Resizable Splitters */}
       <div
         id="command-deck-main"
+        className={`command-deck-container ${isDraggingLeft || isDraggingRight ? 'is-sidebar-resizing' : ''}`}
         style={{
-          display: 'flex',
-          flex: 1,
-          overflow: 'hidden',
-        }}
+          '--deck-left-width': `${leftRailWidth}px`,
+          '--deck-right-width': `${rightRailWidth}px`,
+        } as React.CSSProperties}
       >
-        {/* Left Rail (320px) */}
-        <LeftRail
-          corridors={corridors}
-          selectedF1={selectedF1}
-          onSelectF1={(f1) => {
-            setSelectedF1(f1);
-            if (f1) {
-              if (currentRoute === '/') handleNavigate('/deck');
-              loadScenario(f1);
-            } else {
-              handleClear();
-            }
+        {/* Left Rail */}
+        <div
+          className={`deck-col-left ${mobileDeckTab === 'left' ? 'mobile-active' : ''}`}
+          style={{ width: `${leftRailWidth}px` }}
+        >
+          <LeftRail
+            corridors={corridors}
+            selectedF1={selectedF1}
+            onSelectF1={(f1) => {
+              setSelectedF1(f1);
+              if (f1) {
+                if (currentRoute === '/') handleNavigate('/deck');
+                loadScenario(f1);
+              } else {
+                handleClear();
+              }
+            }}
+            onRunSweep={handleRunSweep}
+            onCancelRun={handleCancelRun}
+            onClear={handleClear}
+            onRecomputeLive={handleRecomputeLive}
+            elapsedMs={runData?.elapsed_ms}
+            runState={isLoading ? 'running' : runData?.cases?.length ? 'complete' : 'idle'}
+            cases={runData?.cases || []}
+            selectedCaseId={selectedCaseId}
+            onSelectCase={setSelectedCaseId}
+            isDbDown={!isDbHealthy}
+          />
+        </div>
+
+        {/* Left Splitter Resizer */}
+        <div
+          id="deck-resizer-left"
+          className={`deck-resizer deck-resizer-left ${isDraggingLeft ? 'is-dragging' : ''}`}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize Left Sidebar"
+          title="Drag to resize left sidebar (Double-click to reset)"
+          onMouseDown={startResizeLeft}
+          onTouchStart={startResizeLeft}
+          onDoubleClick={() => {
+            setLeftRailWidth(320);
+            try { localStorage.setItem('keystone_left_rail_w', '320'); } catch {}
           }}
-          onRunSweep={handleRunSweep}
-          onCancelRun={handleCancelRun}
-          onClear={handleClear}
-          onRecomputeLive={handleRecomputeLive}
-          elapsedMs={runData?.elapsed_ms}
-          runState={isLoading ? 'running' : runData?.cases?.length ? 'complete' : 'idle'}
-          cases={runData?.cases || []}
-          selectedCaseId={selectedCaseId}
-          onSelectCase={setSelectedCaseId}
-          isDbDown={!isDbHealthy}
-        />
+        >
+          <div className="deck-resizer-grip" />
+        </div>
 
         {/* Center Deck (Flex) */}
-        <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className={`deck-col-center ${mobileDeckTab === 'center' ? 'mobile-active' : ''}`} style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <CenterDeck
             viewMode={viewMode}
             onToggleViewMode={setViewMode}
@@ -672,33 +813,56 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* Right Rail (380px) */}
-        <RightRail
-          runData={runData}
-          selectedCaseId={selectedCaseId}
-          worldSummary={worldSummary}
-          onSelectEntity={(id, kind) => {
-            if (kind === 'corridor' || id.startsWith('road_')) {
-              if (currentRoute === '/') handleNavigate('/deck');
-              loadScenario(id);
-            } else if (kind === 'power') {
-              setHighlightSevered(true);
-            } else if (kind === 'alert') {
-              setHighlightSynthetic(true);
-            }
+        {/* Right Splitter Resizer */}
+        <div
+          id="deck-resizer-right"
+          className={`deck-resizer deck-resizer-right ${isDraggingRight ? 'is-dragging' : ''}`}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize Right Sidebar"
+          title="Drag to resize right sidebar (Double-click to reset)"
+          onMouseDown={startResizeRight}
+          onTouchStart={startResizeRight}
+          onDoubleClick={() => {
+            setRightRailWidth(390);
+            try { localStorage.setItem('keystone_right_rail_w', '390'); } catch {}
           }}
-          isStale={isStale}
-          onRecomputeLive={handleRecomputeLive}
-          onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}
-          onNavigateToEvidence={(caseId) => {
-            if (caseId === 'method') {
-              handleNavigate('/method');
-            } else {
-              setEvidenceCaseId(caseId);
-              handleNavigate(`/evidence/${caseId}`);
-            }
-          }}
-        />
+        >
+          <div className="deck-resizer-grip" />
+        </div>
+
+        {/* Right Rail */}
+        <div
+          className={`deck-col-right ${mobileDeckTab === 'right' ? 'mobile-active' : ''}`}
+          style={{ width: `${rightRailWidth}px` }}
+        >
+          <RightRail
+            runData={runData}
+            selectedCaseId={selectedCaseId}
+            worldSummary={worldSummary}
+            onSelectEntity={(id, kind) => {
+              if (kind === 'corridor' || id.startsWith('road_')) {
+                if (currentRoute === '/') handleNavigate('/deck');
+                loadScenario(id);
+              } else if (kind === 'power') {
+                setHighlightSevered(true);
+              } else if (kind === 'alert') {
+                setHighlightSynthetic(true);
+              }
+            }}
+            isStale={isStale}
+            onRecomputeLive={handleRecomputeLive}
+            onOpenDecisionModal={(verdict) => setDecisionModal({ isOpen: true, verdict })}
+            onNavigateToEvidence={(caseId) => {
+              if (caseId === 'method') {
+                handleNavigate('/method');
+              } else {
+                setEvidenceCaseId(caseId);
+                handleNavigate(`/evidence/${caseId}`);
+              }
+            }}
+          />
+        </div>
       </div>
 
       {/* 3. Bottom Frame Bar (56px) */}

@@ -70,7 +70,6 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
   
   // Breached critical facility count:
   // In Policy A (Baseline / No Action), breaches_a gives the facility breaches for this case.
-  // Default to 2 for golden case or derive from runData recommendation exposed count.
   const breachesCount = typeof selectedCase?.breaches_a === 'number'
     ? selectedCase.breaches_a
     : runData?.recommendation?.exposed_count > 0
@@ -90,40 +89,40 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
       id="blast-radius-panel"
       className="blast-radius-panel"
       style={{
-        padding: 'var(--s4)',
+        padding: '16px 18px',
         borderBottom: '1px solid var(--line-hair)',
         backgroundColor: 'var(--bg-panel)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--s3)',
+        gap: '12px',
       }}
       aria-label="Blast Radius and Cyber-Physical Cascade"
     >
-      {/* Header with Title and Provenance */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      {/* Header with Title and Provenance Shortcut */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
         <div>
           <div
             style={{
-              fontSize: 'var(--fs-micro)',
+              fontSize: '10px',
               textTransform: 'uppercase',
               color: 'var(--fail)',
               fontWeight: 700,
               letterSpacing: '0.06em',
               display: 'flex',
               alignItems: 'center',
-              gap: 'var(--s1)',
+              gap: '6px',
             }}
           >
-            <span>💥</span>
+            <span style={{ fontSize: '12px' }}>💥</span>
             <span>BLAST RADIUS HERO</span>
           </div>
           <h2
             style={{
-              fontSize: 'var(--fs-ui)',
+              fontSize: '15px',
               fontWeight: 700,
               color: 'var(--ink-hi)',
-              margin: '2px 0 0 0',
-              letterSpacing: '0.02em',
+              margin: '3px 0 0 0',
+              letterSpacing: '0.01em',
             }}
           >
             Dependency Cascade
@@ -136,12 +135,17 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           style={{
             background: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
-            borderRadius: 'var(--r-ctl)',
+            borderRadius: '6px',
             color: 'var(--accent)',
-            fontSize: 'var(--fs-micro)',
-            fontWeight: 700,
-            padding: '3px 8px',
+            fontSize: '11px',
+            fontWeight: 600,
+            padding: '4px 10px',
             cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
           }}
           title="Drill directly to FalkorDB causality evidence"
         >
@@ -153,37 +157,69 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
       <div
         id="blast-hero-metric"
         style={{
-          backgroundColor: 'var(--bg-raised)',
+          backgroundColor: 'var(--bg-sunken)',
           border: '1px solid var(--line-hair)',
-          borderRadius: 'var(--r-panel)',
-          padding: 'var(--s3) var(--s4)',
+          borderRadius: '10px',
+          padding: '12px 14px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 700, letterSpacing: '0.04em' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+          <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--ink-mid)', fontWeight: 700, letterSpacing: '0.05em' }}>
             CRITICAL FACILITIES OUTSIDE SLA
           </span>
-          <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
+          <span
+            className="mono"
+            style={{
+              fontSize: '11px',
+              color: 'var(--ink-mid)',
+              backgroundColor: 'var(--bg-raised)',
+              border: '1px solid var(--line-hair)',
+              padding: '2px 7px',
+              borderRadius: '5px',
+              fontWeight: 500,
+            }}
+          >
             Deadline: 20m road / 5m alert
           </span>
         </div>
 
-        {/* Large Metric & Ghosted Baseline */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--s3)', margin: 'var(--s1) 0' }}>
+        {/* Large Metric & Baseline Indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+            <div
+              id="blast-hero-number"
+              style={{
+                fontSize: '28px',
+                fontWeight: 800,
+                color: breachesCount > 0 ? 'var(--fail)' : 'var(--ok)',
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {breachesCount} / {totalCriticalFacilities}
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--ink-mid)' }}>
+              breached <span className="mono" style={{ color: 'var(--ink-lo)', fontSize: '11px' }}>(baseline: 0 / {totalCriticalFacilities})</span>
+            </div>
+          </div>
+
           <div
-            id="blast-hero-number"
-            className="mono"
             style={{
-              fontSize: 'var(--fs-metric)',
-              fontWeight: 800,
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '3px 8px',
+              borderRadius: '9999px',
+              backgroundColor: breachesCount > 0 ? 'rgba(220, 38, 38, 0.1)' : 'rgba(16, 185, 129, 0.1)',
               color: breachesCount > 0 ? 'var(--fail)' : 'var(--ok)',
-              lineHeight: 1,
+              border: breachesCount > 0 ? '1px solid rgba(220, 38, 38, 0.25)' : '1px solid rgba(16, 185, 129, 0.25)',
+              letterSpacing: '0.03em',
             }}
           >
-            {breachesCount} / {totalCriticalFacilities}
-          </div>
-          <div style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)' }}>
-            breached <span className="mono" style={{ color: 'var(--ink-lo)' }}>(baseline: 0 / {totalCriticalFacilities})</span>
+            {breachesCount > 0 ? 'SLA BREACH' : 'NORMAL SLA'}
           </div>
         </div>
 
@@ -192,12 +228,11 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           id="blast-delta-bar"
           style={{
             position: 'relative',
-            height: '10px',
-            backgroundColor: 'var(--bg-sunken)',
+            height: '7px',
+            backgroundColor: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
-            borderRadius: 'var(--r-chip)',
+            borderRadius: '9999px',
             overflow: 'hidden',
-            marginTop: 'var(--s2)',
           }}
           role="progressbar"
           aria-valuenow={breachesCount}
@@ -205,31 +240,20 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           aria-valuemax={totalCriticalFacilities}
           aria-label={`${breachesCount} of ${totalCriticalFacilities} critical facilities outside SLA`}
         >
-          {/* Ghosted baseline capacity (100% width indicator) */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: '100%',
-              backgroundColor: 'transparent',
-              borderRight: '2px dashed var(--line-hair)',
-            }}
-          />
           {/* Breached fraction fill */}
           <div
             className="motif-sever"
             style={{
               height: '100%',
               width: `${pctBreached}%`,
-              backgroundColor: breachesCount > 0 ? 'var(--fail)' : 'var(--ok)',
-              borderRadius: 'var(--r-chip)',
+              background: breachesCount > 0 ? 'linear-gradient(90deg, #dc2626, #b91c1c)' : 'linear-gradient(90deg, #10b981, #059669)',
+              borderRadius: '9999px',
+              transition: 'width 0.3s ease',
             }}
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)', marginTop: '4px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--ink-lo)', marginTop: '1px' }}>
           <span>0 (Operational)</span>
           <span className="mono" style={{ fontWeight: 600, color: breachesCount > 0 ? 'var(--fail)' : 'var(--ok)' }}>
             {pctBreached}% System Degradation
@@ -244,7 +268,7 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--s3)',
+          gap: '8px',
         }}
       >
         {/* Core: Failed Corridor */}
@@ -256,27 +280,29 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           onClick={() => handleEntityClick(f1CorridorId, 'corridor')}
           onKeyDown={(e) => { if (e.key === 'Enter') handleEntityClick(f1CorridorId, 'corridor'); }}
           style={{
-            backgroundColor: 'var(--fail-wash)',
-            border: '1px solid var(--fail)',
-            borderRadius: 'var(--r-ctl)',
-            padding: 'var(--s2) var(--s3)',
+            backgroundColor: 'rgba(220, 38, 38, 0.04)',
+            border: '1px solid rgba(220, 38, 38, 0.25)',
+            borderRadius: '8px',
+            padding: '9px 12px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: '10px',
+            transition: 'all 0.15s ease',
           }}
           title="Click to inspect root corridor failure"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', minWidth: 0 }}>
-            <span style={{ fontSize: 'var(--fs-ui)', lineHeight: 1 }}>🎯</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+            <span style={{ fontSize: '14px', lineHeight: 1 }}>🎯</span>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--fail)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div style={{ fontSize: '10px', color: 'var(--fail)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 ROOT FAILURE (F1)
               </div>
               <div
                 style={{
-                  fontSize: 'var(--fs-cap)',
-                  fontWeight: 700,
+                  fontSize: '12px',
+                  fontWeight: 600,
                   color: 'var(--ink-hi)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -287,7 +313,18 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
               </div>
             </div>
           </div>
-          <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--fail)', fontWeight: 700, flexShrink: 0 }}>
+          <span
+            className="mono"
+            style={{
+              fontSize: '11px',
+              color: 'var(--fail)',
+              fontWeight: 700,
+              flexShrink: 0,
+              backgroundColor: 'rgba(220, 38, 38, 0.08)',
+              padding: '2px 7px',
+              borderRadius: '9999px',
+            }}
+          >
             {f1?.length_km ? `${f1.length_km} km` : 'SEVERED'}
           </span>
         </div>
@@ -303,38 +340,53 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           style={{
             backgroundColor: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
-            borderLeft: '4px solid var(--fail)',
-            borderRadius: 'var(--r-ctl)',
-            padding: 'var(--s2) var(--s3)',
+            borderLeft: '3px solid var(--fail)',
+            borderRadius: '8px',
+            padding: '10px 12px',
             cursor: 'pointer',
+            transition: 'all 0.15s ease',
           }}
           title="Click to view road layer impact"
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
-              <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px' }}>🛣️</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                 Layer 1 · Road Arteries
               </span>
             </div>
-            <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--fail)', fontWeight: 700 }}>
+            <span
+              className="mono"
+              style={{
+                fontSize: '11px',
+                color: 'var(--fail)',
+                fontWeight: 600,
+                backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                padding: '2px 7px',
+                borderRadius: '9999px',
+              }}
+            >
               {severedCorridorCount} / {totalCorridors} corridors severed
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s1)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {severedCorridors.map((c) => (
               <span
                 key={c.id}
                 id={`blast-entity-${c.id}`}
                 className="mono"
                 style={{
-                  fontSize: 'var(--fs-micro)',
-                  padding: '1px 6px',
-                  backgroundColor: 'var(--fail-wash)',
+                  fontSize: '11px',
+                  padding: '3px 8px',
+                  backgroundColor: 'rgba(220, 38, 38, 0.06)',
                   color: 'var(--fail)',
-                  border: '1px solid var(--fail)',
-                  borderRadius: 'var(--r-chip)',
+                  border: '1px solid rgba(220, 38, 38, 0.2)',
+                  borderRadius: '6px',
                   fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
               >
                 {c.id.replace('road_', '')} (submerged)
@@ -354,27 +406,39 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           style={{
             backgroundColor: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
-            borderLeft: '4px solid var(--warn)',
-            borderRadius: 'var(--r-ctl)',
-            padding: 'var(--s2) var(--s3)',
+            borderLeft: '3px solid var(--warn)',
+            borderRadius: '8px',
+            padding: '10px 12px',
             cursor: 'pointer',
+            transition: 'all 0.15s ease',
           }}
           title="Click to view power feeder impact"
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
-              <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px' }}>⚡</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                 Layer 2 · Power Feeders
               </span>
             </div>
-            <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--warn)', fontWeight: 700 }}>
+            <span
+              className="mono"
+              style={{
+                fontSize: '11px',
+                color: 'var(--warn)',
+                fontWeight: 600,
+                backgroundColor: 'rgba(217, 119, 6, 0.08)',
+                padding: '2px 7px',
+                borderRadius: '9999px',
+              }}
+            >
               {severedFeeders.length} / {totalPowerFeeders} feeders dark
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s1)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {severedFeeders.length === 0 && (
-              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+              <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)', padding: '2px 0' }}>
                 no feeder carried on this corridor
               </span>
             )}
@@ -384,13 +448,16 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
                 id={`blast-entity-${pf.id}`}
                 className="mono"
                 style={{
-                  fontSize: 'var(--fs-micro)',
-                  padding: '1px 6px',
-                  backgroundColor: 'var(--warn-wash)',
+                  fontSize: '11px',
+                  padding: '3px 8px',
+                  backgroundColor: 'rgba(217, 119, 6, 0.06)',
                   color: 'var(--warn)',
-                  border: '1px solid var(--warn)',
-                  borderRadius: 'var(--r-chip)',
+                  border: '1px solid rgba(217, 119, 6, 0.2)',
+                  borderRadius: '6px',
                   fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
               >
                 ⚡ {pf.name || pf.id} (severed)
@@ -410,27 +477,39 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
           style={{
             backgroundColor: 'var(--bg-raised)',
             border: '1px solid var(--line-hair)',
-            borderLeft: '4px solid var(--branch)',
-            borderRadius: 'var(--r-ctl)',
-            padding: 'var(--s2) var(--s3)',
+            borderLeft: '3px solid var(--branch)',
+            borderRadius: '8px',
+            padding: '10px 12px',
             cursor: 'pointer',
+            transition: 'all 0.15s ease',
           }}
           title="Click to view telecom and alert network impact"
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)' }}>
-              <span style={{ fontSize: 'var(--fs-micro)', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px' }}>📡</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-hi)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                 Layer 3 · Alert & Telecom
               </span>
             </div>
-            <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--branch)', fontWeight: 700 }}>
+            <span
+              className="mono"
+              style={{
+                fontSize: '11px',
+                color: 'var(--branch)',
+                fontWeight: 600,
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                padding: '2px 7px',
+                borderRadius: '9999px',
+              }}
+            >
               {unpoweredTowers.length} / {totalTowers} towers · {isolatedRelays.length} / {totalRelays} relays
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s1)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {unpoweredTowers.length === 0 && (
-              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+              <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)', padding: '2px 0' }}>
                 no tower unpowered by this failure
               </span>
             )}
@@ -440,20 +519,23 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
                 id={`blast-entity-${t.id}`}
                 className="mono"
                 style={{
-                  fontSize: 'var(--fs-micro)',
-                  padding: '1px 6px',
-                  backgroundColor: 'var(--branch-wash)',
+                  fontSize: '11px',
+                  padding: '3px 8px',
+                  backgroundColor: 'rgba(139, 92, 246, 0.06)',
                   color: 'var(--branch)',
-                  border: '1px solid var(--branch)',
-                  borderRadius: 'var(--r-chip)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  borderRadius: '6px',
                   fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
               >
                 📡 {t.name || t.id} (unpowered)
               </span>
             ))}
             {isolatedRelays.length === 0 && (
-              <span className="mono" style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
+              <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)', padding: '2px 0' }}>
                 no relay isolated by this failure
               </span>
             )}
@@ -463,13 +545,16 @@ export const BlastRadius: React.FC<BlastRadiusProps> = ({
                 id={`blast-entity-${r.id}`}
                 className="mono"
                 style={{
-                  fontSize: 'var(--fs-micro)',
-                  padding: '1px 6px',
+                  fontSize: '11px',
+                  padding: '3px 8px',
                   backgroundColor: 'var(--bg-sunken)',
                   color: 'var(--ink-hi)',
                   border: '1px solid var(--line-hair)',
-                  borderRadius: 'var(--r-chip)',
+                  borderRadius: '6px',
                   fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
               >
                 🔔 {r.name || r.id} (isolated)

@@ -86,12 +86,12 @@ export const LeftRail: React.FC<LeftRailProps> = ({
   return (
     <aside
       style={{
-        width: 'var(--w-rail-l)',
+        width: '100%',
         backgroundColor: 'var(--bg-panel)',
         borderRight: '1px solid var(--line-hair)',
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - var(--h-header) - var(--h-framebar))',
+        height: '100%',
         overflow: 'hidden',
       }}
       role="region"
@@ -137,30 +137,55 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             </button>
           )}
         </div>
-        <select
-          value={selectedF1}
-          onChange={(e) => onSelectF1(e.target.value)}
-          disabled={isRunning || isDbDown}
-          style={{
-            width: '100%',
-            backgroundColor: 'var(--bg-sunken)',
-            border: '1px solid var(--line-hair)',
-            color: 'var(--ink-hi)',
-            padding: 'var(--s2) var(--s3)',
-            borderRadius: 'var(--r-ctl)',
-            fontSize: 'var(--fs-body)',
-            marginBottom: 'var(--s3)',
-          }}
-          className="mono"
-          id="corridor-select"
-        >
-          <option value="">— Select an observed corridor failure —</option>
-          {corridors.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name} ({c.length_km.toFixed(1)} km{c.breach_count !== undefined ? ` · ${c.breach_count} breaches` : ''})
-            </option>
-          ))}
-        </select>
+        <div style={{ position: 'relative', marginBottom: 'var(--s3)' }}>
+          <select
+            value={selectedF1}
+            onChange={(e) => onSelectF1(e.target.value)}
+            disabled={isRunning || isDbDown}
+            style={{
+              width: '100%',
+              backgroundColor: 'var(--bg-sunken)',
+              border: '1px solid var(--line-hair)',
+              color: 'var(--ink-hi)',
+              padding: '10px 32px 10px 12px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 500,
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              cursor: isRunning || isDbDown ? 'not-allowed' : 'pointer',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              display: 'block',
+              transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+            }}
+            id="corridor-select"
+          >
+            <option value="">— Select an observed corridor failure —</option>
+            {corridors.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} · {c.length_km.toFixed(1)} km{c.breach_count !== undefined ? ` · ${c.breach_count} breaches` : ''}
+              </option>
+            ))}
+          </select>
+          <div
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+              color: 'var(--ink-mid)',
+              fontSize: '11px',
+            }}
+            aria-hidden="true"
+          >
+            ▼
+          </div>
+        </div>
 
         <button
           onClick={onRunSweep}

@@ -95,8 +95,9 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
     >
       {/* Top Controls Toolbar */}
       <div
+        className="graph-toolbar"
         style={{
-          height: '44px',
+          minHeight: '44px',
           borderBottom: '1px solid var(--line-hair)',
           backgroundColor: 'var(--bg-panel)',
           display: 'flex',
@@ -145,7 +146,7 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
         </div>
 
         {/* Legend buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+        <div className="graph-legend-toggles" style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
           {onToggleSynthetic && (
             <button
               id="toggle-synthetic"
@@ -288,22 +289,37 @@ export const GraphContainer: React.FC<GraphContainerProps> = ({
               position: 'absolute',
               top: 'var(--s3)',
               left: 'var(--s3)',
+              maxWidth: 'calc(100% - 24px)',
+              boxSizing: 'border-box',
               backgroundColor: 'var(--branch-wash)',
               border: '1px solid var(--branch)',
               color: 'var(--branch)',
-              padding: 'var(--s1) var(--s3)',
+              padding: '4px 10px',
               borderRadius: 'var(--r-ctl)',
               fontSize: 'var(--fs-micro)',
               fontWeight: 600,
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: 'var(--s2)',
               boxShadow: 'var(--branch-glow)',
               pointerEvents: 'none',
+              overflow: 'hidden',
+              zIndex: 5,
             }}
+            title={branchId || undefined}
           >
-            <span>BRANCH</span>
-            <span className="mono">{branchId}</span>
+            <span style={{ flexShrink: 0, fontWeight: 700 }}>BRANCH</span>
+            <span
+              className="mono"
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {branchId}
+            </span>
           </div>
         )}
 

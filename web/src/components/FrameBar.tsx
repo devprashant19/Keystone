@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StatusBadge } from './primitives';
 
 interface FrameBarProps {
@@ -20,8 +20,17 @@ export const FrameBar: React.FC<FrameBarProps> = ({
   onSelectFrame,
   branchName,
 }) => {
+  const activeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (activeBtnRef.current) {
+      activeBtnRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [currentFrame]);
+
   return (
     <footer
+      className="framebar-root"
       style={{
         height: 'var(--h-framebar)',
         backgroundColor: 'var(--bg-panel)',
@@ -35,7 +44,7 @@ export const FrameBar: React.FC<FrameBarProps> = ({
       role="region"
       aria-label="Counterfactual Frame Stepper"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
+      <div className="framebar-stepper-wrap" style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
         <button
           id="frame-prev-btn"
           onClick={() => onSelectFrame(Math.max(0, currentFrame - 1))}
@@ -48,21 +57,26 @@ export const FrameBar: React.FC<FrameBarProps> = ({
             color: currentFrame <= 0 ? 'var(--ink-lo)' : 'var(--ink-hi)',
             cursor: currentFrame <= 0 ? 'not-allowed' : 'pointer',
             fontSize: 'var(--fs-micro)',
+            flexShrink: 0,
           }}
           title="Previous Frame (ArrowLeft)"
           aria-label="Previous Frame"
         >
           ◀
         </button>
-        <span style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 600 }}>
+        <span
+          className="framebar-label"
+          style={{ fontSize: 'var(--fs-micro)', textTransform: 'uppercase', color: 'var(--ink-lo)', fontWeight: 600, flexShrink: 0 }}
+        >
           FRAMES:
         </span>
-        <div style={{ display: 'flex', gap: 'var(--s1)' }}>
+        <div className="framebar-buttons-scroll" style={{ display: 'flex', gap: 'var(--s1)', overflowX: 'auto' }}>
           {FRAMES.map((f) => {
             const isActive = currentFrame === f.index;
             return (
               <button
                 key={f.index}
+                ref={isActive ? activeBtnRef : undefined}
                 id={`frame-step-${f.index}`}
                 className={`frame-step ${isActive ? 'active' : ''}`}
                 onClick={() => onSelectFrame(f.index)}
@@ -79,6 +93,8 @@ export const FrameBar: React.FC<FrameBarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 'var(--s1)',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
                 title={f.desc}
                 aria-pressed={isActive}
@@ -100,6 +116,7 @@ export const FrameBar: React.FC<FrameBarProps> = ({
             color: currentFrame >= 4 ? 'var(--ink-lo)' : 'var(--ink-hi)',
             cursor: currentFrame >= 4 ? 'not-allowed' : 'pointer',
             fontSize: 'var(--fs-micro)',
+            flexShrink: 0,
           }}
           title="Next Frame (ArrowRight)"
           aria-label="Next Frame"
@@ -109,7 +126,7 @@ export const FrameBar: React.FC<FrameBarProps> = ({
       </div>
 
       {/* Display active branch graph ID */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }} className="mono">
+      <div className="framebar-status-wrap mono" style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', flexShrink: 0 }}>
         <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>GRAPH STATE:</span>
         <StatusBadge
           status={currentFrame >= 2 ? 'BRANCH' : 'OK'}

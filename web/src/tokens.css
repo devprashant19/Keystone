@@ -1,5 +1,5 @@
 :root {
-  /* LIGHT THEME (PUKAAR PALETTE · DEFAULT ON) */
+  /* LIGHT THEME (KEYSTONE PALETTE · DEFAULT ON) */
   /* Surfaces */
   --bg-void:    #f2f8fc;   /* blue-tinted paper canvas */
   --bg-panel:   #ffffff;   /* crisp white card & panel surfaces */
@@ -8,7 +8,7 @@
   --bg-header:  #ffffff;   /* sticky header bar */
 
   /* Lines & Dividers — clean hairlines */
-  --line-hair:  #d6e6f1;   /* pukaar hairlines */
+  --line-hair:  #d6e6f1;   /* keystone hairlines */
   --line-firm:  #b9d3e5;   /* secondary rule */
   --line-focus: #1d7fc4;   /* accessible focus ring */
 
@@ -35,7 +35,7 @@
   --branch-glow: 0 0 0 1px #6b21a8, 0 0 18px rgba(107, 33, 168, 0.20);
   --bg-spotlight: rgba(227, 240, 248, 0.70);
 
-  /* Status (Pukaar 4-level severity scale) */
+  /* Status (Keystone 4-level severity scale) */
   --ok:         #0f6443;   /* normal: teal-green */
   --ok-wash:    #def5ea;
   --warn:       #6b5000;   /* watch / degraded: deep yellow-amber */
@@ -46,8 +46,8 @@
   --synthetic-wash: #e2f1fb;
 
   /* Typography */
-  --font-display: 'Anton', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --fs-micro:  11px;  /* units, provenance chips — never body */
@@ -92,10 +92,17 @@
   --r-pill:  999px;
 
   /* Layout */
-  --h-header:   52px;
+  --h-header:   64px;
   --h-framebar: 56px;
   --w-rail-l:   300px;
   --w-rail-r:   380px;
+}
+
+@media (max-width: 960px) {
+  :root {
+    --w-rail-l: 100%;
+    --w-rail-r: 100%;
+  }
 }
 
 [data-theme="dark"] {

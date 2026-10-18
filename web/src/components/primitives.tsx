@@ -158,6 +158,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, size = 
         letterSpacing: '0.04em',
         lineHeight: 1,
         whiteSpace: 'nowrap',
+        maxWidth: '100%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
         flexShrink: 0,
         boxSizing: 'border-box',
       }}

@@ -11,16 +11,27 @@ interface MethodViewProps {
 
 export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worldDigest }) => {
   const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
-    return document.documentElement.getAttribute('data-reduced-motion') === 'true';
+    return typeof document !== 'undefined' && document.documentElement.getAttribute('data-reduced-motion') === 'true';
   });
   const [resetting, setResetting] = useState<boolean>(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [tabularDigit, setTabularDigit] = useState<number>(0);
+  const [copiedTarget, setCopiedTarget] = useState<'config' | 'digest' | null>(null);
 
   const toggleReducedMotion = () => {
     const nextVal = !reducedMotion;
     setReducedMotion(nextVal);
-    document.documentElement.setAttribute('data-reduced-motion', nextVal ? 'true' : 'false');
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-reduced-motion', nextVal ? 'true' : 'false');
+    }
+  };
+
+  const copyToClipboard = (text: string, type: 'config' | 'digest') => {
+    try {
+      navigator?.clipboard?.writeText(text);
+      setCopiedTarget(type);
+      setTimeout(() => setCopiedTarget(null), 1500);
+    } catch (_) {}
   };
 
   const handleResetDemo = async () => {
@@ -46,308 +57,592 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
   return (
     <div
       style={{
-        height: 'calc(100vh - var(--h-header))',
+        height: 'calc(100vh - var(--h-header, 64px))',
         backgroundColor: 'var(--bg-void)',
         color: 'var(--ink-hi)',
-        padding: 'var(--s6) var(--s7)',
+        padding: 'clamp(24px, 4vh, 48px) clamp(16px, 4vw, 40px)',
         overflowY: 'auto',
+        fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        boxSizing: 'border-box',
       }}
     >
-      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-        {/* Back navigation */}
-        <button
-          onClick={onBack}
+      <div style={{ maxWidth: '1040px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {/* Top Navigation & Hero Banner */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: 'var(--bg-panel)',
+              border: '1px solid var(--line-hair)',
+              color: 'var(--accent)',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 18px',
+              borderRadius: '999px',
+              boxShadow: 'var(--sh-1)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>←</span>
+            <span>Return to Incident Command Deck</span>
+          </button>
+
+          <div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--accent)',
+                marginBottom: '8px',
+              }}
+            >
+              <span>◈</span>
+              <span>SCIENTIFIC PROVENANCE & BENCHMARK METHODOLOGY</span>
+            </div>
+            <h1
+              style={{
+                fontSize: 'clamp(2rem, 3.8vw, 2.75rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.15,
+                margin: '0 0 10px 0',
+                color: 'var(--ink-hi)',
+              }}
+            >
+              Methodology & Scientific Integrity
+            </h1>
+            <p
+              style={{
+                fontSize: 'clamp(14px, 1.2vw, 15.5px)',
+                color: 'var(--ink-mid)',
+                lineHeight: 1.6,
+                maxWidth: '780px',
+                margin: 0,
+              }}
+            >
+              KEYSTONE Pre-Mortem enforces strict pre-registration discipline. All constants, evaluators,
+              and denominator definitions are cryptographically frozen before runtime execution to prevent cherry-picking.
+            </p>
+          </div>
+        </div>
+
+        {/* 1. Cryptographic Hashes (Side-by-Side Clean Cards) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          {/* Config Hash Card */}
+          <div
+            style={{
+              backgroundColor: 'var(--bg-panel)',
+              border: '1px solid var(--line-hair)',
+              borderRadius: '16px',
+              padding: '20px 22px',
+              boxShadow: 'var(--sh-1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ✓ Frozen Configuration Hash
+              </span>
+              <button
+                id="copy-config-btn"
+                onClick={() => copyToClipboard(configHash, 'config')}
+                style={{
+                  background: 'var(--bg-sunken)',
+                  border: '1px solid var(--line-hair)',
+                  color: 'var(--ink-mid)',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                {copiedTarget === 'config' ? '✓ Copied' : 'Copy SHA-256'}
+              </button>
+            </div>
+            <div
+              className="mono"
+              style={{
+                fontSize: '12px',
+                color: 'var(--ink-hi)',
+                backgroundColor: 'var(--bg-sunken)',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                border: '1px solid var(--line-hair)',
+                wordBreak: 'break-all',
+                lineHeight: 1.4,
+              }}
+            >
+              {configHash || 'ed468a59c67aa8a84f23dc7f71caecb0e6e2e5f8fd0cac3491b2070306eeaa35'}
+            </div>
+            <span style={{ fontSize: '11.5px', color: 'var(--ink-lo)' }}>
+              Evaluator constants & hospital target boundaries frozen pre-execution.
+            </span>
+          </div>
+
+          {/* World Digest Card */}
+          <div
+            style={{
+              backgroundColor: 'var(--bg-panel)',
+              border: '1px solid var(--line-hair)',
+              borderRadius: '16px',
+              padding: '20px 22px',
+              boxShadow: 'var(--sh-1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ok)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ✓ Immutable Base World Digest
+              </span>
+              <button
+                id="copy-digest-btn"
+                onClick={() => copyToClipboard(worldDigest, 'digest')}
+                style={{
+                  background: 'var(--bg-sunken)',
+                  border: '1px solid var(--line-hair)',
+                  color: 'var(--ink-mid)',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                {copiedTarget === 'digest' ? '✓ Copied' : 'Copy Digest'}
+              </button>
+            </div>
+            <div
+              className="mono"
+              style={{
+                fontSize: '12px',
+                color: 'var(--ink-hi)',
+                backgroundColor: 'var(--bg-sunken)',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                border: '1px solid var(--line-hair)',
+                wordBreak: 'break-all',
+                lineHeight: 1.4,
+              }}
+            >
+              {worldDigest || '602e4e66d1877742f9fc23aa88b1fe683fdff1558d69eaa6040d4277513a1d31'}
+            </div>
+            <span style={{ fontSize: '11.5px', color: 'var(--ink-lo)' }}>
+              Canonical SHA-256 state over 14 Delhi arterial corridors & cross-layer graph.
+            </span>
+          </div>
+        </div>
+
+        {/* 2. Frozen Constants Grid (Clean Modern Cards instead of raw table) */}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--accent)',
-            cursor: 'pointer',
-            fontSize: 'var(--fs-cap)',
-            fontWeight: 600,
-            marginBottom: 'var(--s4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--s1)',
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
           }}
         >
-          ◀ Return to Incident Command Deck
-        </button>
-
-        <h1 style={{ fontSize: 'var(--fs-h2)', fontWeight: 700, marginBottom: 'var(--s2)', margin: 0 }}>
-          Methodology, Provenance & Scientific Integrity
-        </h1>
-        <p style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', marginBottom: 'var(--s5)' }}>
-          KEYSTONE Pre-Mortem is built under a strict pre-registration discipline. All constants, evaluators, and denominator definitions are frozen before runtime execution to prevent cherry-picking.
-        </p>
-
-        {/* 1. Frozen Config Card */}
-        <section style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)', marginBottom: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--accent)', margin: 0 }}>
-            1. Frozen Configuration (SHA-256 Verified)
-          </h2>
-          <div style={{ display: 'flex', gap: 'var(--s4)', marginBottom: 'var(--s3)' }} className="mono">
-            <div>CONFIG HASH: <span style={{ color: 'var(--ink-hi)', fontWeight: 600 }}>{configHash}</span></div>
-            <div>WORLD DIGEST: <span style={{ color: 'var(--ink-hi)', fontWeight: 600 }}>{worldDigest}</span></div>
+          <div style={{ marginBottom: '18px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--ink-hi)' }}>
+              1. Frozen Benchmark Constants
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--ink-mid)', margin: 0 }}>
+              Fixed parametric values defining operational access thresholds and resource limits.
+            </p>
           </div>
-          <table style={{ width: '100%', fontSize: 'var(--fs-cap)', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Constant</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Value</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Methodological Label</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Access Deadline</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>20.0 minutes</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-mid)' }}>Synthetic urban target band</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Assumed Monsoon Arterial Speed</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>24.0 km/h</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--warn)' }}>Synthetic planning assumption — NOT empirical</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Effective Travel Allowance</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>6.8 km</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-mid)' }}>Derived: (20 - 3) / 60 * 24</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Alert Delivery Deadline</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8.0 minutes</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-mid)' }}>Synthetic mesh propagation threshold</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Action Budget</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>1 action per f1</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-mid)' }}>Strict resource scarcity constraint</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
 
-        {/* 2. Three-Way Decomposition */}
-        <section style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)', marginBottom: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--accent)', margin: 0 }}>
-            2. Three-Way Case Decomposition & Denominators
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            {[
+              { label: 'Access Deadline', value: '20.0 min', desc: 'Synthetic urban target band', tag: 'URBAN TARGET' },
+              { label: 'Assumed Monsoon Speed', value: '24.0 km/h', desc: 'Synthetic planning assumption', tag: 'PLANNING' },
+              { label: 'Effective Allowance', value: '6.8 km', desc: 'Derived: (20 - 3) / 60 × 24', tag: 'DERIVED' },
+              { label: 'Alert Delivery Deadline', value: '8.0 min', desc: 'Synthetic mesh threshold', tag: 'TELECOM' },
+              { label: 'Action Budget', value: '1 action / f1', desc: 'Strict scarcity constraint', tag: 'SCARCITY' },
+            ].map((c) => (
+              <div
+                key={c.label}
+                style={{
+                  backgroundColor: 'var(--bg-sunken)',
+                  border: '1px solid var(--line-hair)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ink-lo)' }}>{c.label}</span>
+                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-panel)', color: 'var(--accent)', border: '1px solid var(--line-hair)' }}>
+                    {c.tag}
+                  </span>
+                </div>
+                <div className="mono" style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink-hi)' }}>
+                  {c.value}
+                </div>
+                <span style={{ fontSize: '11px', color: 'var(--ink-mid)' }}>{c.desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Three-Way Case Decomposition (Clean Stat Cards) */}
+        <div
+          style={{
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
+          }}
+        >
+          <div style={{ marginBottom: '18px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--ink-hi)' }}>
+              2. Three-Way Case Decomposition (182 Ordered Failure Pairs)
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--ink-mid)', margin: 0 }}>
+              To avoid inflating headline claims, KEYSTONE partitions all contingency pairs into three disjoint classes before policy comparison:
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+            <div style={{ backgroundColor: 'var(--bg-sunken)', border: '1px solid var(--line-hair)', borderRadius: '14px', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--warn)' }}>f1-Alone Cases</span>
+                <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)' }}>57.1%</span>
+              </div>
+              <div className="mono" style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink-hi)' }}>104</div>
+              <p style={{ fontSize: '12px', color: 'var(--ink-mid)', margin: 0, lineHeight: 1.45 }}>
+                Breaches that occur under the initial cut alone. No preventive action on f2 can avert these.
+              </p>
+            </div>
+
+            <div style={{ backgroundColor: 'var(--bg-sunken)', border: '1px solid var(--line-hair)', borderRadius: '14px', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--branch)' }}>f2-Alone Cases</span>
+                <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)' }}>26.4%</span>
+              </div>
+              <div className="mono" style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink-hi)' }}>48</div>
+              <p style={{ fontSize: '12px', color: 'var(--ink-mid)', margin: 0, lineHeight: 1.45 }}>
+                Breaches that occur under the second failure alone, regardless of whether f1 is active.
+              </p>
+            </div>
+
+            <div style={{ backgroundColor: 'var(--bg-sunken)', border: '1px solid var(--line-hair)', borderRadius: '14px', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ok)' }}>Intact / Resilient</span>
+                <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-lo)' }}>16.5%</span>
+              </div>
+              <div className="mono" style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink-hi)' }}>30</div>
+              <p style={{ fontSize: '12px', color: 'var(--ink-mid)', margin: 0, lineHeight: 1.45 }}>
+                Both primary hospital dispatch access SLAs maintained (access latency ≤ 20.0 minutes).
+              </p>
+            </div>
+          </div>
+
+          {/* Interaction Denominator Callout */}
+          <div
+            style={{
+              backgroundColor: 'rgba(79, 179, 255, 0.08)',
+              border: '1px solid rgba(79, 179, 255, 0.25)',
+              borderRadius: '12px',
+              padding: '14px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>⚖️</span>
+            <div>
+              <strong style={{ fontSize: '13px', color: 'var(--accent)', display: 'block' }}>
+                Headline Denominator: 0 Interaction-Only Cases at 6.8 km
+              </strong>
+              <span style={{ fontSize: '12px', color: 'var(--ink-mid)' }}>
+                Breaches that occur only when both f1 and f2 occur jointly. Single-arterial cuts already sever LNJP access, proving dignified abstention over fabricated complexity.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Empirical Sensitivity Analysis Table */}
+        <div
+          style={{
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
+          }}
+        >
+          <div style={{ marginBottom: '18px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--ink-hi)' }}>
+              3. Empirical Sensitivity Sweep (results/deadline_sweep.csv)
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--ink-mid)', margin: 0 }}>
+              Secondary sensitivity analysis demonstrating interaction-only cases at looser allowances (12 cases at 8.0 km, 8 at 9–12 km).
+            </p>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              id="deadline-sweep-table"
+              style={{
+                width: '100%',
+                fontSize: '12.5px',
+                borderCollapse: 'collapse',
+                textAlign: 'left',
+              }}
+            >
+              <thead>
+                <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', backgroundColor: 'var(--bg-sunken)' }}>
+                  <th style={{ padding: '10px 14px', borderRadius: '8px 0 0 8px' }}>Allowance (km)</th>
+                  <th style={{ padding: '10px 14px' }}>Deadline (min)</th>
+                  <th style={{ padding: '10px 14px' }}>Total Cases</th>
+                  <th style={{ padding: '10px 14px' }}>Interaction Only</th>
+                  <th style={{ padding: '10px 14px' }}>f1 Alone</th>
+                  <th style={{ padding: '10px 14px' }}>f2 Alone</th>
+                  <th style={{ padding: '10px 14px', borderRadius: '0 8px 8px 0' }}>Neither (Intact)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { a: '4.0 km', d: '13.0 min', t: '182', io: '0', f1: '182', f2: '48', n: '0', active: false },
+                  { a: '5.0 km', d: '15.5 min', t: '182', io: '0', f1: '148', f2: '48', n: '18', active: false },
+                  { a: '6.0 km', d: '18.0 min', t: '182', io: '0', f1: '104', f2: '48', n: '30', active: false },
+                  { a: '6.8 km (Frozen)', d: '20.0 min', t: '182', io: '0', f1: '104', f2: '48', n: '30', active: true },
+                  { a: '7.0 km', d: '20.5 min', t: '182', io: '0', f1: '104', f2: '48', n: '30', active: false },
+                  { a: '8.0 km', d: '23.0 min', t: '182', io: '12', f1: '65', f2: '45', n: '60', active: false },
+                  { a: '9.0 km', d: '25.5 min', t: '182', io: '8', f1: '65', f2: '45', n: '64', active: false },
+                  { a: '10.0 km', d: '28.0 min', t: '182', io: '8', f1: '65', f2: '45', n: '64', active: false },
+                  { a: '12.0 km', d: '33.0 min', t: '182', io: '8', f1: '65', f2: '45', n: '64', active: false },
+                ].map((row) => (
+                  <tr
+                    key={row.a}
+                    style={{
+                      borderBottom: '1px solid var(--line-hair)',
+                      backgroundColor: row.active ? 'rgba(79, 179, 255, 0.12)' : 'transparent',
+                      fontWeight: row.active ? 700 : 400,
+                    }}
+                  >
+                    <td className="mono" style={{ padding: '10px 14px', color: row.active ? 'var(--accent)' : 'inherit' }}>
+                      {row.a}
+                    </td>
+                    <td className="mono" style={{ padding: '10px 14px' }}>{row.d}</td>
+                    <td className="mono" style={{ padding: '10px 14px' }}>{row.t}</td>
+                    <td className="mono" style={{ padding: '10px 14px', color: row.io !== '0' ? 'var(--ok)' : 'inherit', fontWeight: 700 }}>
+                      {row.io}
+                    </td>
+                    <td className="mono" style={{ padding: '10px 14px' }}>{row.f1}</td>
+                    <td className="mono" style={{ padding: '10px 14px' }}>{row.f2}</td>
+                    <td className="mono" style={{ padding: '10px 14px' }}>{row.n}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 5. Explicit Limitations & Boundaries */}
+        <div
+          style={{
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
+          }}
+        >
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 14px 0', color: 'var(--fail)' }}>
+            4. Explicit Limitations & Boundaries
           </h2>
-          <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', lineHeight: 'var(--lh-prose)', marginBottom: 'var(--s3)' }}>
-            To avoid inflating headline claims, KEYSTONE decomposes all 182 scenario pairs into three disjoint classes before any policy comparison:
-          </p>
-          <ul style={{ fontSize: 'var(--fs-cap)', lineHeight: 'var(--lh-prose)', paddingLeft: 'var(--s5)', color: 'var(--ink-hi)' }}>
-            <li>
-              <strong>f1-alone cases:</strong> Breaches that occur under the initial failure alone. No preventive action can avert these.
-            </li>
-            <li>
-              <strong>f2-alone cases:</strong> Breaches that occur under the second failure alone regardless of f1.
-            </li>
-            <li>
-              <strong style={{ color: 'var(--accent)' }}>Interaction-only cases (The Headline Denominator):</strong> Breaches that occur only when both f1 and f2 occur jointly. This is the only region where conditioning on f1 changes the optimal action!
-            </li>
-          </ul>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <span style={{ color: 'var(--fail)', fontSize: '15px' }}>•</span>
+              <span style={{ fontSize: '13px', color: 'var(--ink-mid)', lineHeight: 1.55 }}>
+                <strong style={{ color: 'var(--ink-hi)' }}>Zero Probability Claims:</strong> KEYSTONE evaluates deterministic conditional reachability in worst-case graph cascades, without ungrounded stochastic approximations.
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <span style={{ color: 'var(--fail)', fontSize: '15px' }}>•</span>
+              <span style={{ fontSize: '13px', color: 'var(--ink-mid)', lineHeight: 1.55 }}>
+                <strong style={{ color: 'var(--ink-hi)' }}>Synthetic Layer Labeling:</strong> Road network geometry is 100% real Delhi OSM; electrical feeder & cellular relay layers are labeled synthetic topologies.
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <span style={{ color: 'var(--fail)', fontSize: '15px' }}>•</span>
+              <span style={{ fontSize: '13px', color: 'var(--ink-mid)', lineHeight: 1.55 }}>
+                <strong style={{ color: 'var(--ink-hi)' }}>Honest Spatial Exclusion:</strong> <code className="mono">wtp_wazirabad</code> sits 3.53 km from any modeled road node and is excluded from hospital access SLA metrics to prevent fabricating false connectivity.
+              </span>
+            </div>
+          </div>
+        </div>
 
-          <h3 style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-hi)', marginTop: 'var(--s4)', marginBottom: 'var(--s2)' }}>
-            Secondary Sensitivity Analysis: Empirical Allowance Sweep (results/deadline_sweep.csv)
-          </h3>
-          <p style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)', marginBottom: 'var(--s2)' }}>
-            Secondary sensitivity analysis demonstrating interaction-only cases at looser allowances (12 cases at 8.0 km, 8 at 9–12 km). The primary benchmark uses the pre-registered 6.8 km frozen threshold.
-          </p>
-          <table id="deadline-sweep-table" style={{ width: '100%', fontSize: 'var(--fs-micro)', borderCollapse: 'collapse', marginTop: 'var(--s2)' }}>
-            <thead>
-              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Allowance (km)</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Deadline (min)</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Total</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Interaction Only</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>f1 Alone</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>f2 Alone</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Neither</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>4.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>13.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>5.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>15.5 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>148</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>18</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>6.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>18.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)', backgroundColor: 'var(--bg-sunken)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--accent)', fontWeight: 700 }}>6.8 km (Frozen)</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>20.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ink-hi)', fontWeight: 700 }}>0</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>7.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>20.5 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>0</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>104</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>48</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>30</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)', backgroundColor: 'var(--bg-sunken)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--accent)', fontWeight: 700 }}>8.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>23.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)', color: 'var(--ok)', fontWeight: 700 }}>12</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>60</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>9.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>25.5 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>10.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>28.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>12.0 km</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>33.0 min</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>182</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>8</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>65</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>45</td>
-                <td className="mono" style={{ padding: 'var(--s2) var(--s1)' }}>64</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        {/* 3. Provenance & Attribution */}
-        <section style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)', marginBottom: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--accent)', margin: 0 }}>
-            3. Dataset Provenance & Attribution
+        {/* 6. Settings, Accessibility & Verification Reset */}
+        <div
+          style={{
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
+          }}
+        >
+          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 16px 0', color: 'var(--ink-hi)' }}>
+            5. System Controls & Demo Reset
           </h2>
-          <table style={{ width: '100%', fontSize: 'var(--fs-cap)', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ color: 'var(--ink-lo)', borderBottom: '1px solid var(--line-hair)', textAlign: 'left', backgroundColor: 'var(--bg-header)' }}>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Layer</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>Source</th>
-                <th style={{ padding: 'var(--s2) var(--s1)' }}>License</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Delhi Road Network</td>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>CityGraph (OpenStreetMap Delhi Central)</td>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>MIT License</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Flood Inundation Polygons</td>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>CityGraph (Delhi July 2023 Historic Flood Event)</td>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Reference Record</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid var(--line-hair)' }}>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Power & Telecom Layers</td>
-                <td style={{ padding: 'var(--s2) var(--s1)' }}>Synthetic layered specification (power_and_alert.json)</td>
-                <td style={{ padding: 'var(--s2) var(--s1)', color: 'var(--synthetic)' }}>Synthetic Benchmark</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            {/* Reduced Motion Toggle Card */}
+            <div style={{ backgroundColor: 'var(--bg-sunken)', border: '1px solid var(--line-hair)', borderRadius: '14px', padding: '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div>
+                <strong style={{ fontSize: '13.5px', color: 'var(--ink-hi)', display: 'block' }}>Reduced Motion Mode</strong>
+                <span style={{ fontSize: '11.5px', color: 'var(--ink-lo)' }}>Disables parallax & heavy transitions</span>
+              </div>
+              <button
+                onClick={toggleReducedMotion}
+                style={{
+                  padding: '7px 14px',
+                  backgroundColor: reducedMotion ? 'var(--ok)' : 'var(--bg-panel)',
+                  color: reducedMotion ? '#ffffff' : 'var(--ink-hi)',
+                  border: '1px solid var(--line-hair)',
+                  borderRadius: '999px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '12px',
+                  boxShadow: 'var(--sh-1)',
+                }}
+              >
+                {reducedMotion ? 'ON' : 'OFF'}
+              </button>
+            </div>
 
-        {/* 4. Design System & Encodings Reference (U1 #design) */}
-        <section id="design" style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)', marginBottom: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--accent)', margin: 0 }}>
-            4. Design System & Status Encodings Gallery
-          </h2>
-          <p style={{ fontSize: 'var(--fs-cap)', color: 'var(--ink-mid)', marginBottom: 'var(--s4)' }}>
-            Single source of truth for semantic encodings (<code className="mono">encodings.ts</code>). Every status carries colour, text badge, shape/stroke difference, and distinct icon.
-          </p>
+            {/* Reset Demo Card */}
+            <div style={{ backgroundColor: 'var(--bg-sunken)', border: '1px solid var(--line-hair)', borderRadius: '14px', padding: '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div>
+                <strong style={{ fontSize: '13.5px', color: 'var(--ink-hi)', display: 'block' }}>Reset Incident Demo</strong>
+                <span style={{ fontSize: '11.5px', color: 'var(--ink-lo)' }}>Sweeps orphan branches & resets world</span>
+              </div>
+              <button
+                id="reset-demo-btn"
+                onClick={handleResetDemo}
+                disabled={resetting}
+                style={{
+                  padding: '7px 14px',
+                  backgroundColor: 'rgba(255, 138, 155, 0.12)',
+                  color: 'var(--fail)',
+                  border: '1px solid rgba(255, 138, 155, 0.35)',
+                  borderRadius: '999px',
+                  cursor: resetting ? 'not-allowed' : 'pointer',
+                  fontWeight: 600,
+                  fontSize: '12px',
+                  boxShadow: 'var(--sh-1)',
+                }}
+              >
+                {resetting ? 'Resetting…' : 'Reset Demo'}
+              </button>
+            </div>
+          </div>
+          {resetMessage && (
+            <div style={{ marginTop: '12px', fontSize: '12.5px', color: 'var(--accent)', fontWeight: 600 }}>
+              {resetMessage}
+            </div>
+          )}
+        </div>
+
+        {/* 7. Verification Audit Suite & Design Tokens (Clean Organized Section) */}
+        <div
+          id="design"
+          style={{
+            backgroundColor: 'var(--bg-panel)',
+            border: '1px solid var(--line-hair)',
+            borderRadius: '18px',
+            padding: '24px 28px',
+            boxShadow: 'var(--sh-1)',
+          }}
+        >
+          <div style={{ marginBottom: '18px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--ink-hi)' }}>
+              6. Design System Tokens & Semantic Encodings
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--ink-mid)', margin: 0 }}>
+              Single source of truth for semantic graph encodings. Every status carries color, text badge, shape difference, and distinct icon.
+            </p>
+          </div>
 
           {/* Encodings Gallery Container for U1-03 Greyscale Check */}
           <div
             id="encodings-gallery"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 'var(--s3)',
-              marginBottom: 'var(--s5)',
-              padding: 'var(--s3)',
-              backgroundColor: 'var(--bg-sunken)',
-              borderRadius: 'var(--r-ctl)',
-              border: '1px solid var(--line-hair)'
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: '12px',
+              marginBottom: '24px',
             }}
           >
-            {ALL_ENCODING_CONCEPTS.map(item => {
+            {ALL_ENCODING_CONCEPTS.map((item) => {
               const enc = getStatusEncoding(item.status);
               return (
                 <div
                   key={item.id}
                   className="encoding-card"
                   style={{
-                    backgroundColor: 'var(--bg-raised)',
+                    backgroundColor: 'var(--bg-sunken)',
                     border: '1px solid var(--line-hair)',
-                    borderRadius: 'var(--r-ctl)',
-                    padding: 'var(--s3)',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--s2)'
+                    gap: '8px',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 'var(--fs-cap)', fontWeight: 600, color: 'var(--ink-hi)' }}>{enc.concept}</span>
+                    <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--ink-hi)' }}>{enc.concept}</span>
                     <StatusBadge status={item.status} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)' }}>
-                    <svg width="80" height="20" style={{ overflow: 'visible' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="60" height="14" style={{ overflow: 'visible' }}>
                       <line
                         x1="0"
-                        y1="10"
-                        x2="80"
-                        y2="10"
+                        y1="7"
+                        x2="60"
+                        y2="7"
                         stroke={enc.colorVar}
                         strokeWidth={enc.strokeWidth}
                         strokeDasharray={enc.strokeDasharray || 'none'}
                       />
                       {enc.iconGlyph === 'cross' && (
-                        <text x="40" y="14" textAnchor="middle" fill={enc.colorVar} fontSize="12" fontWeight="bold">✕</text>
+                        <text x="30" y="11" textAnchor="middle" fill={enc.colorVar} fontSize="11" fontWeight="bold">✕</text>
                       )}
                     </svg>
-                    <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }} className="mono">
+                    <span style={{ fontSize: '11px', color: 'var(--ink-lo)' }} className="mono">
                       {enc.shape}
                     </span>
-                  </div>
-                  <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }}>
-                    {enc.label}
                   </div>
                 </div>
               );
@@ -360,176 +655,100 @@ export const MethodView: React.FC<MethodViewProps> = ({ onBack, configHash, worl
                 <div
                   className="encoding-card"
                   style={{
-                    backgroundColor: 'var(--branch-wash)',
+                    backgroundColor: 'var(--bg-sunken)',
                     border: '1px solid var(--branch)',
-                    boxShadow: 'var(--branch-glow)',
-                    borderRadius: 'var(--r-ctl)',
-                    padding: 'var(--s3)',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--s2)'
+                    gap: '8px',
+                    boxShadow: 'var(--branch-glow)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 'var(--fs-cap)', fontWeight: 600, color: 'var(--branch)' }}>{bEnc.concept}</span>
+                    <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--branch)' }}>{bEnc.concept}</span>
                     <StatusBadge status="BRANCH" label={bEnc.badgeText} />
                   </div>
-                  <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-hi)' }}>
-                    1px boundary + --branch-glow (the only sanctioned glow)
+                  <div style={{ fontSize: '11px', color: 'var(--ink-lo)' }} className="mono">
+                    1px boundary + glow
                   </div>
                 </div>
               );
             })()}
           </div>
 
-          {/* 19 Hand-authored SVG Icons Gallery (U1-10) */}
-          <h3 style={{ fontSize: 'var(--fs-body)', color: 'var(--ink-hi)', marginBottom: 'var(--s3)', margin: 0 }}>
-            Hand-Authored Domain SVG Icons (19 Items on 16px Grid)
-          </h3>
-          <div
-            id="icons-gallery"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-              gap: 'var(--s2)',
-              marginBottom: 'var(--s5)',
-              padding: 'var(--s3)',
-              backgroundColor: 'var(--bg-sunken)',
-              borderRadius: 'var(--r-ctl)',
-              border: '1px solid var(--line-hair)'
-            }}
-          >
-            {ALL_ICONS.map(({ name, Component }) => (
-              <div
-                key={name}
-                className="icon-card"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 'var(--s2)',
-                  backgroundColor: 'var(--bg-raised)',
-                  border: '1px solid var(--line-hair)',
-                  borderRadius: 'var(--r-chip)',
-                  gap: 'var(--s1)'
-                }}
-              >
-                <div style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Component size={16} />
+          {/* 19 Hand-authored SVG Icons Gallery */}
+          <div style={{ marginBottom: '18px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink-hi)', display: 'block', marginBottom: '10px' }}>
+              Hand-Authored Domain SVG Icons (19 Items on 16px Grid)
+            </span>
+            <div
+              id="icons-gallery"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+                gap: '8px',
+                padding: '12px',
+                backgroundColor: 'var(--bg-sunken)',
+                borderRadius: '12px',
+                border: '1px solid var(--line-hair)',
+              }}
+            >
+              {ALL_ICONS.map(({ name, Component }) => (
+                <div
+                  key={name}
+                  className="icon-card"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '10px 8px',
+                    backgroundColor: 'var(--bg-panel)',
+                    border: '1px solid var(--line-hair)',
+                    borderRadius: '8px',
+                    gap: '4px',
+                  }}
+                >
+                  <div style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Component size={16} />
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--ink-mid)' }} className="mono">
+                    {name}
+                  </span>
                 </div>
-                <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-mid)' }} className="mono">
-                  {name}
+              ))}
+            </div>
+          </div>
+
+          {/* Verification Audit Chips */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+            {/* U1-05 Tabular Numeral Verification */}
+            <div style={{ padding: '12px 14px', backgroundColor: 'var(--bg-sunken)', borderRadius: '10px', border: '1px solid var(--line-hair)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11.5px', color: 'var(--ink-mid)', fontWeight: 600 }}>Tabular Numerals Test:</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  id="cycle-digit-btn"
+                  type="button"
+                  onClick={() => setTabularDigit((d) => (d === 0 ? 8 : 0))}
+                  style={{ padding: '3px 8px', cursor: 'pointer', fontSize: '11px', borderRadius: '6px', background: 'var(--bg-panel)', border: '1px solid var(--line-hair)', color: 'var(--ink-hi)' }}
+                >
+                  Toggle
+                </button>
+                <span id="tabular-test-element" className="mono tabular" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink-hi)', minWidth: '16px', textAlign: 'center' }}>
+                  {tabularDigit}
                 </span>
               </div>
-            ))}
-          </div>
-
-          {/* U1-05 Tabular Numeral Verification Test Element */}
-          <div style={{ padding: 'var(--s3)', backgroundColor: 'var(--bg-sunken)', borderRadius: 'var(--r-ctl)', marginBottom: 'var(--s3)', border: '1px solid var(--line-hair)' }}>
-            <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)', textTransform: 'uppercase' }}>U1-05 Tabular Numerals Verification Slot: </span>
-            <button
-              id="cycle-digit-btn"
-              type="button"
-              onClick={() => setTabularDigit(d => (d === 0 ? 8 : 0))}
-              style={{ padding: '2px var(--s2)', marginLeft: 'var(--s2)', cursor: 'pointer', fontSize: 'var(--fs-micro)' }}
-            >
-              Toggle Digit
-            </button>
-            <span
-              id="tabular-test-element"
-              className="mono tabular"
-              style={{ display: 'inline-block', marginLeft: 'var(--s3)', fontSize: 'var(--fs-h2)', fontWeight: 600, color: 'var(--ink-hi)' }}
-            >
-              {tabularDigit}
-            </span>
-          </div>
-
-          {/* U1-06 MetricTile Null Safety Verification Slot */}
-          <div style={{ padding: 'var(--s3)', backgroundColor: 'var(--bg-sunken)', borderRadius: 'var(--r-ctl)', border: '1px solid var(--line-hair)' }}>
-            <span style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)', textTransform: 'uppercase', display: 'block', marginBottom: 'var(--s2)' }}>
-              U1-06 MetricTile Null Safety Verification Slot:
-            </span>
-            <div id="null-metric-test" style={{ maxWidth: '240px' }}>
-              <MetricTile label="Unreachable Facilities" value={null} unit="facilities" />
             </div>
-          </div>
-        </section>
 
-        {/* 5. Explicit Limits */}
-        <section style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)', marginBottom: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--fail)', margin: 0 }}>
-            5. Explicit Limitations & Boundaries
-          </h2>
-          <ul style={{ fontSize: 'var(--fs-cap)', lineHeight: 'var(--lh-prose)', paddingLeft: 'var(--s5)', color: 'var(--ink-mid)' }}>
-            <li>Zero probability or stochastic claims: KEYSTONE evaluates deterministic conditional worst-case reachability.</li>
-            <li>No population density data or live emergency dispatch integration.</li>
-            <li>
-              <code className="mono">wtp_wazirabad</code> is excluded from access SLA metrics because it sits 3.53 km from any modeled road node; snapping it would fabricate false connectivity.
-            </li>
-          </ul>
-        </section>
-
-        {/* 6. Accessibility & Reset Deck */}
-        <section style={{ backgroundColor: 'var(--bg-panel)', border: '1px solid var(--line-hair)', borderRadius: 'var(--r-panel)', padding: 'var(--s5)' }}>
-          <h2 style={{ fontSize: 'var(--fs-ui)', marginBottom: 'var(--s3)', color: 'var(--ink-hi)', margin: 0 }}>
-            6. Deck Settings & Verification Reset
-          </h2>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--s4)' }}>
-            <div>
-              <strong style={{ fontSize: 'var(--fs-body)' }}>Reduced Motion Mode</strong>
-              <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
-                Disables animated sever and route transitions for WCAG 2.1 AA compliance
+            {/* U1-06 MetricTile Null Safety */}
+            <div style={{ padding: '12px 14px', backgroundColor: 'var(--bg-sunken)', borderRadius: '10px', border: '1px solid var(--line-hair)' }}>
+              <div id="null-metric-test">
+                <MetricTile label="Unreachable Facilities" value={null} unit="facilities" />
               </div>
             </div>
-            <button
-              onClick={toggleReducedMotion}
-              style={{
-                padding: 'var(--s2) var(--s4)',
-                backgroundColor: reducedMotion ? 'var(--ok)' : 'var(--bg-raised)',
-                color: reducedMotion ? 'var(--bg-void)' : 'var(--ink-hi)',
-                border: '1px solid var(--line-hair)',
-                borderRadius: 'var(--r-ctl)',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: 'var(--fs-cap)',
-              }}
-            >
-              {reducedMotion ? 'Reduced Motion: ON' : 'Reduced Motion: OFF'}
-            </button>
           </div>
-
-          <div style={{ borderTop: '1px solid var(--line-hair)', paddingTop: 'var(--s4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <strong style={{ fontSize: 'var(--fs-body)' }}>Reset Incident Demo</strong>
-              <div style={{ fontSize: 'var(--fs-micro)', color: 'var(--ink-lo)' }}>
-                Clears memory, sweeps orphan branches, reloads pristine world
-              </div>
-            </div>
-            <button
-              id="reset-demo-btn"
-              onClick={handleResetDemo}
-              disabled={resetting}
-              style={{
-                padding: 'var(--s2) var(--s4)',
-                backgroundColor: 'var(--fail-wash)',
-                color: 'var(--fail)',
-                border: '1px solid var(--fail)',
-                borderRadius: 'var(--r-ctl)',
-                cursor: resetting ? 'not-allowed' : 'pointer',
-                fontWeight: 600,
-                fontSize: 'var(--fs-cap)',
-              }}
-            >
-              {resetting ? 'Resetting…' : 'Reset Demo Sequence'}
-            </button>
-          </div>
-          {resetMessage && (
-            <div style={{ marginTop: 'var(--s3)', fontSize: 'var(--fs-cap)', color: 'var(--accent)' }}>
-              {resetMessage}
-            </div>
-          )}
-        </section>
+        </div>
       </div>
     </div>
   );
